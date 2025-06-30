@@ -1,0 +1,63 @@
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[user]
+	name = Ananth Pullur
+	email = 106897936+Uncool-dudes@users.noreply.github.com
+[core]
+	editor = nvim
+  compression = 9
+  whitespace = error
+  preloadindex = true
+	pager = delta
+[advice]
+  addEmptyPathspec = false
+  pushNonFastForward = false
+  statusHints = false
+[url "git@github.com:"]
+  insteadOf = "gh:"
+[url "git@github.com:Uncool-dudes/"]
+  insteadOf = "uc:"
+[status]
+  branch = true
+  showStash = true
+  showUntrackedFiles = true
+[diff]
+  context = 3
+  renames = copies
+  interHunkContext = 10
+[pager]
+  diff = delta
+[interactive]
+	diffFilter = delta --color-only
+  singlekey = true
+[push]
+  autoSetupRemote = true
+  default = current
+  followTags = true
+[pull]
+  default = current
+  rebase = true
+[rebase]
+  autoStash = true
+  missingCommitsCheck = warn
+[alias]
+  cge = config --global --edit
+  cc = commit
+  cm = commit -m
+  pr = pull --rebase
+  bb = branch
+  ba = branch -a
+  aa = add -A
+  st = status -t
+  sta = status
+  g = checkout
+  edit = commit -a --amend
+  swh = show -w HEAD
+  lgf = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold cyan)%aD%C(reset) %C(bold green)(%ar)%C(reset)%C(auto)%d%C(reset)%n''          %C(white)%s%C(reset) %C(dim white)- %an%C(reset)'
+  lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)' --all
+
+[delta]
+	navigate = true
+[merge]
+	conflictStyle = zdiff3
