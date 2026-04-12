@@ -1,0 +1,146 @@
+# ── Instant Prompt ──────────────────────────────────────────────
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+# ── Zsh Options ─────────────────────────────────────────────────
+setopt CORRECT
+setopt GLOB_DOTS
+setopt NO_CASE_GLOB
+setopt PIPE_FAIL
+setopt INTERACTIVE_COMMENTS
+
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+
+# ── Environment ─────────────────────────────────────────────────
+export EDITOR='nvim'
+export VISUAL='code'
+
+typeset -U path
+path=(
+  "$HOME/.local/bin"
+  "$HOME/go/bin"
+  "$HOME/.cargo/bin"
+  "$HOME/.pnpm-global/bin"
+  $path
+)
+
+# ── Oh My Zsh ───────────────────────────────────────────────────
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME="powerlevel10k/powerlevel10k"
+DISABLE_MAGIC_FUNCTIONS=true
+zstyle ':omz:plugins:ssh-agent' quiet yes
+
+plugins=(
+  colored-man-pages
+  gitignore
+  sudo
+  extract
+  ssh-agent
+  zsh-autosuggestions
+)
+
+source $ZSH/oh-my-zsh.sh
+
+# ── Aliases ─────────────────────────────────────────────────────
+# Replacements
+alias cat='bat'
+alias mkdir='mkdir -p'
+alias ls='eza'
+alias ll='eza --icons --git'
+alias lt='eza --icons --git --tree'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+
+# Systemctl
+alias sc-start='sudo systemctl start'
+alias sc-stop='sudo systemctl stop'
+alias sc-reload='sudo systemctl reload'
+alias sc-restart='sudo systemctl restart'
+alias sc-try-restart='sudo systemctl try-restart'
+alias sc-enable='sudo systemctl enable'
+alias sc-disable='sudo systemctl disable'
+alias sc-reenable='sudo systemctl reenable'
+
+# Global pipes
+alias -g G='| rg'
+alias -g L='| less'
+alias -g H='| head'
+alias -g T='| tail'
+alias -g C='| wc -l'
+alias -g J='| jq .'
+alias -g S='| sort'
+alias -g U='| sort -u'
+alias -g K='| awk "{print \$2}" | xargs -r kill -9'
+alias -g F='| fzf'
+
+# Global redirects
+alias -g NE='2>/dev/null'
+alias -g NUL='>/dev/null 2>&1'
+
+# Utils
+alias fp='ps aux F K'
+alias fk='ss -tlnp NE F K'
+
+# ── Functions ───────────────────────────────────────────────────
+function upgrade() {
+  sudo pacman -Sy
+
+  echo ":: Checking Arch Linux PGP Keyring..."
+  local installedver="$(LANG= sudo pacman -Qi archlinux-keyring | grep -Po '(?<=Version         : ).*')"
+  local currentver="$(LANG= sudo pacman -Si archlinux-keyring | grep -Po '(?<=Version         : ).*')"
+
+  if [ "$installedver" != "$currentver" ]; then
+    echo " Arch Linux PGP Keyring is out of date."
+    echo " Updating before full system upgrade."
+    sudo pacman -S --needed --noconfirm archlinux-keyring
+  else
+    echo " Arch Linux PGP Keyring is up to date."
+    echo " Proceeding with full system upgrade."
+  fi
+
+  if (( $+commands[yay] )); then
+    yay -Su
+  elif (( $+commands[paru] )); then
+    paru -Su
+  else
+    sudo pacman -Su
+  fi
+}
+
+function auto_venv() {
+  if [[ -d .venv ]]; then
+    source .venv/bin/activate
+  elif [[ -d venv ]]; then
+    source venv/bin/activate
+  elif [[ -n "$VIRTUAL_ENV" ]]; then
+    deactivate
+  fi
+}
+
+add-zsh-hook chpwd auto_venv
+
+# ── External Tools ──────────────────────────────────────────────
+# delta
+alias diff='delta'
+
+# pnpm
+eval "$(pnpm completion zsh)"
+
+# zoxide
+eval "$(zoxide init zsh --cmd cd)"
+
+# atuin
+eval "$(atuin init zsh)"
+
+# syntax highlighting (must be last)
+if [[ "$(uname)" == "Darwin" ]]; then
+  source "$(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+elif [[ -f /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh ]]; then
+  source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+fi
+
+# ── Prompt ──────────────────────────────────────────────────────
+[[ ! -f ~/.config/zsh/.p10k.zsh ]] || source ~/.config/zsh/.p10k.zsh
