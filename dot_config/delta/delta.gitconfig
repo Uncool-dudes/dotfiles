@@ -1,0 +1,30 @@
+[core]
+    pager = delta
+
+[pager]
+    diff = delta
+    blame = delta --features=blame
+    log = delta --features=log
+
+[interactive]
+    diffFilter = delta --color-only
+
+[delta]
+    navigate = true
+    side-by-side = true
+    line-numbers = true
+    hyperlinks = true
+    keep-plus-minus-markers = false
+    tabs = 4
+    syntax-theme = oxocarbon-dark
+    blame-palette = "#161616 #1e1e1e #262626"
+    merge-conflict-begin-symbol = ▼
+    merge-conflict-end-symbol = ▲
+    file-modified-label = Δ
+    right-arrow = '⟶  '
+
+[delta "blame"]
+    side-by-side = false
+
+[delta "log"]
+    side-by-side = false

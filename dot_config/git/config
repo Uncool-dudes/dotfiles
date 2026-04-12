@@ -1,0 +1,201 @@
+# ╔══════════════════════════════════════════╗
+# ║          NATIVE GIT CONFIG               ║
+# ╚══════════════════════════════════════════╝
+
+[user]
+	name = Ananth Pullur
+	email = 106897936+Uncool-dudes@users.noreply.github.com
+
+[core]
+	compression = 9
+	whitespace = error
+	preloadindex = true
+	fsmonitor = true
+	untrackedCache = true
+	quotePath = false
+	excludesFile = ~/.gitignore_global
+
+[init]
+	defaultBranch = main
+
+[advice]
+	addEmptyPathspec = false
+	pushNonFastForward = false
+	statusHints = false
+
+[help]
+	autocorrect = prompt
+
+[color]
+	ui = auto
+
+[commit]
+	verbose = true
+
+[status]
+	branch = true
+	showStash = true
+	showUntrackedFiles = true
+	submoduleSummary = true
+
+[log]
+	abbrevCommit = true
+	decorate = true
+	date = relative
+
+[format]
+	pretty = format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'
+
+[branch]
+	sort = -committerdate
+
+[column]
+	ui = auto
+
+[tag]
+	sort = -version:refname
+
+[submodule]
+	recurse = true
+	fetchJobs = 4
+
+[diff]
+	context = 3
+	renames = copies
+	interHunkContext = 10
+	algorithm = histogram
+	colorMoved = dimmed-zebra
+	colorMovedWS = allow-indentation-change
+	mnemonicPrefix = true
+	wsErrorHighlight = all
+	submodule = log
+
+[merge]
+	conflictStyle = zdiff3
+	log = 20
+	autoStash = true
+
+[push]
+	autoSetupRemote = true
+	default = current
+	followTags = true
+	recurseSubmodules = on-demand
+
+[fetch]
+	prune = true
+	fsckObjects = true
+	recurseSubmodules = on-demand
+
+[pull]
+	default = current
+	rebase = true
+
+[rebase]
+	autoStash = true
+	missingCommitsCheck = warn
+
+[rerere]
+	enabled = true
+
+[stash]
+	showPatch = true
+
+[grep]
+	lineNumber = true
+	extendedRegexp = true
+
+[transfer]
+	fsckObjects = true
+
+[receive]
+	fsckObjects = true
+
+[interactive]
+	singlekey = true
+
+[url "git@github.com:"]
+	insteadOf = "gh:"
+
+[url "git@github.com:Uncool-dudes/"]
+	insteadOf = "uc:"
+
+[alias]
+	# Config
+	ec = config --global --edit
+
+	# Staging
+	a = add -A
+	ap = add -p
+
+	# Commits
+	c = commit
+	cm = commit -m
+	amend = commit --amend --no-edit
+	reword = commit --amend
+
+	# Branches
+	b = branch
+	ba = branch -a
+	sw = switch
+	swc = switch -c
+	co = checkout
+
+	# Status & Info
+	s = status -sb
+	d = diff
+	staged = diff --staged
+  last = show -w HEAD
+
+	# History
+	lg = log --graph --all
+	tree = log --graph --oneline --all --decorate
+
+	# Push & Pull
+	p = push
+	pf = push --force-with-lease
+	pl = pull --rebase
+
+	# Stash
+	ss = stash
+	sp = stash pop
+	sl = stash list
+
+	# Undo
+	undo = reset HEAD~1 --soft
+	nuke = reset --hard HEAD
+	unstage = restore --staged
+
+	# Submodules
+	sub = submodule update --remote --rebase
+
+	# Housekeeping
+  gone = "!git branch -vv | rg ': gone]' | awk '{print $1}' | xargs git branch -D"
+  prune-merged = "!git branch --merged | rg -v '\\*|main|master' | xargs -n 1 git branch -d"
+
+
+# ╔══════════════════════════════════════════╗
+# ║     EXTERNAL DEPENDENCIES                ║
+# ║     delta, meld, nvim, gh cli            ║
+# ╚══════════════════════════════════════════╝
+
+[core]
+	editor = nvim
+
+[diff]
+	tool = nvimdiff
+	guitool = meld
+
+[merge]
+	tool = nvimdiff
+	guitool = meld
+
+[include]
+	path = ~/.config/delta/delta.gitconfig
+
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
