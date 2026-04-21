@@ -2,7 +2,7 @@
 return {
   {
     "bufferline.nvim",
-    enabled = false,
+    enabled = true,
   },
   {
     "snacks.nvim",

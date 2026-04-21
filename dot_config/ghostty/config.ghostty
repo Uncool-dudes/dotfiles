@@ -1,6 +1,6 @@
 # ── Core ─────────────────────────────────────────────────────────
 shell-integration = zsh
-font-family = GeistMono NF
+font-family = VictorMono NF
 font-size = 18
 adjust-cell-height = 2
 theme = Oxocarbon
@@ -30,8 +30,6 @@ keybind = ctrl+0=reset_font_size
 
 # ── Linux (Hyprland/Wayland) ─────────────────────────────────────
 gtk-single-instance = true
-window-decoration = false
-background-blur = 20
 
 # ── macOS ────────────────────────────────────────────────────────
 # macos-titlebar-style = hidden

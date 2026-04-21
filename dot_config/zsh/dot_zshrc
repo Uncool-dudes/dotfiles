@@ -126,6 +126,8 @@ add-zsh-hook chpwd auto_venv
 # delta
 alias diff='delta'
 
+# chezmoi
+eval "$(chezmoi completion zsh)"
 # pnpm
 eval "$(pnpm completion zsh)"
 
