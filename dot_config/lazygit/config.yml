@@ -1,0 +1,99 @@
+gui:
+  skipAmendWarning: true
+  skipStashWarning: true
+  skipNoStagedFilesWarning: true
+  showNumstatInFilesView: true
+  showRandomTip: false
+  showDivergenceFromBaseBranch: arrowAndNumber
+  nerdFontsVersion: "3"
+  filterMode: fuzzy
+  border: hidden
+  animateExplosion: true
+  gui:
+  theme:
+    activeBorderColor:
+      - "#be95ff"
+      - bold
+    inactiveBorderColor:
+      - "#525252"
+    searchingActiveBorderColor:
+      - "#3ddbd9"
+      - bold
+    optionsTextColor:
+      - "#78a9ff"
+    selectedLineBgColor:
+      - "#393939"
+    inactiveViewSelectedLineBgColor:
+      - "#262626"
+    cherryPickedCommitFgColor:
+      - "#ff7eb6"
+    cherryPickedCommitBgColor:
+      - "#262626"
+    markedBaseCommitFgColor:
+      - "#161616"
+    markedBaseCommitBgColor:
+      - "#be95ff"
+    unstagedChangesColor:
+      - "#ee5396"
+    defaultFgColor:
+      - "#f2f4f8"
+git:
+  pagers:
+    - pager: delta --paging=never
+      colorArg: always
+  autoForwardBranches: allBranches
+  diffContextSize: 5
+  parseEmoji: true
+os:
+  editPreset: nvim
+customCommands:
+  # interactive rebase from selected commit
+  - key: "E"
+    context: "commits"
+    command: "git rebase -i {{.SelectedLocalCommit.Hash}}^"
+    description: "Interactive rebase from this commit"
+    output: terminal
+  # copy branch name to clipboard
+  - key: "Y"
+    context: "localBranches"
+    command: "echo -n {{.SelectedLocalBranch.Name}} | wl-copy"
+    description: "Copy branch name"
+  # open in neovim at repo root
+  - key: "<c-n>"
+    context: "global"
+    command: "nvim"
+    description: "Open nvim"
+    output: terminal
+  # fetch and prune dead remote branches
+  - key: "<c-f>"
+    context: "localBranches"
+    command: "git fetch --prune"
+    description: "Fetch and prune"
+    loadingText: "Fetching..."
+  # push with --force-with-lease (safer force push)
+  - key: "<c-p>"
+    context: "global"
+    command: "git push --force-with-lease"
+    description: "Force push (lease)"
+    loadingText: "Force pushing..."
+    prompts:
+      - type: "confirm"
+        title: "Force push"
+        body: "Are you sure you want to force push (with lease)?"
+  # diff against main
+  - key: "M"
+    context: "localBranches"
+    command: "git diff main...{{.SelectedLocalBranch.Name}}"
+    description: "Diff branch against main"
+    output: terminal
+  # open file in nvim from files panel
+  - key: "O"
+    context: "files"
+    command: "nvim {{.SelectedFile.Name}}"
+    description: "Open in nvim"
+    output: terminal
+  - key: "B"
+    context: "localBranches"
+    command: "git diff $(git merge-base {{.SelectedLocalBranch.Name}} HEAD)..HEAD"
+    description: "Diff current branch against selected branch's merge base"
+    output: terminal
