@@ -1,0 +1,138 @@
+# ~/.config/starship.toml
+# Matches a p10k-style layout: dir | git | lang versions | status on right
+# Palette inspired by oxocarbon
+
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Wait 10ms for git to respond
+command_timeout = 1000
+
+format = """
+$os\
+$directory\
+$git_branch\
+$git_status\
+$git_state\
+$fill\
+$golang\
+$nodejs\
+$python\
+$rust\
+$cmd_duration\
+$line_break\
+$character"""
+
+# ── Palette ─────────────────────────────────────────────────────
+palette = "oxocarbon"
+
+[palettes.oxocarbon]
+base00 = "#161616"   # background
+base01 = "#262626"   # surface
+base02 = "#393939"   # overlay
+base03 = "#525252"   # muted
+base04 = "#dde1e6"   # subtle
+base05 = "#f2f4f8"   # text
+base06 = "#ffffff"   # bright
+blue   = "#78a9ff"
+cyan   = "#33b1ff"
+green  = "#42be65"
+yellow = "#ffe97b"
+orange = "#ff7eb6"   # p10k uses this for errors
+red    = "#ee5396"
+purple = "#be95ff"
+teal   = "#08bdba"
+
+# ── OS icon ─────────────────────────────────────────────────────
+[os]
+disabled = false
+format = "[$symbol]($style) "
+style = "fg:base04"
+
+[os.symbols]
+Macos = ""
+Arch = ""
+Linux = ""
+
+# ── Directory ───────────────────────────────────────────────────
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style) "
+style = "bold fg:blue"
+read_only = " 󰌾"
+read_only_style = "fg:red"
+truncation_length = 4
+truncate_to_repo = true
+home_symbol = "~"
+
+[directory.substitutions]
+"Documents" = "󰈙"
+"Downloads" = ""
+"projects"  = "󰲋"
+
+# ── Git ─────────────────────────────────────────────────────────
+[git_branch]
+format = "[$symbol$branch(:$remote_branch)]($style) "
+symbol = " "
+style = "fg:purple"
+truncation_length = 24
+truncation_symbol = "…"
+
+[git_status]
+format = "([$all_status$ahead_behind]($style) )"
+style = "fg:yellow"
+conflicted = "~"
+ahead = "⇡${count}"
+behind = "⇣${count}"
+diverged = "⇕⇡${ahead_count}⇣${behind_count}"
+untracked = "?${count}"
+stashed = "*"
+modified = "!${count}"
+staged = "+${count}"
+renamed = "»${count}"
+deleted = "✘${count}"
+
+[git_state]
+format = "[$state($progress_current/$progress_total)]($style) "
+style = "fg:orange"
+
+# ── Fill ────────────────────────────────────────────────────────
+# Pushes right-side modules to the right
+[fill]
+symbol = " "
+
+# ── Language versions (right side) ──────────────────────────────
+[golang]
+format = "[$symbol$version]($style) "
+symbol = " "
+style = "fg:cyan"
+detect_files = ["go.mod", "go.sum", "*.go"]
+
+[nodejs]
+format = "[$symbol$version]($style) "
+symbol = " "
+style = "fg:green"
+detect_files = ["package.json", ".nvmrc"]
+
+[python]
+format = "[$symbol$version( $virtualenv)]($style) "
+symbol = " "
+style = "fg:yellow"
+detect_files = [".python-version", "pyproject.toml", "requirements.txt"]
+
+[rust]
+format = "[$symbol$version]($style) "
+symbol = " "
+style = "fg:orange"
+detect_files = ["Cargo.toml"]
+
+# ── Command duration ────────────────────────────────────────────
+[cmd_duration]
+format = "[ $duration]($style) "
+style = "fg:base03"
+min_time = 2_000        # only show if command took > 2s
+show_milliseconds = false
+
+# ── Prompt character ────────────────────────────────────────────
+[character]
+success_symbol = "[❯](bold fg:green)"
+error_symbol   = "[❯](bold fg:red)"
+vimcmd_symbol  = "[❮](bold fg:purple)"   # shows in vi normal mode
