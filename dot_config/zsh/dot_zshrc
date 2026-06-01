@@ -162,6 +162,7 @@ _cache_eval() {
 
 _cache_eval chezmoi completion zsh
 _cache_eval pnpm    completion zsh
+_cache_eval mise    completion zsh
 _cache_eval zoxide  init zsh --cmd cd
 _cache_eval direnv  hook zsh
 _cache_eval atuin   init zsh
@@ -176,3 +177,9 @@ _cache_eval atuin   init zsh
 if (( $+commands[starship] )); then
   _cache_eval starship init zsh
 fi
+
+# ── Keybindings ─────────────────────────────────────────────────
+export WORDCHARS=''
+
+bindkey '^[[1;3C' forward-word
+bindkey '^[[1;3D' backward-word
