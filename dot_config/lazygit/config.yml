@@ -46,3 +46,14 @@ git:
   parseEmoji: true
 os:
   editPreset: nvim
+customCommands:
+  - key: "c"
+    context: "files"
+    description: "convco commit"
+    command: "convco commit"
+    output: terminal
+  - key: "C"
+    context: "files"
+    description: "convco commit --amend"
+    command: "convco commit --amend"
+    output: terminal

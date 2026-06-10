@@ -83,6 +83,7 @@
 
 [fetch]
 	prune = true
+  pruneTags = true
 	fsckObjects = true
 	recurseSubmodules = on-demand
 
@@ -91,8 +92,10 @@
 	rebase = true
 
 [rebase]
+  abbreviateCommands = true 
 	autoStash = true
 	missingCommitsCheck = warn
+  updateRefs = true
 
 [rerere]
 	enabled = true

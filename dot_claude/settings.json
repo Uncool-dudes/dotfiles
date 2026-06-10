@@ -57,7 +57,14 @@
       }
     }
   },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "effortLevel": "medium",
+  "tui": "fullscreen",
   "theme": "dark-ansi",
+  "preferredNotifChannel": "ghostty",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true
 }
