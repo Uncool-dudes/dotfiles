@@ -9,17 +9,23 @@
     };
   };
 
-  outputs = { nixpkgs, home-manager, ... }:
+  outputs =
+    { nixpkgs, home-manager, ... }:
     let
-      system = builtins.currentSystem;
-      username = builtins.getEnv "USER";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
+      system = "aarch64-darwin";
+      username = "uncool";
+      pkgs = import nixpkgs {
+        inherit system;
+        config.allowUnfree = true;
+      };
+    in
+    {
       homeConfigurations.default = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [
           ./modules/common.nix
-          ./modules/linux.nix
+          ./modules/shell.nix
+          (if pkgs.stdenv.isDarwin then ./modules/darwin.nix else ./modules/linux.nix)
         ];
         extraSpecialArgs = { inherit username; };
       };

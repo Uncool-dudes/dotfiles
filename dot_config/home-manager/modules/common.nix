@@ -1,37 +1,49 @@
 # modules/common.nix
-# Full environment shared across all machines
+# Packages shared across all machines
 { pkgs, username, ... }: {
 
   home.username = username;
-  home.homeDirectory = builtins.getEnv "HOME";
+  home.homeDirectory = "/Users/${username}";
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
 
+  home.sessionPath = [
+    "$HOME/.nix-profile/bin"
+    "/nix/var/nix/profiles/default/bin"
+    "$HOME/.local/bin"
+    "$HOME/go/bin"
+    "$HOME/.cargo/bin"
+    "$HOME/.pnpm-global/bin"
+  ];
+
   home.packages = with pkgs; [
     # Shell
-    zsh
-    atuin
-    starship
+    antidote
     chezmoi
-    direnv
-    mise
+    navi
+    tealdeer
 
     # Core CLI
     git
     bat
     eza
     fd
-    fzf
     ripgrep
     delta
-    zoxide
     procs
     hl-log-viewer
+    sd
+    grex
+    xh
+    watchexec
 
     # Git
     lazygit
     github-cli
+    gitleaks
+    convco
+    lefthook
 
     # Editor
     neovim
@@ -45,12 +57,55 @@
     # Node
     pnpm
 
+    # Python
+    uv
+
     # Claude
     claude-code
 
-    # GUI — cross platform
-    ghostty
-    _1password-gui
-    chromium
+    # Text / data
+    jq
+    fx
+    gum
+    tokei
+    pandoc
+
+    # Task runner
+    just
+
+    # System / monitoring
+    btop
+    dust
+    duf
+    hyperfine
+    dive
+
+    # Media
+    ffmpeg
+    yt-dlp
+    imagemagick
+
+    # Dev
+    typst
+    croc
+    graphviz
+    nmap
+    tectonic
+
+    # Nix
+    nixfmt
+    nil
+    nvd
+    statix
+    deadnix
+
+    # Secrets
+    _1password-cli
+
+    # Misc
+    tmux
+    onefetch
+    fastfetch
+    wget
   ];
 }
