@@ -55,6 +55,7 @@
     rustup
 
     # Node
+    nodejs
     pnpm
 
     # Python

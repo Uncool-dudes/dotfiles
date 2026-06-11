@@ -1,3 +1,5 @@
+autoload -Uz add-zsh-hook
+
 # ── Functions ────────────────────────────────────────────────────
 function upgrade() {
   sudo pacman -Sy
@@ -20,18 +22,7 @@ function upgrade() {
     sudo pacman -Su
   fi
 }
- 
-function auto_venv() {
-  if [[ -d .venv ]]; then
-    [[ "$VIRTUAL_ENV" != "$PWD/.venv" ]] && source .venv/bin/activate
-  elif [[ -d venv ]]; then
-    [[ "$VIRTUAL_ENV" != "$PWD/venv" ]] && source venv/bin/activate
-  elif [[ -n "$VIRTUAL_ENV" ]]; then
-    [[ "$PWD" != "${VIRTUAL_ENV%/*}"* ]] && deactivate
-  fi
-}
-add-zsh-hook chpwd auto_venv
- 
+
 function fp() { ps aux | fzf --height 40% | awk '{print $2}' | xargs -r kill -9 }
 function fk() { ss -tlnp 2>/dev/null | fzf --height 40% }
 function tarzst() { tar --use-compress-program=zstd -cvf "${1}.tar.zst" "$1" }
@@ -39,11 +30,22 @@ function zsh-update-plugins() {
   antidote bundle < "${ZDOTDIR:-$HOME}/.zsh_plugins.txt" > "${ZDOTDIR:-$HOME}/.zsh_plugins.zsh"
   exec zsh
 }
- 
-# ── Completions ──────────────────────────────────────────────────
-source <(chezmoi completion zsh)
-source <(pnpm completion zsh)
- 
-# ── Keybindings ──────────────────────────────────────────────────
-bindkey '^[[1;3C' forward-word
-bindkey '^[[1;3D' backward-wordindkey '^[[1;3D' backward-word
+
+# ── Cached eval ──────────────────────────────────────────────────
+_cache_eval() {
+  local name="$1"
+  local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/${name}.zsh"
+  local bin="${commands[$name]:-$(whence $name 2>/dev/null)}"
+  if [[ ! -f "$cache" || -z "$bin" || "$cache" -ot "$bin" ]]; then
+    mkdir -p "${cache:h}"
+    "$name" "${@:2}" > "$cache" 2>/dev/null
+  fi
+  [[ -f "$cache" ]] && source "$cache"
+}
+
+_cache_eval chezmoi completion zsh
+_cache_eval pnpm    completion zsh
+_cache_eval zoxide  init zsh --cmd cd
+_cache_eval direnv  hook zsh
+_cache_eval atuin   init zsh
+(( $+commands[starship] )) && _cache_eval starship init zsh

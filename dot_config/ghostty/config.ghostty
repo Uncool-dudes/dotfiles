@@ -1,8 +1,8 @@
 # ── Core ─────────────────────────────────────────────────────────
 shell-integration = zsh
-font-family = VictorMono NF
+font-family = Iosevka NFM Light
 font-size = 18
-adjust-cell-height = 2
+adjust-cell-height = 5
 theme = Oxocarbon
 
 cursor-style = bar
@@ -33,4 +33,4 @@ gtk-single-instance = true
 
 # ── macOS ────────────────────────────────────────────────────────
 # macos-titlebar-style = hidden
-# macos-option-as-alt = true
+macos-option-as-alt = true

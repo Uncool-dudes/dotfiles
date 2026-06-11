@@ -36,7 +36,7 @@
 	branch = true
 	showStash = true
 	showUntrackedFiles = true
-	submoduleSummary = true
+	; submoduleSummary = true
 
 [log]
 	abbrevCommit = true

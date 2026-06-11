@@ -7,22 +7,20 @@
   ...
 }:
 {
-
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
-
     antidote = {
       enable = true;
       plugins = [
-        "zsh-users/zsh-autosuggestions"
+        "romkatv/zsh-defer"
         "zsh-users/zsh-completions kind:fpath"
-        "ohmyzsh/ohmyzsh path:plugins/sudo/sudo.plugin.zsh"
-        "ohmyzsh/ohmyzsh path:plugins/ssh-agent/ssh-agent.plugin.zsh"
-        "zdharma-continuum/fast-syntax-highlighting"
+        "ohmyzsh/ohmyzsh path:lib/key-bindings.zsh"
+        "zsh-users/zsh-autosuggestions kind:defer"
+        "ohmyzsh/ohmyzsh path:plugins/sudo/sudo.plugin.zsh kind:defer"
+        "zdharma-continuum/fast-syntax-highlighting kind:defer"
       ];
     };
-
     setOptions = [
       "CORRECT"
       "GLOB_DOTS"
@@ -30,18 +28,18 @@
       "PIPE_FAIL"
       "INTERACTIVE_COMMENTS"
     ];
-
     completionInit = ''
       autoload -Uz compinit
+      setopt EXTENDED_GLOB
       if [[ -n ''${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+24) ]]; then
         compinit
       else
         compinit -C
       fi
+      unsetopt EXTENDED_GLOB
       zstyle ':completion:*' menu select
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
     '';
-
     sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
@@ -49,7 +47,6 @@
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       WORDCHARS = "";
     };
-
     shellAliases = {
       lz = "lazygit";
       cat = "bat";
@@ -74,7 +71,6 @@
       sc-disable = "sudo systemctl disable";
       sc-reenable = "sudo systemctl reenable";
     };
-
     shellGlobalAliases = {
       G = "| rg";
       L = "| less";
@@ -88,34 +84,27 @@
       NE = "2>/dev/null";
       NUL = ">/dev/null 2>&1";
     };
-
     initContent = builtins.readFile ./zsh/extra.zsh;
   };
-
   programs.starship = {
     enable = true;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
   };
-
   programs.atuin = {
     enable = true;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
   };
-
   programs.fzf = {
     enable = true;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
   };
-
   programs.zoxide = {
     enable = true;
-    enableZshIntegration = true;
-    options = [ "--cmd cd" ];
+    enableZshIntegration = false;
   };
-
   programs.direnv = {
     enable = true;
     nix-direnv.enable = true;
-    enableZshIntegration = true;
+    enableZshIntegration = false;
   };
 }
