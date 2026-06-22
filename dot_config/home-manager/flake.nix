@@ -31,8 +31,8 @@
               };
           in {
             "uncool@mac"    = mkHome { system = "aarch64-darwin"; extraModules = [ ./modules/darwin.nix ]; };
-            "uncool@ubuntu" = mkHome { system = "x86_64-linux";   extraModules = [ ./modules/linux.nix  ]; };
-            "uncool@arch"   = mkHome { system = "x86_64-linux";   extraModules = [ ./modules/linux.nix  ]; };
+            "uncool@ubuntu" = mkHome { system = "x86_64-linux";   extraModules = [ ./modules/ubuntu.nix ]; };
+            "uncool@arch"   = mkHome { system = "x86_64-linux";   extraModules = [ ./modules/arch.nix   ]; };
           };
       };
     };

@@ -1,39 +1,19 @@
 autoload -Uz add-zsh-hook
 
 # ── Functions ────────────────────────────────────────────────────
-function upgrade() {
-  sudo pacman -Sy
-  echo ":: Checking Arch Linux PGP Keyring..."
-  local installedver="$(LANG= sudo pacman -Qi archlinux-keyring | grep -Po '(?<=Version         : ).*')"
-  local currentver="$(LANG= sudo pacman -Si archlinux-keyring | grep -Po '(?<=Version         : ).*')"
-  if [ "$installedver" != "$currentver" ]; then
-    echo " Arch Linux PGP Keyring is out of date."
-    echo " Updating before full system upgrade."
-    sudo pacman -S --needed --noconfirm archlinux-keyring
+function fp() { ps aux | fzf --height 40% | awk '{print $2}' | xargs -r kill -9 }
+function fport() {
+  if [[ "$OSTYPE" == darwin* ]]; then
+    lsof -iTCP -sTCP:LISTEN -n -P | fzf --height 40%
   else
-    echo " Arch Linux PGP Keyring is up to date."
-    echo " Proceeding with full system upgrade."
-  fi
-  if (( $+commands[yay] )); then
-    yay -Su
-  elif (( $+commands[paru] )); then
-    paru -Su
-  else
-    sudo pacman -Su
+    ss -tlnp | fzf --height 40%
   fi
 }
-
-function fp() { ps aux | fzf --height 40% | awk '{print $2}' | xargs -r kill -9 }
-function fk() { ss -tlnp 2>/dev/null | fzf --height 40% }
 function tarzst() {
   local dest="${2:-.}"
   local name
   name="$(basename "$1")"
   tar --use-compress-program=zstd -cvf "${dest}/${name}.tar.zst" "$1"
-}
-function zsh-update-plugins() {
-  antidote bundle < "${ZDOTDIR:-$HOME}/.zsh_plugins.txt" > "${ZDOTDIR:-$HOME}/.zsh_plugins.zsh"
-  exec zsh
 }
 
 # ── Cached eval ──────────────────────────────────────────────────

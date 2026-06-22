@@ -1,5 +1,5 @@
-# modules/linux.nix
-# Hyprland and Linux-only packages
+# modules/arch.nix
+# Arch Linux / Hyprland-specific packages
 { pkgs, ... }: {
   home.packages = with pkgs; [
     hyprlauncher
