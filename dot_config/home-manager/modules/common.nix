@@ -21,16 +21,20 @@
     # Shell
     antidote
     chezmoi
-    navi
     tealdeer
 
     # Core CLI
     git
+    age
     bat
     eza
+    csvlens
+    miller
+    tilt
     fd
     ripgrep
     delta
+    whosthere
     procs
     hl-log-viewer
     sd
@@ -40,16 +44,23 @@
 
     # Git
     lazygit
+    git-absorb
     github-cli
+    gitflow
     gitleaks
     convco
+    glow
+    mpv
     lefthook
 
     # Editor
     neovim
+    sqlfluff
+    black
 
     # Go
     go
+    golangci-lint
 
     # Rust
     rustup

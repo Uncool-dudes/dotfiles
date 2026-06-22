@@ -25,7 +25,12 @@ function upgrade() {
 
 function fp() { ps aux | fzf --height 40% | awk '{print $2}' | xargs -r kill -9 }
 function fk() { ss -tlnp 2>/dev/null | fzf --height 40% }
-function tarzst() { tar --use-compress-program=zstd -cvf "${1}.tar.zst" "$1" }
+function tarzst() {
+  local dest="${2:-.}"
+  local name
+  name="$(basename "$1")"
+  tar --use-compress-program=zstd -cvf "${dest}/${name}.tar.zst" "$1"
+}
 function zsh-update-plugins() {
   antidote bundle < "${ZDOTDIR:-$HOME}/.zsh_plugins.txt" > "${ZDOTDIR:-$HOME}/.zsh_plugins.zsh"
   exec zsh
@@ -49,3 +54,5 @@ _cache_eval zoxide  init zsh --cmd cd
 _cache_eval direnv  hook zsh
 _cache_eval atuin   init zsh
 (( $+commands[starship] )) && _cache_eval starship init zsh
+
+export DIRENV_LOG_FORMAT=""
