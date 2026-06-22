@@ -3,7 +3,7 @@
 command_timeout = 1000
 scan_timeout = 30
 
-format = "$directory$git_branch$git_status$cmd_duration$character"
+format = "$directory$git_branch$git_status$nix_shell$direnv$cmd_duration$character"
 
 palette = "oxocarbon"
 
@@ -38,6 +38,24 @@ truncation_symbol = "…"
 format = "([$conflicted]($style) )"
 style = "bold fg:pink"
 conflicted = "~"
+
+[direnv]
+disabled = false
+format = '[$symbol](fg:muted)[$allowed]($style) '
+symbol = "⚿ "
+style = "bold fg:teal"
+allowed_msg = "✓"
+denied_msg = "✗"
+not_allowed_msg = "?"
+
+[nix_shell]
+format = '[$symbol$state( \($name\))]($style) '
+symbol = "❄ "
+style = "bold fg:cyan"
+pure_msg = "✓"
+impure_msg = "✗"
+unknown_msg = "?"
+heuristic = true
 
 [fill]
 symbol = " "
