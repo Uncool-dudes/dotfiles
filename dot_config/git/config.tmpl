@@ -1,10 +1,11 @@
 # ╔══════════════════════════════════════════╗
-# ║          NATIVE GIT CONFIG               ║
+# ║          GIT CONFIG                      ║
 # ╚══════════════════════════════════════════╝
 
 [user]
 	name = Ananth Pullur
 	email = 106897936+Uncool-dudes@users.noreply.github.com
+	signingkey = {{ onepasswordRead "op://Personal/ks42nayh7uclm6mhmclydhncpm/public key" }}
 
 [core]
 	compression = 9
@@ -14,6 +15,7 @@
 	untrackedCache = true
 	quotePath = false
 	excludesFile = ~/.gitignore_global
+	editor = nvim
 
 [init]
 	defaultBranch = main
@@ -31,6 +33,7 @@
 
 [commit]
 	verbose = true
+	gpgsign = true
 
 [status]
 	branch = true
@@ -54,6 +57,7 @@
 
 [tag]
 	sort = -version:refname
+	gpgsign = true
 
 [submodule]
 	recurse = true
@@ -69,11 +73,15 @@
 	mnemonicPrefix = true
 	wsErrorHighlight = all
 	submodule = log
+	tool = nvimdiff
+	guitool = meld
 
 [merge]
 	conflictStyle = zdiff3
 	log = 20
 	autoStash = true
+	tool = nvimdiff
+	guitool = meld
 
 [push]
 	autoSetupRemote = true
@@ -83,19 +91,18 @@
 
 [fetch]
 	prune = true
-  pruneTags = true
+	pruneTags = true
 	fsckObjects = true
 	recurseSubmodules = on-demand
 
 [pull]
-	default = current
 	rebase = true
 
 [rebase]
-  abbreviateCommands = true 
+	abbreviateCommands = true
 	autoStash = true
 	missingCommitsCheck = warn
-  updateRefs = true
+	updateRefs = true
 
 [rerere]
 	enabled = true
@@ -147,7 +154,7 @@
 	s = status -sb
 	d = diff
 	staged = diff --staged
-  last = show -w HEAD
+	last = show -w HEAD
 
 	# History
 	lg = log --graph --all
@@ -172,39 +179,19 @@
 	sub = submodule update --remote --rebase
 
 	# Housekeeping
-  gone = "!git branch -vv | rg ': gone]' | awk '{print $1}' | xargs git branch -D"
-  prune-merged = "!git branch --merged | rg -v '\\*|main|master' | xargs -n 1 git branch -d"
-
-
-# ╔══════════════════════════════════════════╗
-# ║     EXTERNAL DEPENDENCIES                ║
-# ║     delta, meld, nvim, gh cli            ║
-# ╚══════════════════════════════════════════╝
-
-[core]
-	editor = nvim
-
-[diff]
-	tool = nvimdiff
-	guitool = meld
-
-[merge]
-	tool = nvimdiff
-	guitool = meld
+	gone = "!git branch -vv | rg ': gone]' | awk '{print $1}' | xargs git branch -D"
+	prune-merged = "!git branch --merged | rg -v '\\*|main|master' | xargs -n 1 git branch -d"
 
 [include]
 	path = ~/.config/delta/delta.gitconfig
 
 [credential "https://github.com"]
-  helper =
+	helper =
 	helper = !gh auth git-credential
 
 [credential "https://gist.github.com"]
-  helper =
+	helper =
 	helper = !gh auth git-credential
-
-[user]
-	signingkey = {{ onepasswordRead "op://Personal/ks42nayh7uclm6mhmclydhncpm/public key" }}
 
 [gpg]
 	format = ssh
@@ -212,9 +199,3 @@
 [gpg "ssh"]
 	program = {{ if eq .chezmoi.os "darwin" }}/Applications/1Password.app/Contents/MacOS/op-ssh-sign{{ else }}op-ssh-sign{{ end }}
 	allowedSignersFile = ~/.config/git/allowed_signers
-
-[commit]
-	gpgsign = true
-
-[tag]
-	gpgsign = true

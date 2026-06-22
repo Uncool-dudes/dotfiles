@@ -56,3 +56,17 @@ _cache_eval atuin   init zsh
 (( $+commands[starship] )) && _cache_eval starship init zsh
 
 export DIRENV_LOG_FORMAT=""
+
+# ── Home-manager ─────────────────────────────────────────────────
+function hms() {
+  local flake=~/.config/home-manager
+  local profile
+  if [[ "$OSTYPE" == darwin* ]]; then
+    profile="uncool@mac"
+  elif grep -qi ubuntu /etc/os-release 2>/dev/null; then
+    profile="uncool@ubuntu"
+  else
+    profile="uncool@arch"
+  fi
+  home-manager switch --flake "${flake}#${profile}" "$@"
+}

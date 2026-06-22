@@ -3,7 +3,7 @@
 { pkgs, username, ... }: {
 
   home.username = username;
-  home.homeDirectory = "/Users/${username}";
+  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
