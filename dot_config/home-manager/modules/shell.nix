@@ -46,6 +46,10 @@
       LG_CONFIG_FILE = "$HOME/.config/lazygit/config.yml";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       WORDCHARS = "";
+      SSH_AUTH_SOCK =
+        if pkgs.stdenv.isDarwin
+        then "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+        else "${config.home.homeDirectory}/.1password/agent.sock";
     };
     shellAliases = {
       lz = "lazygit";
@@ -86,6 +90,10 @@
     };
     initContent = builtins.readFile ./zsh/extra.zsh;
   };
+  home.sessionPath =
+    lib.optionals pkgs.stdenv.isDarwin [ "/Applications/1Password.app/Contents/MacOS" ]
+    ++ lib.optionals pkgs.stdenv.isLinux [ "/opt/1Password" ];
+
   programs.starship = {
     enable = true;
     enableZshIntegration = false;
