@@ -2,11 +2,7 @@
   "permissions": {
     "defaultMode": "auto"
   },
-  "model": "sonnet",
-  "availableModels": [
-    "claude-sonnet-4-6",
-    "claude-haiku-4-5-20251001"
-  ],
+  "model": "sonnet[1m]",
   "hooks": {
     "SessionStart": [
       {
@@ -60,6 +56,29 @@
   "worktree": {
     "baseRef": "fresh"
   },
+  "availableModels": [
+    "claude-sonnet-4-6[1m]",
+    "claude-sonnet-4-6",
+    "claude-haiku-4-5"
+  ],
+  "allow": [
+    "Bash(git push *)",
+    "Bash(git push)",
+    "Bash(git commit *)",
+    "Bash(git add *)",
+    "Bash(git fetch *)",
+    "Bash(git pull *)",
+    "Bash(git checkout *)",
+    "Bash(git switch *)",
+    "Bash(git stash *)",
+    "Bash(git merge *)",
+    "Bash(git rebase *)",
+    "Bash(git cherry-pick *)",
+    "Bash(git revert *)",
+    "Bash(git tag *)",
+    "Bash(git restore --staged *)"
+  ],
+  "enforceAvailableModels": true,
   "effortLevel": "medium",
   "tui": "fullscreen",
   "theme": "dark-ansi",
