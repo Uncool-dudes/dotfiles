@@ -202,3 +202,18 @@
 [credential "https://gist.github.com"]
   helper =
 	helper = !gh auth git-credential
+
+[user]
+	signingkey = {{ onepasswordRead "op://Personal/ks42nayh7uclm6mhmclydhncpm/public key" }}
+
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	program = {{ if eq .chezmoi.os "darwin" }}/Applications/1Password.app/Contents/MacOS/op-ssh-sign{{ else }}op-ssh-sign{{ end }}
+
+[commit]
+	gpgsign = true
+
+[tag]
+	gpgsign = true
