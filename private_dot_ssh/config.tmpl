@@ -1,0 +1,20 @@
+Host *
+    IdentityAgent {{ if eq .chezmoi.os "darwin" }}"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"{{ else }}"~/.1password/agent.sock"{{ end }}
+    SetEnv TERM=xterm-256color
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 10m
+    ServerAliveInterval 15
+    ServerAliveCountMax 3
+    ForwardAgent no
+
+
+Host 34.100.233.89
+  HostName 34.100.233.89
+  User ananth
+
+
+Host git.ananthp.dev
+    HostName git.ananthp.dev
+    User git
+    IdentityFile ~/.ssh/id_ed25519_personal
