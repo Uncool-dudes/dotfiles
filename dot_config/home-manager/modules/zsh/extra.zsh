@@ -57,6 +57,6 @@ function drs() {
   if command -v darwin-rebuild &>/dev/null; then
     sudo darwin-rebuild switch --flake ~/.config/home-manager#Ananths-MacBook-Pro "$@"
   else
-    sudo HOME=/Users/uncool nix --extra-experimental-features 'nix-command flakes' run nix-darwin/master#darwin-rebuild -- switch --flake ~/.config/home-manager#Ananths-MacBook-Pro "$@"
+    sudo HOME="$HOME" nix --extra-experimental-features 'nix-command flakes' run nix-darwin/master#darwin-rebuild -- switch --flake ~/.config/home-manager#Ananths-MacBook-Pro "$@"
   fi
 }

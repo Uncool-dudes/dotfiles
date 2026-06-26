@@ -3,6 +3,7 @@
 { pkgs, username, ... }: {
 
   imports = [
+    ./stylix.nix
     ./shell.nix
     ./starship.nix
     ./atuin.nix
@@ -12,6 +13,7 @@
     ./lazygit.nix
     ./ripgrep.nix
     ./ghostty.nix
+    ./tmux.nix
     ./devtools.nix
   ];
 
@@ -20,6 +22,16 @@
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
+  programs.btop = {
+    enable = true;
+    settings = {
+      shown_boxes = "proc cpu";
+      proc_sorting = "memory";
+      cpu_bottom = true;
+      save_config_on_exit = false;
+    };
+  };
+  programs.mpv.enable = true;
 
   home.sessionPath = [
     "/nix/var/nix/profiles/default/bin"
@@ -63,7 +75,6 @@
 
     # System / monitoring
     bandwhich
-    btop
     nmap
     dive
     duf
@@ -73,7 +84,6 @@
     # Media
     ffmpeg
     imagemagick
-    mpv
     yt-dlp
 
     # Backup
@@ -87,7 +97,6 @@
     # Misc
     fastfetch
     onefetch
-    tmux
     wget
   ];
 }

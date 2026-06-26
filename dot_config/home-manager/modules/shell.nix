@@ -99,9 +99,6 @@
       "--height=40%"
       "--layout=reverse"
       "--border"
-      "--color=bg+:#393939,bg:#161616,spinner:#be95ff,hl:#ee5396"
-      "--color=fg:#f2f4f8,header:#ee5396,info:#78a9ff,pointer:#be95ff"
-      "--color=marker:#42be65,fg+:#f2f4f8,prompt:#78a9ff,hl+:#ee5396"
     ];
     fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
     changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
