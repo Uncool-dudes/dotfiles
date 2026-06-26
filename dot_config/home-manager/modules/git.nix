@@ -204,7 +204,7 @@
       hyperlinks = true;
       keep-plus-minus-markers = false;
       tabs = 4;
-      syntax-theme = "oxocarbon-dark";
+      syntax-theme = "base16-stylix";
       blame-palette = "#161616 #1e1e1e #262626";
       merge-conflict-begin-symbol = "▼";
       merge-conflict-end-symbol = "▲";

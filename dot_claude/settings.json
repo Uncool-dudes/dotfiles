@@ -3,6 +3,12 @@
     "defaultMode": "auto"
   },
   "model": "sonnet[1m]",
+  "availableModels": [
+    "claude-sonnet-4-6[1m]",
+    "claude-sonnet-4-6",
+    "claude-haiku-4-5"
+  ],
+  "enforceAvailableModels": true,
   "hooks": {
     "SessionStart": [
       {
@@ -29,6 +35,9 @@
       }
     ]
   },
+  "worktree": {
+    "baseRef": "fresh"
+  },
   "statusLine": {
     "type": "command",
     "command": "bash \"/Users/uncool/.claude/hooks/caveman-statusline.sh\""
@@ -53,14 +62,13 @@
       }
     }
   },
-  "worktree": {
-    "baseRef": "fresh"
-  },
-  "availableModels": [
-    "claude-sonnet-4-6[1m]",
-    "claude-sonnet-4-6",
-    "claude-haiku-4-5"
-  ],
+  "effortLevel": "medium",
+  "tui": "fullscreen",
+  "theme": "dark-ansi",
+  "preferredNotifChannel": "ghostty",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
   "allow": [
     "Bash(git push *)",
     "Bash(git push)",
@@ -78,12 +86,5 @@
     "Bash(git tag *)",
     "Bash(git restore --staged *)"
   ],
-  "enforceAvailableModels": true,
-  "effortLevel": "medium",
-  "tui": "fullscreen",
-  "theme": "dark-ansi",
-  "preferredNotifChannel": "ghostty",
-  "inputNeededNotifEnabled": true,
-  "agentPushNotifEnabled": true,
-  "skipAutoPermissionPrompt": true
+  "skipWorkflowUsageWarning": true
 }

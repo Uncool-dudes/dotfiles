@@ -6,7 +6,7 @@
     settings = {
       "$schema" = "https://starship.rs/config-schema.json";
       command_timeout = 1000;
-      scan_timeout = 30;
+      scan_timeout = 500;
       format = "$directory$git_branch$git_status$nix_shell$direnv$cmd_duration$character";
       palette = "oxocarbon";
 

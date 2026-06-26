@@ -12,7 +12,7 @@
           else "~/.1password/agent.sock";
         SetEnv = { TERM = "xterm-256color"; };
         ControlMaster = "auto";
-        ControlPath = "~/.ssh/cm-%r@%h:%p";
+        ControlPath = "~/.ssh/cm-%C";
         ControlPersist = "10m";
         ServerAliveInterval = 15;
         ServerAliveCountMax = 3;

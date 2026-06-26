@@ -14,6 +14,10 @@
     ./ripgrep.nix
     ./ghostty.nix
     ./tmux.nix
+    ./mpv.nix
+    ./gh.nix
+    ./fastfetch.nix
+    ./yt-dlp.nix
     ./devtools.nix
   ];
 
@@ -22,6 +26,37 @@
   home.stateVersion = "25.05";
 
   programs.home-manager.enable = true;
+
+  nix.gc = {
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 30d";
+  };
+
+  programs.tealdeer = {
+    enable = true;
+    settings.display.use_pager = true;
+  };
+  programs.fd = {
+    enable = true;
+    hidden = true;
+    ignores = [
+      ".git/"
+      "node_modules/"
+      "__pycache__/"
+      "*.pyc"
+      ".DS_Store"
+      "target/"
+      "dist/"
+      ".direnv/"
+    ];
+  };
+  programs.eza = {
+    enable = true;
+    icons = "auto";
+    git = true;
+    extraOptions = [ "--group-directories-first" ];
+  };
   programs.btop = {
     enable = true;
     settings = {
@@ -31,8 +66,6 @@
       save_config_on_exit = false;
     };
   };
-  programs.mpv.enable = true;
-
   home.sessionPath = [
     "/nix/var/nix/profiles/default/bin"
     "$HOME/.local/bin"
@@ -41,12 +74,9 @@
   home.packages = with pkgs; [
     # Shell
     chezmoi
-    tealdeer
 
     # Core CLI
     age
-    eza
-    fd
     grex
     hl-log-viewer
     procs
@@ -58,9 +88,6 @@
     # Git
     convco
     git-absorb
-    git-town
-    github-cli
-    gitleaks
     glow
     lefthook
 
@@ -84,7 +111,6 @@
     # Media
     ffmpeg
     imagemagick
-    yt-dlp
 
     # Backup
     bash
@@ -95,7 +121,6 @@
     _1password-cli
 
     # Misc
-    fastfetch
     onefetch
     wget
   ];

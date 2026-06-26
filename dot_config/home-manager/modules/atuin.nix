@@ -32,6 +32,7 @@
       };
 
       sync.records = true;
+      daemon.enabled = true;
       ui.columns = [ "time" "command" ];
     };
   };

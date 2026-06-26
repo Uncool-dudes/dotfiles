@@ -52,10 +52,8 @@
       lz = "lazygit";
       cat = "bat";
       mkdir = "mkdir -p";
-      ls = "eza";
-      ll = "eza --icons --git";
-      lt = "eza --icons --git --tree";
       diff = "delta";
+      rl = "source ${config.xdg.configHome}/zsh/.zshrc";
       cc = "claude";
       ccc = "claude --continue";
       ccr = "claude --resume";
@@ -94,14 +92,14 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = false;
-    defaultCommand = "fd --type f --hidden --follow --exclude .git";
+    defaultCommand = "fd --type f --follow";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
       "--border"
     ];
-    fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
-    changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
+    fileWidgetCommand = "fd --type f --follow";
+    changeDirWidgetCommand = "fd --type d --follow";
   };
   programs.zoxide = {
     enable = true;
@@ -111,5 +109,6 @@
     enable = true;
     nix-direnv.enable = true;
     enableZshIntegration = false;
+    silent = true;
   };
 }

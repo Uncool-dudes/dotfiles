@@ -1,6 +1,27 @@
 # modules/devtools.nix
 # Development tools, languages, and editors
 { pkgs, inputs, ... }: {
+  programs.uv = {
+    enable = true;
+    python = {
+      versions = [ "3.13" "3.12" ];
+      default = "3.13";
+    };
+    tool.packages = [
+      "black"
+      "sqlfluff"
+    ];
+  };
+
+  programs.go = {
+    enable = true;
+    telemetry.mode = "off";
+    env.GOPRIVATE = [
+      "github.com/fabrikiot"
+      "github.com/ratchio"
+    ];
+  };
+
   home.sessionPath = [
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
@@ -9,17 +30,13 @@
 
   home.packages = with pkgs; [
     # Editor
-    black
     neovim
-    sqlfluff
 
     # Languages
     fnm
-    go
     golangci-lint
     pnpm
     rustup
-    uv
 
     # Dev
     claude-code

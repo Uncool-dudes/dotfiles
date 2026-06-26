@@ -18,6 +18,7 @@
       "pkgconf"
       "postgresql@17"
       "sdl2-compat"
+      "rtk"
       "tailscale"
     ];
 
@@ -51,6 +52,8 @@
       "tailscale-app"
       "ti-connect-ce"
       "typora"
+      "flowvision"
+      "rectangle-pro"
       "yubico-authenticator"
       "zoom"
       "zotero"
@@ -61,7 +64,7 @@
       "Mirror Magnet" = 1563698880;
       "WhatsApp"      = 310633997;
       "Tripsy"        = 1429967544;
-      "Gestimer"      = 990588172;
+      "Gestimer 2"    = 6447125648;
       "iA Writer"     = 775737590;
     };
   };
