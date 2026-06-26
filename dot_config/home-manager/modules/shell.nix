@@ -1,5 +1,3 @@
-# modules/shell.nix
-# Shell environment — zsh and all shell-integrated tools
 {
   config,
   lib,
@@ -43,7 +41,6 @@
     sessionVariables = {
       EDITOR = "nvim";
       VISUAL = "nvim";
-      LG_CONFIG_FILE = "$HOME/.config/lazygit/config.yml";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       WORDCHARS = "";
       SSH_AUTH_SOCK =
@@ -65,7 +62,6 @@
       cch = "CLAUDE_CONFIG_DIR=~/.claude-home claude";
       ".." = "cd ..";
       "..." = "cd ../..";
-      # Systemctl (Arch)
       sc-start = "sudo systemctl start";
       sc-stop = "sudo systemctl stop";
       sc-reload = "sudo systemctl reload";
@@ -90,21 +86,25 @@
     };
     initContent = builtins.readFile ./zsh/extra.zsh;
   };
+
   home.sessionPath =
     lib.optionals pkgs.stdenv.isDarwin [ "/Applications/1Password.app/Contents/MacOS" ]
     ++ lib.optionals pkgs.stdenv.isLinux [ "/opt/1Password" ];
 
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = false;
-  };
-  programs.atuin = {
-    enable = true;
-    enableZshIntegration = false;
-  };
   programs.fzf = {
     enable = true;
     enableZshIntegration = false;
+    defaultCommand = "fd --type f --hidden --follow --exclude .git";
+    defaultOptions = [
+      "--height=40%"
+      "--layout=reverse"
+      "--border"
+      "--color=bg+:#393939,bg:#161616,spinner:#be95ff,hl:#ee5396"
+      "--color=fg:#f2f4f8,header:#ee5396,info:#78a9ff,pointer:#be95ff"
+      "--color=marker:#42be65,fg+:#f2f4f8,prompt:#78a9ff,hl+:#ee5396"
+    ];
+    fileWidgetCommand = "fd --type f --hidden --follow --exclude .git";
+    changeDirWidgetCommand = "fd --type d --hidden --follow --exclude .git";
   };
   programs.zoxide = {
     enable = true;

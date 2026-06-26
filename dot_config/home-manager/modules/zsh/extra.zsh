@@ -29,6 +29,8 @@ _cache_eval() {
 }
 
 _cache_eval chezmoi completion zsh
+_cache_eval fnm     env --use-on-cd --shell zsh
+_cache_eval fzf     --zsh
 _cache_eval pnpm    completion zsh
 _cache_eval zoxide  init zsh --cmd cd
 _cache_eval direnv  hook zsh
@@ -49,4 +51,12 @@ function hms() {
     profile="uncool@arch"
   fi
   home-manager switch --flake "${flake}#${profile}" "$@"
+}
+
+function drs() {
+  if command -v darwin-rebuild &>/dev/null; then
+    sudo darwin-rebuild switch --flake ~/.config/home-manager#Ananths-MacBook-Pro "$@"
+  else
+    sudo HOME=/Users/uncool nix --extra-experimental-features 'nix-command flakes' run nix-darwin/master#darwin-rebuild -- switch --flake ~/.config/home-manager#Ananths-MacBook-Pro "$@"
+  fi
 }
