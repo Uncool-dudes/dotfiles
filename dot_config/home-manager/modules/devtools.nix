@@ -41,6 +41,7 @@
     # Dev
     claude-code
     croc
+    hurl
     graphviz
     just
     tectonic

@@ -52,6 +52,7 @@
       "tailscale-app"
       "ti-connect-ce"
       "typora"
+      "qview"
       "flowvision"
       "rectangle-pro"
       "yubico-authenticator"
@@ -60,7 +61,7 @@
     ];
 
     masApps = {
-      "Keka"          = 425424353;
+      "Keka"          = 470158793;
       "Mirror Magnet" = 1563698880;
       "WhatsApp"      = 310633997;
       "Tripsy"        = 1429967544;

@@ -1,0 +1,152 @@
+{
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "permissions": {
+    "defaultMode": "auto"
+  },
+  "model": "sonnet[1m]",
+  "availableModels": [
+    "claude-sonnet-4-6[1m]",
+    "claude-sonnet-4-6",
+    "claude-haiku-4-5"
+  ],
+  "enforceAvailableModels": true,
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/uncool/.claude/hooks/caveman-activate.js\"",
+            "timeout": 5,
+            "statusMessage": "Loading caveman mode..."
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"/Users/uncool/.claude/hooks/caveman-mode-tracker.js\"",
+            "timeout": 5,
+            "statusMessage": "Tracking caveman mode..."
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r \".file_path // .path // empty\"); [[ \"$file\" == *.nix ]] && nixfmt \"$file\" || true'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "enableWorkflows": false,
+  "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash -c 'cols=${COLUMNS:-}; case \"$cols\" in \"\"|*[!0-9]*) cols=$(stty size </dev/tty 2>/dev/null | awk '\"'\"'{ print $2 }'\"'\"');; esac; case \"$cols\" in \"\"|*[!0-9]*) cols=120;; esac; export COLUMNS=$(( cols > 4 ? cols - 4 : 1 )); plugin_dir=$(ls -d \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}\"/plugins/cache/*/claude-hud/*/ 2>/dev/null | awk -F/ '\"'\"'{ print $(NF-1) \"\\t\" $0 }'\"'\"' | grep -E '\"'\"'^[0-9]+\\.[0-9]+\\.[0-9]+[[:space:]]'\"'\"' | sort -t. -k1,1n -k2,2n -k3,3n -k4,4n | tail -1 | cut -f2-); exec \"$HOME/.local/share/fnm/aliases/default/bin/node\" \"${plugin_dir}dist/index.js\"'"
+  },
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "cc-skills-golang@samber": true,
+    "caveman@caveman": true,
+    "claude-hud@claude-hud": true
+  },
+  "extraKnownMarketplaces": {
+    "samber": {
+      "source": {
+        "source": "github",
+        "repo": "samber/cc"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    },
+    "claude-hud": {
+      "source": {
+        "source": "github",
+        "repo": "jarrodwatts/claude-hud"
+      }
+    }
+  },
+  "effortLevel": "medium",
+  "promptSuggestionEnabled": false,
+  "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark-ansi",
+  "editorMode": "normal",
+  "preferredNotifChannel": "ghostty",
+  "autoCompactEnabled": true,
+  "switchModelsOnFlag": false,
+  "remoteControlAtStartup": false,
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true,
+  "allow": [
+    "Bash(git push *)",
+    "Bash(git push)",
+    "Bash(git commit *)",
+    "Bash(git add *)",
+    "Bash(git fetch *)",
+    "Bash(git pull *)",
+    "Bash(git checkout *)",
+    "Bash(git switch *)",
+    "Bash(git stash *)",
+    "Bash(git merge *)",
+    "Bash(git rebase *)",
+    "Bash(git cherry-pick *)",
+    "Bash(git revert *)",
+    "Bash(git tag *)",
+    "Bash(git restore --staged *)",
+    "Bash(git status)",
+    "Bash(git status *)",
+    "Bash(git log *)",
+    "Bash(git diff *)",
+    "Bash(git show *)",
+    "Bash(git blame *)",
+    "Bash(git branch *)",
+    "Bash(git remote *)",
+    "Bash(git ls-files *)",
+    "Bash(go build *)",
+    "Bash(go test *)",
+    "Bash(go run *)",
+    "Bash(go vet *)",
+    "Bash(go mod *)",
+    "Bash(nix fmt *)",
+    "Bash(nix build *)",
+    "Bash(nix flake *)",
+    "Bash(golangci-lint *)",
+    "Bash(fd *)",
+    "Bash(rg *)",
+    "Bash(bat *)",
+    "Bash(eza *)",
+    "Bash(just *)"
+  ]
+}

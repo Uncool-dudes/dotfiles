@@ -14,7 +14,7 @@
       "--glob=!*.map"
       "--glob=!*.min.js"
       "--glob=!*.min.css"
-      "--type-add=go-tmpl:*.tmpl"
+      "--type-add=gotmpl:*.tmpl"
       "--type-add=svelte:*.svelte"
       "--type-add=proto:*.proto"
       "--colors=match:fg:yellow"

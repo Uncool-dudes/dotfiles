@@ -33,7 +33,7 @@
       };
 
       core = {
-        compression = 9;
+        compression = 6;
         whitespace = "error";
         preloadindex = true;
         fsmonitor = true;

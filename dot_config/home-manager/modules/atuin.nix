@@ -3,6 +3,7 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = false;
+    daemon.enable = true;
     settings = {
       search_mode = "fuzzy";
       filter_mode = "global";
@@ -32,7 +33,6 @@
       };
 
       sync.records = true;
-      daemon.enabled = true;
       ui.columns = [ "time" "command" ];
     };
   };

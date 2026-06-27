@@ -1,0 +1,20 @@
+{
+  "lineLayout": "expanded",
+  "elementOrder": ["context", "usage"],
+  "display": {
+    "showModel": false,
+    "showContextBar": false,
+    "contextValue": "tokens",
+    "showCost": false,
+    "showUsage": true,
+    "usageCompact": true,
+    "timeFormat": "elapsed",
+    "showResetLabel": false,
+    "showDuration": false,
+    "showSpeed": false,
+    "showSessionName": false
+  },
+  "gitStatus": {
+    "enabled": false
+  }
+}
