@@ -39,18 +39,20 @@
       zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
     '';
     sessionVariables = {
+      WORK_FOLDER = "${config.home.homeDirectory}/projects/ratch";
+      ZSH_AUTOSUGGEST_MANUAL_REBIND = "1";
       EDITOR = "nvim";
       VISUAL = "nvim";
       MANPAGER = "sh -c 'col -bx | bat -l man -p'";
       WORDCHARS = "";
+      NODE_NO_WARNINGS = "1";
       SSH_AUTH_SOCK =
-        if pkgs.stdenv.isDarwin
+        if pkgs.stdenv.hostPlatform.isDarwin
         then "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
         else "${config.home.homeDirectory}/.1password/agent.sock";
     };
     shellAliases = {
       lz = "lazygit";
-      cat = "bat";
       mkdir = "mkdir -p";
       diff = "delta";
       rl = "source ${config.xdg.configHome}/zsh/.zshrc";
@@ -58,6 +60,10 @@
       ccc = "claude --continue";
       ccr = "claude --resume";
       cch = "CLAUDE_CONFIG_DIR=~/.claude-home claude";
+      cql = "codeql query run --search-path ~/.codeql/packages";
+      cqldb = "codeql database create --language=go --source-root=. --threads=4";
+      cqli = "codeql pack install";
+      cqlq = "cd .codeql/queries";
       ".." = "cd ..";
       "..." = "cd ../..";
       sc-start = "sudo systemctl start";
@@ -86,8 +92,8 @@
   };
 
   home.sessionPath =
-    lib.optionals pkgs.stdenv.isDarwin [ "/Applications/1Password.app/Contents/MacOS" ]
-    ++ lib.optionals pkgs.stdenv.isLinux [ "/opt/1Password" ];
+    lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ "/Applications/1Password.app/Contents/MacOS" ]
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ "/opt/1Password" ];
 
   programs.fzf = {
     enable = true;
@@ -98,8 +104,8 @@
       "--layout=reverse"
       "--border"
     ];
-    fileWidgetCommand = "fd --type f --follow";
-    changeDirWidgetCommand = "fd --type d --follow";
+    fileWidget.command = "fd --type f --follow";
+    changeDirWidget.command = "fd --type d --follow";
   };
   programs.zoxide = {
     enable = true;

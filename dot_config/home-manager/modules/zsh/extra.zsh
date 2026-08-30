@@ -16,6 +16,10 @@ function tarzst() {
   tar --use-compress-program=zstd -cvf "${dest}/${name}.tar.zst" "$1"
 }
 
+function alloydb-psql() {
+  PGPASSWORD=$(op read "op://Ratch/Alloy DB cluster/password") psql service=alloydb "$@"
+}
+
 # ── Cached eval ──────────────────────────────────────────────────
 _cache_eval() {
   local name="$1"
@@ -37,6 +41,11 @@ _cache_eval direnv  hook zsh
 _cache_eval atuin   init zsh
 (( $+commands[starship] )) && _cache_eval starship init zsh
 
+# ── gcloud ───────────────────────────────────────────────────────
+local _gcloud_sdk="/opt/homebrew/share/google-cloud-sdk"
+[[ -f "$_gcloud_sdk/path.zsh.inc" ]] && source "$_gcloud_sdk/path.zsh.inc"
+[[ -f "$_gcloud_sdk/completion.zsh.inc" ]] && source "$_gcloud_sdk/completion.zsh.inc"
+
 # ── Home-manager ─────────────────────────────────────────────────
 function hms() {
   local flake=~/.config/home-manager
@@ -49,6 +58,17 @@ function hms() {
     profile="uncool@arch"
   fi
   home-manager switch --flake "${flake}#${profile}" "$@"
+}
+
+function atuin-fix() {
+  if [[ "$OSTYPE" != darwin* ]]; then
+    echo "atuin-fix: darwin only (launchd)" >&2
+    return 1
+  fi
+  local sock=~/.local/share/atuin/daemon.sock
+  local label=org.nix-community.home.atuin-daemon
+  [[ -S "$sock" ]] && rm "$sock"
+  launchctl kickstart -k "user/$(id -u)/$label"
 }
 
 function drs() {

@@ -11,21 +11,19 @@
 
     brews = [
       "libpq"
-      "leptonica"
-      "librsvg"
       "mole"
-      "openssl@3"
-      "pkgconf"
-      "postgresql@17"
-      "sdl2-compat"
+      "postgresql@18"
       "rtk"
       "tailscale"
     ];
 
     casks = [
+      "gcloud-cli"
       "1password"
       "bettertouchtool"
       "cleanshot"
+      "idagio"
+      "renamer"
       "docker-desktop"
       "font-geist-mono-nerd-font"
       "font-iosevka-nerd-font"
@@ -46,11 +44,11 @@
       "ngrok"
       "pdf-expert"
       "popclip"
-      "postgres-app"
       "raycast"
       "superhuman"
-      "tailscale-app"
+
       "ti-connect-ce"
+      "transmission"
       "typora"
       "qview"
       "flowvision"
@@ -61,12 +59,13 @@
     ];
 
     masApps = {
-      "Keka"          = 470158793;
+      "Amphetamine" = 937984704;
+      "Keka" = 470158793;
       "Mirror Magnet" = 1563698880;
-      "WhatsApp"      = 310633997;
-      "Tripsy"        = 1429967544;
-      "Gestimer 2"    = 6447125648;
-      "iA Writer"     = 775737590;
+      "WhatsApp" = 310633997;
+      "Tripsy" = 1429967544;
+      "Gestimer 2" = 6447125648;
+      "iA Writer" = 775737590;
     };
   };
 }

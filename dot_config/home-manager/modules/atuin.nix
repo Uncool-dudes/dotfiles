@@ -3,7 +3,10 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = false;
-    daemon.enable = true;
+    daemon = {
+      enable = true;
+      logLevel = "debug";
+    };
     settings = {
       search_mode = "fuzzy";
       filter_mode = "global";
@@ -24,16 +27,37 @@
 
       stats = {
         common_subcommands = [
-          "cargo" "docker" "git" "go"
-          "kubectl" "npm" "pnpm"
-          "systemctl" "tmux"
+          "cargo"
+          "docker"
+          "git"
+          "go"
+          "kubectl"
+          "npm"
+          "pnpm"
+          "systemctl"
+          "tmux"
         ];
         common_prefix = [ "sudo" ];
-        ignored_commands = [ "cd" "ls" "ll" "clear" "exit" ];
+        ignored_commands = [
+          "cd"
+          "ls"
+          "ll"
+          "clear"
+          "exit"
+        ];
       };
 
+      sync_address = "https://atuin.ananthp.dev";
       sync.records = true;
-      ui.columns = [ "time" "command" ];
+      ui.columns = [
+        "time"
+        "command"
+      ];
     };
+  };
+
+  launchd.agents.atuin-daemon.config = {
+    StandardOutPath = "/tmp/atuin-daemon.log";
+    StandardErrorPath = "/tmp/atuin-daemon.err";
   };
 }

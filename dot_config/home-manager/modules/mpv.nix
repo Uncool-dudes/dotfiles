@@ -13,7 +13,7 @@
     config = {
       # Renderer
       vo = "gpu-next";
-      hwdec = if pkgs.stdenv.isDarwin then "videotoolbox" else "auto-safe";
+      hwdec = if pkgs.stdenv.hostPlatform.isDarwin then "videotoolbox" else "auto-safe";
       profile = "gpu-hq";
 
       # Playback

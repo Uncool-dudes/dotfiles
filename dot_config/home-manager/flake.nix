@@ -52,9 +52,14 @@
 
         homeConfigurations =
           let
+            # curl-cffi (yt-dlp's optional impersonation dep, pulled in by mpv's
+            # youtubeSupport) is broken on darwin - missing LC_RPATH for libcurl-impersonate.
+            overlays = [
+              (final: prev: { mpv = prev.mpv.override { youtubeSupport = false; }; })
+            ];
             mkHome = { system, extraModules ? [] }:
               home-manager.lib.homeManagerConfiguration {
-                pkgs = import inputs.nixpkgs { inherit system; config.allowUnfree = true; };
+                pkgs = import inputs.nixpkgs { inherit system overlays; config.allowUnfree = true; };
                 modules = [ ./modules/common.nix ] ++ extraModules;
                 extraSpecialArgs = { username = "uncool"; inherit inputs; };
               };

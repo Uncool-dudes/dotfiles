@@ -3,15 +3,26 @@
   programs.gh = {
     enable = true;
     settings = {
-      git_protocol = "https";
+      git_protocol = "ssh";
       prompt = "enabled";
       color_labels = "enabled";
+      pager = "delta";
+      editor = "nvim";
+      telemetry = "disabled";
       aliases = {
         co = "pr checkout";
+        draft = "pr create --draft --fill";
+        prs = "pr list --author @me";
+        ready = "pr ready";
+        approve = "pr review --approve";
+        reviewer = "pr edit --add-reviewer";
       };
     };
     extensions = [
       pkgs.gh-dash
+      pkgs.gh-poi
+      pkgs.gh-markdown-preview
+      pkgs.gh-stack
 
       (pkgs.writeShellApplication {
         name = "gh-delete-repo";

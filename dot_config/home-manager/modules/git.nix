@@ -12,19 +12,22 @@
       format = "ssh";
       signByDefault = true;
       signer =
-        if pkgs.stdenv.isDarwin
-        then "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-        else "op-ssh-sign";
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+        else
+          "op-ssh-sign";
     };
 
     ignores = [ "**/.claude/settings.local.json" ];
 
     maintenance = {
       enable = true;
-      repositories = [];
+      repositories = [
+        "${config.home.homeDirectory}/projects/ratch/gamma"
+      ];
     };
 
-    includes = [{ path = "~/.config/git/signing.inc"; }];
+    includes = [ { path = "~/.config/git/signing.inc"; } ];
 
     settings = {
       user = {
@@ -40,6 +43,7 @@
         untrackedCache = true;
         quotePath = false;
         editor = "nvim";
+        pager = "delta";
       };
 
       init.defaultBranch = "main";
@@ -99,6 +103,17 @@
         guitool = "meld";
       };
 
+      difftool = {
+        prompt = false;
+        "nvimdiff".cmd = ''nvim -d "$LOCAL" "$REMOTE"'';
+      };
+
+      mergetool = {
+        prompt = false;
+        keepBackup = false;
+        "nvimdiff".cmd = ''nvim -d "$LOCAL" "$MERGED" "$REMOTE"'';
+      };
+
       push = {
         autoSetupRemote = true;
         default = "current";
@@ -111,6 +126,7 @@
         pruneTags = true;
         fsckObjects = true;
         recurseSubmodules = "on-demand";
+        writeCommitGraph = true;
       };
 
       pull.rebase = true;
@@ -118,11 +134,18 @@
       rebase = {
         abbreviateCommands = true;
         autoStash = true;
+        autoSquash = true;
+        forkPoint = true;
         missingCommitsCheck = "warn";
         updateRefs = true;
+        rescheduleFailedExec = true;
+        instructionFormat = "%s%n# %an, %ar";
       };
 
-      rerere.enabled = true;
+      rerere = {
+        enabled = true;
+        autoUpdate = true;
+      };
 
       stash = {
         index = true;
@@ -139,21 +162,34 @@
       interactive.singlekey = true;
 
       url = {
-        "git@github.com:" = { insteadOf = "gh:"; };
-        "git@github.com:Uncool-dudes/" = { insteadOf = "uc:"; };
+        "git@github.com:" = {
+          insteadOf = "gh:";
+        };
+        "git@github.com:Uncool-dudes/" = {
+          insteadOf = "uc:";
+        };
       };
 
       credential = {
-        "https://github.com".helper = [ "" "!gh auth git-credential" ];
-        "https://gist.github.com".helper = [ "" "!gh auth git-credential" ];
+        "https://github.com".helper = [
+          ""
+          "!gh auth git-credential"
+        ];
+        "https://gist.github.com".helper = [
+          ""
+          "!gh auth git-credential"
+        ];
       };
 
       gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";
 
       pager = {
+        diff = "delta";
         blame = "delta --features=blame";
         log = "delta --features=log";
       };
+
+      interactive.diffFilter = "delta --color-only";
 
       delta = {
         blame.side-by-side = false;
@@ -189,8 +225,14 @@
         nuke = "reset --hard HEAD";
         unstage = "restore --staged";
         sub = "submodule update --remote --rebase";
-        gone = "!git branch -vv | rg ': gone]' | awk '{print $1}' | xargs git branch -D";
+        gone = "!git branch -vv | rg --no-line-number ': gone]' | awk '{print $1}' | xargs git branch -D";
         prune-merged = "!git branch --merged | rg -v '\\*|main|master' | xargs -n 1 git branch -d";
+        sqa = "!git fetch origin main:main --quiet 2>/dev/null; git rebase -i --autosquash $(git merge-base main HEAD)";
+        base = "!git fetch origin main:main --quiet 2>/dev/null; git merge-base main HEAD";
+        fixup = "!f() { git commit --fixup=\"\${1:-HEAD}\"; }; f";
+        rc = "rebase --continue";
+        ra = "rebase --abort";
+        rs = "rebase --skip";
       };
     };
   };

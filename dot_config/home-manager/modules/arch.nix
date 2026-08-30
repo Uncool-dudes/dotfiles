@@ -2,6 +2,7 @@
 # Arch Linux / Hyprland-specific packages
 { pkgs, ... }: {
   home.packages = with pkgs; [
+    bandwhich
     hyprlauncher
     qview
     wireplumber

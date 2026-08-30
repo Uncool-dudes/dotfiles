@@ -8,6 +8,16 @@ No drift to full sentences across long session. Permanent until "stop caveman" o
 ## Commits
 
 No co-authorship lines. Ever. Conventional Commits. Subject ≤50 chars. Body only when "why" non-obvious.
+No em dashes (—) anywhere — in commit messages, code, comments, docs. Use `-` or `--`.
+
+### Fixup commits (preferred over amend/new-unrelated-commit)
+
+User likes fixup commits for follow-on fixes to work already on the branch. When fixing/extending a commit that's already landed on the current branch, try `git absorb` first - it blames each changed hunk to find its owning commit and auto-creates the right `fixup!` commit(s), splitting across multiple target commits if different hunks in the same file are owned by different commits. This is more precise than picking one target by hand, and it declines (leaves unstaged) rather than guessing wrong on ambiguous hunks like whole-file deletes/renames - handle those leftover hunks with manual `git commit --fixup=<target-sha>`. User runs `git rebase -i --autosquash <base>` themselves later to fold them in.
+
+**Missteps to avoid:**
+- **Create fixups immediately after the commit they target, not at the end of a multi-commit session.** If other real (non-fixup) commits land on the branch after the target but before the fixup is created, and those commits touch the same file the fixup touches, `--autosquash` will conflict: it replays the fixup right after its target, skipping the intervening real commits, so the diff context won't match. Symptom: modify/delete or context-mismatch conflicts on files the fixup didn't intend to fight over. If this happens, resolve favoring the fixup's intended end state — it's not a sign the fixup was wrong, just an ordering artifact.
+- One logical change per fixup. Don't bundle e.g. "drop a subdirectory" and "fix imports" into one fixup commit — split them (one `git add`+commit per concern) so `rebase -i` history stays legible even before autosquash folds them away.
+- Always rebuild/vet after creating a fixup, before telling the user it's ready - a fixup that doesn't compile against the rest of the stack is worse than no fixup.
 
 ## Code
 
@@ -29,6 +39,10 @@ No co-authorship lines. Ever. Conventional Commits. Subject ≤50 chars. Body on
 ## Database
 
 - Never `pg_dump`. Use `psql` with `information_schema` or `pg_catalog`.
+
+## Observability
+
+- Never call Agent0 (Dash0 MCP `runTask`/Agent0 tools).
 
 ## Tools
 
@@ -64,3 +78,6 @@ Also:
 - `witr` process inspector — `witr <name>` (substring), `witr -x <name>` (exact), `witr -p <pid>`, `witr -o <port>`, `witr -f <file>`, `witr -c <container>`; flags repeatable/mixable. `-s` ancestry, `-t` tree, `--env` env vars, `--verbose` extended, `--json` machine output. No args = TUI (`-i` force TUI). Searches Docker/Podman/K8s/LXC with `-c`.
 
 @RTK.md
+# graphify
+- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
+When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

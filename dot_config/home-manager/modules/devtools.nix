@@ -1,6 +1,11 @@
 # modules/devtools.nix
 # Development tools, languages, and editors
 { pkgs, inputs, ... }: {
+  programs.direnv = {
+    enable = true;
+    nix-direnv.enable = true;
+  };
+
   programs.uv = {
     enable = true;
     python = {
@@ -26,6 +31,7 @@
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
     "$HOME/.pnpm-global/bin"
+    "$HOME/.local/bin"
   ];
 
   home.packages = with pkgs; [
@@ -41,18 +47,23 @@
     # Dev
     claude-code
     croc
-    hurl
+    # hurl # scripted HTTP test files (.hurl) - no such files in use currently
     graphviz
+    jujutsu
     just
+    ko
+    postgresql
     tectonic
     tilt
     typst
+    virtualenv
 
     # Nix
     deadnix
     inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.home-manager
     nil
     nixfmt
+    nix-tree
     nvd
     statix
   ];

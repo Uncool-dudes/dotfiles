@@ -17,13 +17,15 @@
     ./mpv.nix
     ./gh.nix
     ./fastfetch.nix
-    ./yt-dlp.nix
+    ./aria2.nix
     ./devtools.nix
   ];
 
-  home.username = username;
-  home.homeDirectory = if pkgs.stdenv.isDarwin then "/Users/${username}" else "/home/${username}";
-  home.stateVersion = "25.05";
+  home = {
+    inherit username;
+    homeDirectory = if pkgs.stdenv.hostPlatform.isDarwin then "/Users/${username}" else "/home/${username}";
+    stateVersion = "25.05";
+  };
 
   programs.home-manager.enable = true;
 
@@ -33,37 +35,60 @@
     options = "--delete-older-than 30d";
   };
 
-  programs.tealdeer = {
-    enable = true;
-    settings.display.use_pager = true;
-  };
-  programs.fd = {
-    enable = true;
-    hidden = true;
-    ignores = [
-      ".git/"
-      "node_modules/"
-      "__pycache__/"
-      "*.pyc"
-      ".DS_Store"
-      "target/"
-      "dist/"
-      ".direnv/"
-    ];
-  };
-  programs.eza = {
-    enable = true;
-    icons = "auto";
-    git = true;
-    extraOptions = [ "--group-directories-first" ];
-  };
-  programs.btop = {
-    enable = true;
-    settings = {
-      shown_boxes = "proc cpu";
-      proc_sorting = "memory";
-      cpu_bottom = true;
-      save_config_on_exit = false;
+  programs = {
+    nix-index.enable = true;
+
+    tealdeer = {
+      enable = true;
+      settings.display.use_pager = true;
+    };
+
+    yazi = {
+      enable = true;
+      shellWrapperName = "y";
+      settings = {
+        mgr.show_hidden = false;
+        preview = {
+          image_filter = "triangle";
+          max_width = 1000;
+          max_height = 800;
+        };
+        tasks = {
+          preload_workers = 15;
+          fetch_workers = 10;
+        };
+      };
+    };
+
+    fd = {
+      enable = true;
+      hidden = true;
+      ignores = [
+        ".git/"
+        "node_modules/"
+        "__pycache__/"
+        "*.pyc"
+        ".DS_Store"
+        "target/"
+        "dist/"
+        ".direnv/"
+      ];
+    };
+
+    eza = {
+      enable = true;
+      icons = "auto";
+      git = true;
+      extraOptions = [ "--group-directories-first" ];
+    };
+    btop = {
+      enable = true;
+      settings = {
+        shown_boxes = "proc cpu";
+        proc_sorting = "memory";
+        cpu_bottom = true;
+        save_config_on_exit = false;
+      };
     };
   };
   home.sessionPath = [
@@ -74,22 +99,30 @@
   home.packages = with pkgs; [
     # Shell
     chezmoi
+    parallel
 
     # Core CLI
-    age
+    # age # file encryption - unused, no sops/secrets workflow consumes it yet
     grex
     hl-log-viewer
+    lnav
+    oha
     procs
     sd
     watchexec
     whosthere
+    witr
     xh
 
     # Git
+    act
     convco
     git-absorb
     glow
     lefthook
+    # tig # git TUI browser - redundant, lazygit covers this
+
+    proximity-sort
 
     # Text / data
     csvlens
@@ -101,16 +134,18 @@
     tokei
 
     # System / monitoring
-    bandwhich
+    iperf3
     nmap
-    dive
+    # dive # docker image layer inspector - only useful when actively building images
     duf
     dust
     hyperfine
 
     # Media
     ffmpeg
+    ffmpegthumbnailer
     imagemagick
+    vips
 
     # Backup
     bash

@@ -26,6 +26,10 @@
       fzf.enable = true;
       mpv.enable = true;
       tmux.enable = true;
+      lazygit.enable = true;
+      ghostty.enable = true;
+      starship.enable = true;
+      yazi.enable = true;
     };
   };
 
