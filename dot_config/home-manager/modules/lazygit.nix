@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   programs.lazygit = {
     enable = true;
@@ -38,7 +38,7 @@
         parseEmoji = false;
       };
 
-      os.editPreset = "nvim";
+      os.editPreset = config.home.sessionVariables.EDITOR;
 
       customCommands = [
         {
@@ -46,62 +46,6 @@
           command = "gh pr create --fill --web";
           context = "global";
           loadingText = "Creating pull request on GitHub";
-        }
-        {
-          key = "b";
-          command = ''tig blame -- "{{.SelectedFile.Name}}"'';
-          context = "files";
-          description = "blame file at tree";
-          output = "terminal";
-        }
-        {
-          key = "b";
-          command = ''tig blame {{.SelectedSubCommit.Sha}} -- "{{.SelectedCommitFile.Name}}"'';
-          context = "commitFiles";
-          description = "blame file at revision";
-          output = "terminal";
-        }
-        {
-          key = "B";
-          command = ''tig blame -- "{{.SelectedCommitFile.Name}}"'';
-          context = "commitFiles";
-          description = "blame file at tree";
-          output = "terminal";
-        }
-        {
-          key = "t";
-          command = "tig show {{.SelectedSubCommit.Sha}}";
-          context = "subCommits";
-          description = "tig commit";
-          output = "terminal";
-        }
-        {
-          key = "t";
-          command = "tig show {{.SelectedLocalBranch.Name}}";
-          context = "localBranches";
-          description = "tig branch";
-          output = "terminal";
-        }
-        {
-          key = "t";
-          command = "tig show {{.SelectedRemoteBranch.RemoteName}}/{{.SelectedRemoteBranch.Name}}";
-          context = "remoteBranches";
-          description = "tig branch";
-          output = "terminal";
-        }
-        {
-          key = "t";
-          command = ''tig {{.SelectedSubCommit.Sha}} -- "{{.SelectedCommitFile.Name}}"'';
-          context = "commitFiles";
-          description = "tig file history";
-          output = "terminal";
-        }
-        {
-          key = "t";
-          command = ''tig -- "{{.SelectedFile.Name}}"'';
-          context = "files";
-          description = "tig file history";
-          output = "terminal";
         }
       ];
 

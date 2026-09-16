@@ -4,6 +4,10 @@
     "pr": ""
   },
   "permissions": {
+    "allow": [
+      "Write(//Users/uncool/projects/ratch/localconfigs/**)",
+      "Edit(//Users/uncool/projects/ratch/localconfigs/**)"
+    ],
     "defaultMode": "auto"
   },
   "model": "sonnet[1m]",
@@ -102,6 +106,12 @@
       "source": {
         "source": "github",
         "repo": "Egonex-AI/Understand-Anything"
+      }
+    },
+    "humanizer": {
+      "source": {
+        "source": "github",
+        "repo": "blader/humanizer"
       }
     }
   },

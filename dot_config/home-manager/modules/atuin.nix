@@ -3,10 +3,7 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = false;
-    daemon = {
-      enable = true;
-      logLevel = "debug";
-    };
+    daemon.enable = true;
     settings = {
       search_mode = "fuzzy";
       filter_mode = "global";
@@ -35,7 +32,6 @@
           "npm"
           "pnpm"
           "systemctl"
-          "tmux"
         ];
         common_prefix = [ "sudo" ];
         ignored_commands = [

@@ -1,0 +1,13 @@
+{{- $users := dict
+  "postgres" "op://Ratch/Alloy DB cluster/password"
+  "staging_ddl" "op://Ratch/Alloy DB staging ddl/password"
+  "staging_dml" "op://Ratch/Alloy DB staging dml/password"
+  "staging_read" "op://Ratch/Alloy DB staging read only/password"
+  "prod_ddl" "op://Ratch/Alloy DB prod ddl/password"
+  "prod_dml" "op://Ratch/Alloy DB prod dml/password"
+-}}
+{{- range $user, $ref := $users }}
+{{- $pass := onepasswordRead $ref }}
+localhost:5432:*:{{ $user }}:{{ $pass }}
+10.8.87.2:5432:*:{{ $user }}:{{ $pass }}
+{{- end }}

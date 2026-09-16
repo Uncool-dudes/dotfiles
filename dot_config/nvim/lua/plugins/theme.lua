@@ -26,36 +26,4 @@ return {
       theme = "wave",
     },
   },
-  {
-    "kepano/flexoki-neovim",
-    name = "flexoki",
-    lazy = true,
-  },
-  {
-    "catppuccin/nvim",
-    name = "catppuccin",
-    lazy = true,
-    opts = {
-      transparent_background = true,
-      flavour = "mocha",
-    },
-  },
-  {
-    "rose-pine/neovim",
-    name = "rose-pine",
-    lazy = true,
-    opts = {
-      styles = {
-        transparency = true,
-      },
-    },
-  },
-  {
-    "folke/tokyonight.nvim",
-    lazy = true,
-    opts = {
-      transparent = true,
-      style = "night",
-    },
-  },
 }

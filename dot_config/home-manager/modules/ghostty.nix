@@ -28,6 +28,10 @@
 
       window-inherit-working-directory = true;
       notify-on-command-finish = "unfocused";
+      window-save-state = "always";
+
+      macos-auto-secure-input = true;
+      clipboard-paste-protection = true;
 
       gtk-single-instance = true;
       macos-option-as-alt = true;

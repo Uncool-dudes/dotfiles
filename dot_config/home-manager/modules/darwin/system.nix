@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -59,7 +59,4 @@
   system.primaryUser = "uncool";
 
   services.tailscale.enable = true;
-
-
-  environment.systemPackages = [ pkgs.vim ];
 }

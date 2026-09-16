@@ -10,20 +10,17 @@
     };
 
     brews = [
-      "libpq"
       "mole"
-      "postgresql@18"
       "rtk"
-      "tailscale"
     ];
 
     casks = [
+      "adobe-creative-cloud"
       "gcloud-cli"
       "1password"
+      "beekeeper-studio"
       "bettertouchtool"
       "cleanshot"
-      "idagio"
-      "renamer"
       "docker-desktop"
       "font-geist-mono-nerd-font"
       "font-iosevka-nerd-font"
@@ -32,6 +29,7 @@
       "ghostty"
       "google-chrome"
       "hazel"
+      "iina"
       "jetbrains-toolbox"
       "little-snitch"
       "megasync"
@@ -45,14 +43,12 @@
       "pdf-expert"
       "popclip"
       "raycast"
+      "renamer"
+      "steam"
       "superhuman"
-
       "ti-connect-ce"
-      "transmission"
       "typora"
       "qview"
-      "flowvision"
-      "rectangle-pro"
       "yubico-authenticator"
       "zoom"
       "zotero"

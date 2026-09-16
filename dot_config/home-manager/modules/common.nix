@@ -8,17 +8,28 @@
     ./starship.nix
     ./atuin.nix
     ./bat.nix
+    ./eza.nix
+    ./fd.nix
+    ./yazi.nix
+    ./tealdeer.nix
+    ./btop.nix
     ./git.nix
     ./ssh.nix
+    ./postgres.nix
     ./lazygit.nix
     ./ripgrep.nix
     ./ghostty.nix
-    ./tmux.nix
-    ./mpv.nix
     ./gh.nix
+    ./jq.nix
+    ./k9s.nix
+    ./lazydocker.nix
+    ./lazyworktree.nix
+    ./worktrunk.nix
+    ./topgrade.nix
     ./fastfetch.nix
     ./aria2.nix
     ./devtools.nix
+    ./direnv.nix
   ];
 
   home = {
@@ -28,69 +39,12 @@
   };
 
   programs.home-manager.enable = true;
-
-  nix.gc = {
-    automatic = true;
-    dates = "weekly";
-    options = "--delete-older-than 30d";
+  programs.parallel = {
+    enable = true;
+    will-cite = true;
   };
 
-  programs = {
-    nix-index.enable = true;
-
-    tealdeer = {
-      enable = true;
-      settings.display.use_pager = true;
-    };
-
-    yazi = {
-      enable = true;
-      shellWrapperName = "y";
-      settings = {
-        mgr.show_hidden = false;
-        preview = {
-          image_filter = "triangle";
-          max_width = 1000;
-          max_height = 800;
-        };
-        tasks = {
-          preload_workers = 15;
-          fetch_workers = 10;
-        };
-      };
-    };
-
-    fd = {
-      enable = true;
-      hidden = true;
-      ignores = [
-        ".git/"
-        "node_modules/"
-        "__pycache__/"
-        "*.pyc"
-        ".DS_Store"
-        "target/"
-        "dist/"
-        ".direnv/"
-      ];
-    };
-
-    eza = {
-      enable = true;
-      icons = "auto";
-      git = true;
-      extraOptions = [ "--group-directories-first" ];
-    };
-    btop = {
-      enable = true;
-      settings = {
-        shown_boxes = "proc cpu";
-        proc_sorting = "memory";
-        cpu_bottom = true;
-        save_config_on_exit = false;
-      };
-    };
-  };
+  programs.nix-index.enable = true;
   home.sessionPath = [
     "/nix/var/nix/profiles/default/bin"
     "$HOME/.local/bin"
@@ -99,18 +53,14 @@
   home.packages = with pkgs; [
     # Shell
     chezmoi
-    parallel
 
     # Core CLI
-    # age # file encryption - unused, no sops/secrets workflow consumes it yet
+    age
     grex
     hl-log-viewer
-    lnav
-    oha
     procs
     sd
     watchexec
-    whosthere
     witr
     xh
 
@@ -120,26 +70,22 @@
     git-absorb
     glow
     lefthook
-    # tig # git TUI browser - redundant, lazygit covers this
-
-    proximity-sort
 
     # Text / data
     csvlens
     fx
     gum
-    jq
-    miller
     pandoc
     tokei
 
     # System / monitoring
     iperf3
     nmap
-    # dive # docker image layer inspector - only useful when actively building images
+    dive
     duf
     dust
     hyperfine
+    ov
 
     # Media
     ffmpeg
@@ -156,7 +102,14 @@
     _1password-cli
 
     # Misc
-    onefetch
     wget
   ];
+
+  # Considered and rejected (zero usage in shell history unless noted):
+  # lnav       - duplicate of hl-log-viewer
+  # oha        - load-test tool
+  # whosthere  -
+  # tig        - git TUI browser, redundant with lazygit
+  # miller     -
+  # onefetch   -
 }

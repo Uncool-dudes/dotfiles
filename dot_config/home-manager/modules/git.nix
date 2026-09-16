@@ -42,7 +42,7 @@
         fsmonitor = true;
         untrackedCache = true;
         quotePath = false;
-        editor = "nvim";
+        editor = config.home.sessionVariables.EDITOR;
         pager = "delta";
       };
 
@@ -168,17 +168,6 @@
         "git@github.com:Uncool-dudes/" = {
           insteadOf = "uc:";
         };
-      };
-
-      credential = {
-        "https://github.com".helper = [
-          ""
-          "!gh auth git-credential"
-        ];
-        "https://gist.github.com".helper = [
-          ""
-          "!gh auth git-credential"
-        ];
       };
 
       gpg.ssh.allowedSignersFile = "${config.xdg.configHome}/git/allowed_signers";

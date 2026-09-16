@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, ... }:
 {
   programs.ssh = {
     enable = true;
@@ -6,10 +6,7 @@
 
     settings = {
       "*" = {
-        IdentityAgent =
-          if pkgs.stdenv.hostPlatform.isDarwin
-          then "~/Library/Group\\ Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-          else "~/.1password/agent.sock";
+        IdentityAgent = "\"${config.home.sessionVariables.SSH_AUTH_SOCK}\"";
         SetEnv = { TERM = "xterm-256color"; };
         ControlMaster = "auto";
         ControlPath = "~/.ssh/cm-%C";
@@ -17,12 +14,13 @@
         ServerAliveInterval = 15;
         ServerAliveCountMax = 3;
         ForwardAgent = false;
+        HashKnownHosts = true;
+        UpdateHostKeys = true;
       };
 
       "*.ratch.ai" = {
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        IdentitiesOnly = true;
       };
 
       "ssh.ananthp.dev" = {
@@ -41,15 +39,13 @@
         HostName = "dev-api.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        IdentitiesOnly = true;
       };
 
       "alloydb" = {
         HostName = "dev-api.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        IdentitiesOnly = true;
-        LocalForward = "5433 10.8.87.2:5432";
+        LocalForward = "5432 10.8.87.2:5432";
         ExitOnForwardFailure = true;
       };
 
@@ -57,14 +53,12 @@
         HostName = "ratch1-api.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        IdentitiesOnly = true;
       };
 
       "dev2" = {
         HostName = "dev2.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        IdentitiesOnly = true;
       };
 
       "git.ananthp.dev" = {
@@ -72,15 +66,7 @@
         User = "git";
         Port = 2223;
         IdentityFile = "~/.ssh/id_ed25519_personal";
-        IdentitiesOnly = true;
       };
     };
   };
-
-  home.file.".pg_service.conf".text = ''
-    [alloydb]
-    host=localhost
-    port=5433
-    user=postgres
-  '';
 }

@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   programs.gh = {
     enable = true;
@@ -7,7 +7,7 @@
       prompt = "enabled";
       color_labels = "enabled";
       pager = "delta";
-      editor = "nvim";
+      editor = config.home.sessionVariables.EDITOR;
       telemetry = "disabled";
       aliases = {
         co = "pr checkout";
@@ -139,5 +139,29 @@
         '';
       })
     ];
+  };
+
+  xdg.configFile."gh-dash/config.yml" = {
+    force = true;
+    source = (pkgs.formats.yaml { }).generate "gh-dash-config" {
+      prSections = [
+        { title = "My PRs"; filters = "is:open author:@me"; }
+        { title = "Needs my review"; filters = "is:open review-requested:@me"; }
+        { title = "ratchio"; filters = "is:open org:ratchio"; }
+        { title = "Uncool-dudes"; filters = "is:open org:Uncool-dudes"; }
+        { title = "apaag-solutions-lab"; filters = "is:open org:apaag-solutions-lab"; }
+      ];
+      issuesSections = [
+        { title = "My Issues"; filters = "is:open author:@me"; }
+        { title = "ratchio"; filters = "is:open org:ratchio"; }
+        { title = "Uncool-dudes"; filters = "is:open org:Uncool-dudes"; }
+        { title = "apaag-solutions-lab"; filters = "is:open org:apaag-solutions-lab"; }
+      ];
+      defaults = {
+        preview.open = true;
+        refetchIntervalMinutes = 30;
+      };
+      pager.diff = "delta";
+    };
   };
 }
