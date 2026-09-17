@@ -65,7 +65,6 @@
     kind
     kubectl
     kustomize
-    pgcli
     postgresql
     sops
     stern

@@ -39,6 +39,11 @@
     port=5432
     user=prod_dml
 
+    [alloydb-prod-ro]
+    host=localhost
+    port=5432
+    user=prod_read
+
     [alloydb-direct]
     host=10.8.87.2
     port=5432
@@ -68,16 +73,23 @@
     host=10.8.87.2
     port=5432
     user=prod_dml
+
+    [alloydb-prod-ro-direct]
+    host=10.8.87.2
+    port=5432
+    user=prod_read
   '';
 
-  home.file.".config/pgcli/config".text = ''
-    [main]
-    multi_line = False
-    less_chatty = True
-    auto_expand = True
-    destructive_warning = True
-    table_format = psql
-  '';
+  programs.pgcli = {
+    enable = true;
+    settings.main = {
+      multi_line = false;
+      less_chatty = true;
+      auto_expand = true;
+      destructive_warning = true;
+      table_format = "psql";
+    };
+  };
 
   home.file.".psqlrc".text = ''
     \set QUIET 1

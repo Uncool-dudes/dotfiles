@@ -6,6 +6,7 @@
   "prod_ddl" "op://Ratch/Alloy DB prod ddl/password"
   "prod_dml" "op://Ratch/Alloy DB prod dml/password"
 -}}
+{{/* prod_read: add once "Alloy DB prod read only" exists in 1Password */}}
 {{- range $user, $ref := $users }}
 {{- $pass := onepasswordRead $ref }}
 localhost:5432:*:{{ $user }}:{{ $pass }}

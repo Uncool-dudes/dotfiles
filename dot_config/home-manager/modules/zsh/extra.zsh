@@ -1,14 +1,6 @@
 autoload -Uz add-zsh-hook
 
 # ── Functions ────────────────────────────────────────────────────
-function fp() { ps aux | fzf --height 40% | awk '{print $2}' | xargs -r kill -9 }
-function fport() {
-  if [[ "$OSTYPE" == darwin* ]]; then
-    lsof -iTCP -sTCP:LISTEN -n -P | fzf --height 40%
-  else
-    ss -tlnp | fzf --height 40%
-  fi
-}
 function gcd() { cd "$(ghq list --full-path | fzf --height 40%)" }
 function mkcd() {
   if [[ -z "$1" ]]; then
@@ -17,12 +9,8 @@ function mkcd() {
   fi
   mkdir -p -- "$1" && cd -- "$1"
 }
-function tarzst() {
-  local dest="${2:-.}"
-  local name
-  name="$(basename "$1")"
-  tar --use-compress-program=zstd -cvf "${dest}/${name}.tar.zst" "$1"
-}
+_auto_ls_on_cd() { eza }
+add-zsh-hook chpwd _auto_ls_on_cd
 
 # ── Cached eval ──────────────────────────────────────────────────
 _cache_eval() {
@@ -43,8 +31,8 @@ _cache_eval pnpm    completion zsh
 _cache_eval zoxide  init zsh --cmd cd
 _cache_eval direnv  hook zsh
 _cache_eval atuin   init zsh
-(( $+commands[starship] )) && _cache_eval starship init zsh
-(( $+commands[wt] )) && _cache_eval wt config shell init zsh
+_cache_eval starship init zsh
+_cache_eval wt        config shell init zsh
 
 # ── gcloud ───────────────────────────────────────────────────────
 local _gcloud_sdk="/opt/homebrew/share/google-cloud-sdk"

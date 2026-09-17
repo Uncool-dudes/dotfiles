@@ -5,6 +5,8 @@
   imports = [
     ./stylix.nix
     ./shell.nix
+    ./fzf.nix
+    ./zoxide.nix
     ./starship.nix
     ./atuin.nix
     ./bat.nix
@@ -25,7 +27,6 @@
     ./lazydocker.nix
     ./lazyworktree.nix
     ./worktrunk.nix
-    ./topgrade.nix
     ./fastfetch.nix
     ./aria2.nix
     ./devtools.nix

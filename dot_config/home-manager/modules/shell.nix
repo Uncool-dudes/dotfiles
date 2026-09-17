@@ -17,16 +17,6 @@
     GHQ_ROOT = "${config.home.homeDirectory}/projects";
   };
 
-  # DataGrip/JetBrains SSH client can't parse a socket path containing spaces
-  # (IJPL-63098) - symlink the real 1Password socket to a space-free path.
-  home.activation.linkOnePasswordAgentSock = lib.hm.dag.entryAfter [ "writeBoundary" ] (
-    if pkgs.stdenv.hostPlatform.isDarwin then ''
-      mkdir -p "${config.home.homeDirectory}/.1password"
-      ln -sf "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock" \
-        "${config.home.homeDirectory}/.1password/agent.sock"
-    '' else ""
-  );
-
   programs.zsh = {
     enable = true;
     dotDir = "${config.xdg.configHome}/zsh";
@@ -69,6 +59,8 @@
     shellAliases = {
       "7z" = "7zz";
       lz = "lazygit";
+      ll = "eza -lah --git --icons";
+      lt = "eza --tree --level=2 --icons";
       mkdir = "mkdir -p";
       diff = "delta";
       du = "dust";
@@ -114,35 +106,4 @@
   home.sessionPath =
     lib.optionals pkgs.stdenv.hostPlatform.isDarwin [ "/Applications/1Password.app/Contents/MacOS" ]
     ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [ "/opt/1Password" ];
-
-  programs.fzf = {
-    enable = true;
-    enableZshIntegration = false;
-    defaultCommand = "fd --type f --follow";
-    defaultOptions = [
-      "--height=40%"
-      "--layout=reverse"
-      "--border"
-    ];
-    fileWidget.command = "fd --type f --follow";
-    changeDirWidget.command = "fd --type d --follow";
-  };
-  programs.zoxide = {
-    enable = true;
-    enableZshIntegration = false;
-  };
-
-  launchd.agents.ssh-auth-sock-setenv = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
-    enable = true;
-    config = {
-      ProgramArguments = [
-        "/bin/launchctl"
-        "setenv"
-        "SSH_AUTH_SOCK"
-        config.home.sessionVariables.SSH_AUTH_SOCK
-      ];
-      RunAtLoad = true;
-      KeepAlive = false;
-    };
-  };
 }

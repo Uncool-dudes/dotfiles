@@ -19,7 +19,6 @@
       };
     };
     extensions = [
-      pkgs.gh-dash
       pkgs.gh-poi
       pkgs.gh-markdown-preview
       pkgs.gh-stack
@@ -141,9 +140,9 @@
     ];
   };
 
-  xdg.configFile."gh-dash/config.yml" = {
-    force = true;
-    source = (pkgs.formats.yaml { }).generate "gh-dash-config" {
+  programs.gh-dash = {
+    enable = true;
+    settings = {
       prSections = [
         { title = "My PRs"; filters = "is:open author:@me"; }
         { title = "Needs my review"; filters = "is:open review-requested:@me"; }

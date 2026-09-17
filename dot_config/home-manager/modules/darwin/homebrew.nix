@@ -18,7 +18,6 @@
       "adobe-creative-cloud"
       "gcloud-cli"
       "1password"
-      "beekeeper-studio"
       "bettertouchtool"
       "cleanshot"
       "docker-desktop"
