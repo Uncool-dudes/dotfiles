@@ -1,0 +1,6 @@
+{ ... }:
+{
+  imports = [
+    ../academia/academia.nix
+  ];
+}

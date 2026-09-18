@@ -15,6 +15,7 @@
     MANPAGER = "sh -c 'col -bx | bat -l man -p'";
     PAGER = "ov";
     GHQ_ROOT = "${config.home.homeDirectory}/projects";
+    DISABLE_AUTOUPDATER = "1";
   };
 
   programs.zsh = {

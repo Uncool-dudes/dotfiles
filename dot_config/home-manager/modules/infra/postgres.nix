@@ -14,6 +14,11 @@
     port=5432
     user=postgres
 
+    [alloydb-read]
+    host=localhost
+    port=5432
+    user=alloy_read
+
     [alloydb-staging-ddl]
     host=localhost
     port=5432

@@ -21,6 +21,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
   outputs = inputs@{ flake-parts, home-manager, nix-darwin, stylix, ... }:
@@ -46,10 +47,23 @@
         })
       ];
 
+      roles = {
+        core = ./modules/roles/core.nix;
+        dev = ./modules/roles/dev.nix;
+        ai = ./modules/roles/ai.nix;
+        infra = ./modules/roles/infra.nix;
+        secrets = ./modules/roles/secrets.nix;
+        extras = ./modules/roles/extras.nix;
+        academia = ./modules/roles/academia.nix;
+        darwinDesktop = ./modules/roles/darwin-desktop.nix;
+      };
+
+      commonRoles = with roles; [ core dev ai infra secrets extras academia ];
+
       macHomeModules = [
-        ./modules/common.nix
+        ./modules/base.nix
         ./modules/darwin/home.nix
-      ];
+      ] ++ commonRoles ++ [ roles.darwinDesktop ];
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
       systems = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
@@ -91,8 +105,8 @@
               };
           in {
             "uncool@mac"    = mkHome { system = "aarch64-darwin"; modules = macHomeModules; };
-            "uncool@ubuntu" = mkHome { system = "x86_64-linux";   modules = [ ./modules/common.nix ./modules/ubuntu.nix ]; };
-            "uncool@arch"   = mkHome { system = "x86_64-linux";   modules = [ ./modules/common.nix ./modules/arch.nix   ]; };
+            "uncool@ubuntu" = mkHome { system = "x86_64-linux";   modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/ubuntu.nix ]; };
+            "uncool@arch"   = mkHome { system = "x86_64-linux";   modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/arch.nix   ]; };
           };
       };
     };

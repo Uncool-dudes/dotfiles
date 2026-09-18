@@ -77,43 +77,7 @@
   },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
-    "cc-skills-golang@samber": true,
-    "caveman@caveman": true,
-    "claude-hud@claude-hud": true,
-    "understand-anything@understand-anything": true,
     "rust-analyzer-lsp@claude-plugins-official": true
-  },
-  "extraKnownMarketplaces": {
-    "samber": {
-      "source": {
-        "source": "github",
-        "repo": "samber/cc"
-      }
-    },
-    "caveman": {
-      "source": {
-        "source": "github",
-        "repo": "JuliusBrussee/caveman"
-      }
-    },
-    "claude-hud": {
-      "source": {
-        "source": "github",
-        "repo": "jarrodwatts/claude-hud"
-      }
-    },
-    "understand-anything": {
-      "source": {
-        "source": "github",
-        "repo": "Egonex-AI/Understand-Anything"
-      }
-    },
-    "humanizer": {
-      "source": {
-        "source": "github",
-        "repo": "blader/humanizer"
-      }
-    }
   },
   "effortLevel": "medium",
   "promptSuggestionEnabled": false,

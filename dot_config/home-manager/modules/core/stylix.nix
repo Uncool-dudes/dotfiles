@@ -6,7 +6,7 @@
     enable = true;
     autoEnable = false;
 
-    base16Scheme = ../themes/base16-oxocarbon-dark.yaml;
+    base16Scheme = ../../themes/base16-oxocarbon-dark.yaml;
 
     image = pkgs.runCommand "black-pixel" {
       nativeBuildInputs = [ pkgs.imagemagick ];
