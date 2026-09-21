@@ -12,6 +12,7 @@
     neovim
     ffmpeg
     imagemagick
+    vips
     _7zz
     glow
     bash

@@ -5,6 +5,7 @@
     arguments = [
       "--smart-case"
       "--hidden"
+      "--no-messages"
       "--follow"
       "--line-number"
       "--max-columns=200"

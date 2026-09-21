@@ -20,6 +20,8 @@
         "github.com/fabrikiot"
         "github.com/ratchio"
       ];
+      GOCACHE = "${config.xdg.cacheHome}/go-build";
+      GOMODCACHE = "${config.xdg.cacheHome}/go-mod";
     };
   };
 

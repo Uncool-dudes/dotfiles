@@ -1,5 +1,6 @@
 { config, lib, pkgs, ... }:
 {
+  home.packages = [ pkgs.autossh ];
   # DataGrip/JetBrains SSH client can't parse a socket path containing spaces
   # (IJPL-63098) - symlink the real 1Password socket to a space-free path.
   home.activation.linkOnePasswordAgentSock = lib.hm.dag.entryAfter [ "writeBoundary" ] (
@@ -69,8 +70,9 @@
         HostName = "dev-api.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/id_ed25519_work";
-        LocalForward = "5432 10.8.87.2:5432";
+        LocalForward = "127.0.0.1:5432 10.8.87.2:5432";
         ExitOnForwardFailure = true;
+        ConnectTimeout = 10;
       };
 
       "ratch1" = {

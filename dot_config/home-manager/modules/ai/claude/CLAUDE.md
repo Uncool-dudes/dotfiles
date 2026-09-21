@@ -78,6 +78,3 @@ Also:
 - `witr` process inspector — `witr <name>` (substring), `witr -x <name>` (exact), `witr -p <pid>`, `witr -o <port>`, `witr -f <file>`, `witr -c <container>`; flags repeatable/mixable. `-s` ancestry, `-t` tree, `--env` env vars, `--verbose` extended, `--json` machine output. No args = TUI (`-i` force TUI). Searches Docker/Podman/K8s/LXC with `-c`.
 
 @RTK.md
-# graphify
-- **graphify** (`~/.claude/skills/graphify/SKILL.md`) - any input to knowledge graph. Trigger: `/graphify`
-When the user types `/graphify`, use the installed graphify skill or instructions before doing anything else.

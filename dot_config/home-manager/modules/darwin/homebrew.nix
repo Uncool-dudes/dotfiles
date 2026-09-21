@@ -5,9 +5,11 @@
 
     onActivation = {
       cleanup = "uninstall";
-      upgrade = true;
-      autoUpdate = true;
+      upgrade = false;
+      autoUpdate = false;
     };
+
+    caskArgs.no_quarantine = true;
 
     brews = [
       "mole"

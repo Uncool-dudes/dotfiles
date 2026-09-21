@@ -5,18 +5,29 @@
   ...
 }:
 {
-  home.sessionVariables = {
-    SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
-    HOMEBREW_NO_ANALYTICS = "1";
-    HOMEBREW_NO_ENV_HINTS = "1";
-    LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
-    EDITOR = "nvim";
-    VISUAL = "nvim";
-    MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-    PAGER = "ov";
-    GHQ_ROOT = "${config.home.homeDirectory}/projects";
-    DISABLE_AUTOUPDATER = "1";
-  };
+  home.sessionVariables =
+    {
+      SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
+      HOMEBREW_NO_ANALYTICS = "1";
+      HOMEBREW_NO_ENV_HINTS = "1";
+      LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
+      EDITOR = "nvim";
+      VISUAL = "nvim";
+      MANPAGER = "sh -c 'col -bx | bat -l man -p'";
+      PAGER = "ov";
+      GHQ_ROOT = "${config.home.homeDirectory}/projects";
+      DISABLE_AUTOUPDATER = "1";
+      DO_NOT_TRACK = "1";
+      DOCKER_CLI_HINTS = "false";
+      PS4 = "+%N:%i> ";
+      MAILCHECK = "0";
+      BUILDKIT_PROGRESS = "plain";
+      COMPOSE_MENU = "false";
+      COMPOSE_BAKE = "true";
+    }
+    // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+      BROWSER = "open";
+    };
 
   programs.zsh = {
     enable = true;
@@ -38,7 +49,19 @@
       "NO_CASE_GLOB"
       "PIPE_FAIL"
       "INTERACTIVE_COMMENTS"
+      "HIST_VERIFY"
     ];
+    history = {
+      path = "${config.xdg.stateHome}/zsh/history";
+      size = 50000;
+      save = 50000;
+      ignoreSpace = true;
+      ignoreAllDups = true;
+      ignoreDups = true;
+      expireDuplicatesFirst = true;
+      extended = true;
+      share = true;
+    };
     completionInit = ''
       autoload -Uz compinit
       setopt EXTENDED_GLOB
@@ -68,15 +91,13 @@
       df = "duf";
       pg_dump = "pg_dump --no-owner --no-privileges --format=custom --compress=9";
       rsync = "rsync -avP";
+      glow = "glow -s dark";
+      wget = "wget --hsts-file=/dev/null";
       rl = "source ${config.xdg.configHome}/zsh/.zshrc";
+      alloydb-tunnel = "autossh -M 0 -Nf alloydb";
       cc = "claude";
       ccc = "claude --continue";
       ccr = "claude --resume";
-      cch = "CLAUDE_CONFIG_DIR=~/.claude-home claude";
-      cql = "codeql query run --search-path ~/.codeql/packages";
-      cqldb = "codeql database create --language=go --source-root=. --threads=4";
-      cqli = "codeql pack install";
-      cqlq = "cd .codeql/queries";
       ".." = "cd ..";
       "..." = "cd ../..";
       sc-start = "sudo systemctl start";

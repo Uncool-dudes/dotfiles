@@ -1,10 +1,14 @@
 {{- $users := dict
   "postgres" "op://Ratch/Alloy DB cluster/password"
-  "staging_ddl" "op://Ratch/Alloy DB staging ddl/password"
-  "staging_dml" "op://Ratch/Alloy DB staging dml/password"
+  "staging-ddl" "op://Ratch/Alloy DB staging ddl/password"
+  "staging-dml" "op://Ratch/Alloy DB staging dml/password"
+  "staging_ddl" "op://Ratch/Alloy DB staging_ddl/password"
+  "staging_dml" "op://Ratch/Alloy DB staging_dml/password"
   "staging_read" "op://Ratch/Alloy DB staging read only/password"
-  "prod_ddl" "op://Ratch/Alloy DB prod ddl/password"
-  "prod_dml" "op://Ratch/Alloy DB prod dml/password"
+  "prod-ddl" "op://Ratch/Alloy DB prod ddl/password"
+  "prod-dml" "op://Ratch/Alloy DB prod dml/password"
+  "prod_ddl" "op://Ratch/Alloy DB prod_ddl/password"
+  "prod_dml" "op://Ratch/Alloy DB prod_dml/password"
   "alloy_read" "op://Ratch/Alloy DB alloy read/password"
 -}}
 {{/* prod_read: add once "Alloy DB prod read only" exists in 1Password */}}

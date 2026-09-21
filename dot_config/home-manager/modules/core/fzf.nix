@@ -3,14 +3,14 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = false;
-    defaultCommand = "fd --type f --follow";
+    defaultCommand = "fd --type f --follow --hidden --exclude .git";
     defaultOptions = [
       "--height=40%"
       "--layout=reverse"
       "--border"
     ];
     fileWidget = {
-      command = "fd --type f --follow";
+      command = "fd --type f --follow --hidden --exclude .git";
       options = [ "--preview" "'bat -n --color=always {}'" ];
     };
     changeDirWidget = {

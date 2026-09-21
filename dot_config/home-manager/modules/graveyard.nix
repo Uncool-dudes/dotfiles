@@ -6,7 +6,6 @@
 # csvlens    - CSV pager, zero usage
 # gitlogue   - unclear what it does / never used
 # hadolint   - Dockerfile linter, zero usage
-# vips       - no gains over imagemagick for actual usage
 # act        - forgot what it did, zero usage
 # lnav       - duplicate of hl-log-viewer
 # oha        - load-test tool, zero usage

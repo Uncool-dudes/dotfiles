@@ -1,17 +1,20 @@
 { inputs, pkgs, ... }:
 let
+  # NOTE: keep in sync with modules/ai/packages.nix override - patches bar chars
+  # in compiled bundle by literal string match, likely to break on version bump.
+  ccstatusline = inputs.llm-agents.packages.${pkgs.system}.ccstatusline.overrideAttrs (old: {
+    postInstall = ''
+      substituteInPlace $out/bin/ccstatusline \
+        --replace-quiet '▓' '-' \
+        --replace-quiet '░' '·'
+    '';
+  });
+
   caveman = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
     rev = "ef6050c5e1848b6880ff47c32ade1a608a64f85e";
     hash = "sha256-LlyBlFsKUHKzsOXEwENoVSsZHtKENVY4vFMRf08vzoU=";
-  };
-
-  claude-hud-src = pkgs.fetchFromGitHub {
-    owner = "jarrodwatts";
-    repo = "claude-hud";
-    rev = "b83b44593af24de1db6183788a51d08715501c02";
-    hash = "sha256-AfFJY6Ts5qzeECFCyevrnMWcZtwQxcCjZS73k8/PQf8=";
   };
 
   cc-skills-golang = pkgs.fetchFromGitHub {
@@ -29,18 +32,14 @@ in
     package = inputs.llm-agents.packages.${pkgs.system}.claude-code;
     context = ./claude/CLAUDE.md;
     settings = builtins.fromJSON (builtins.readFile ./claude/settings.json) // {
-      # claude-hud is just a statusLine script - run it directly from the nix
-      # store instead of installing it as a plugin (avoids depending on the
-      # plugins/cache/*/claude-hud/*/ glob the upstream setup command wires up).
       statusLine = {
         type = "command";
-        command = ''bash -c 'cols=''${COLUMNS:-}; case "$cols" in ""|*[!0-9]*) cols=$(stty size </dev/tty 2>/dev/null | awk '"'"'{ print $2 }'"'"');; esac; case "$cols" in ""|*[!0-9]*) cols=120;; esac; export COLUMNS=$(( cols > 4 ? cols - 4 : 1 )); exec node "${claude-hud-src}/dist/index.js"' '';
+        command = "${ccstatusline}/bin/ccstatusline";
       };
     };
 
     # Official plugins (gopls-lsp, rust-analyzer-lsp) have no external repo -
     # bundled with the CLI itself, kept as enabledPlugins in settings.json instead.
-    # claude-hud is invoked directly via statusLine above, not as a plugin.
     plugins = {
       caveman = caveman;
       cc-skills-golang = cc-skills-golang;
@@ -49,6 +48,6 @@ in
 
   home.file = {
     ".claude/RTK.md".source = ./claude/RTK.md;
-    ".claude/plugins/claude-hud/config.json".source = ./claude/plugins/claude-hud/config.json;
+    ".config/ccstatusline/settings.json".source = ./claude/ccstatusline-settings.json;
   };
 }
