@@ -81,10 +81,16 @@
       log = {
         abbrevCommit = true;
         decorate = true;
-        date = "relative";
+        date = "format:%Y-%m-%d %H:%M";
+        follow = true;
+        showSignature = true;
+        diffMerges = "first-parent";
+        excludeDecoration = "refs/remotes/origin/HEAD";
       };
 
       format.pretty = "format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
+
+      pretty.compact = "format:%C(auto)%h%d %s %C(dim)(%an, %ad)%Creset";
 
       branch.sort = "-committerdate";
       column.ui = "auto";
@@ -224,6 +230,9 @@
         last = "show -w HEAD";
         lg = "log --graph --all";
         tree = "log --graph --oneline --all --decorate";
+        main-line = "log --first-parent --oneline";
+        what-changed = "log --ancestry-path --oneline --no-merges";
+        who = "shortlog -sn --no-merges";
         p = "push";
         pf = "push --force-with-lease";
         pl = "pull --rebase";
@@ -234,9 +243,6 @@
         nuke = "reset --hard HEAD";
         unstage = "restore --staged";
         sub = "submodule update --remote --rebase";
-        gone = "!git branch -vv | rg --no-line-number ': gone]' | awk '{print $1}' | xargs git branch -D";
-        prune-merged = "!git branch --merged | rg -v '\\*|main|master' | xargs -n 1 git branch -d";
-        sqa = "!git fetch origin main:main --quiet 2>/dev/null; git rebase -i --autosquash $(git merge-base main HEAD)";
         base = "!git fetch origin main:main --quiet 2>/dev/null; git merge-base main HEAD";
         fixup = "!f() { git commit --fixup=\"\${1:-HEAD}\"; }; f";
         rc = "rebase --continue";
@@ -251,7 +257,7 @@
     options = {
       navigate = true;
       side-by-side = false;
-      line-numbers = true;
+      line-numbers = false;
       hyperlinks = true;
       keep-plus-minus-markers = false;
       tabs = 4;
@@ -261,6 +267,15 @@
       merge-conflict-end-symbol = "▲";
       file-modified-label = "Δ";
       right-arrow = "⟶  ";
+      file-decoration-style = "none";
+      commit-decoration-style = "none";
+      hunk-header-style = "omit";
+      hunk-header-decoration-style = "none";
+      zero-style = "dim syntax";
+      plus-style = "syntax";
+      minus-style = "syntax";
+      whitespace-error-style = "";
+      width = "variable";
     };
   };
 
