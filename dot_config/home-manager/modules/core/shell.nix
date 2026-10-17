@@ -5,29 +5,27 @@
   ...
 }:
 {
-  home.sessionVariables =
-    {
-      SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
-      HOMEBREW_NO_ANALYTICS = "1";
-      HOMEBREW_NO_ENV_HINTS = "1";
-      LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
-      EDITOR = "nvim";
-      VISUAL = "nvim";
-      MANPAGER = "sh -c 'col -bx | bat -l man -p'";
-      PAGER = "ov";
-      GHQ_ROOT = "${config.home.homeDirectory}/projects";
-      DISABLE_AUTOUPDATER = "1";
-      DO_NOT_TRACK = "1";
-      DOCKER_CLI_HINTS = "false";
-      PS4 = "+%N:%i> ";
-      MAILCHECK = "0";
-      BUILDKIT_PROGRESS = "plain";
-      COMPOSE_MENU = "false";
-      COMPOSE_BAKE = "true";
-    }
-    // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
-      BROWSER = "open";
-    };
+  home.sessionVariables = {
+    SSH_AUTH_SOCK = "${config.home.homeDirectory}/.1password/agent.sock";
+    HOMEBREW_NO_ANALYTICS = "1";
+    HOMEBREW_NO_ENV_HINTS = "1";
+    LESSHISTFILE = "${config.xdg.cacheHome}/less/history";
+    EDITOR = "nvim";
+    VISUAL = "nvim";
+    GHQ_ROOT = "${config.home.homeDirectory}/projects";
+    DISABLE_AUTOUPDATER = "1";
+    DO_NOT_TRACK = "1";
+    DOCKER_CLI_HINTS = "false";
+    DOCKER_SCAN_SUGGEST = "false";
+    PS4 = "+%N:%i> ";
+    MAILCHECK = "0";
+    BUILDKIT_PROGRESS = "plain";
+    COMPOSE_MENU = "false";
+    COMPOSE_BAKE = "true";
+  }
+  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+    BROWSER = "open";
+  };
 
   programs.zsh = {
     enable = true;
@@ -38,9 +36,12 @@
         "romkatv/zsh-defer"
         "zsh-users/zsh-completions kind:fpath"
         "ohmyzsh/ohmyzsh path:lib/key-bindings.zsh"
+        "aloxaf/fzf-tab"
+        "kutsan/zsh-system-clipboard"
         "zsh-users/zsh-autosuggestions kind:defer"
         "ohmyzsh/ohmyzsh path:plugins/sudo/sudo.plugin.zsh kind:defer"
         "zdharma-continuum/fast-syntax-highlighting kind:defer"
+        "MichaelAquilina/zsh-you-should-use kind:defer"
       ];
     };
     setOptions = [
@@ -79,9 +80,11 @@
       ZSH_AUTOSUGGEST_MANUAL_REBIND = "1";
       WORDCHARS = "";
       NODE_NO_WARNINGS = "1";
+      YSU_MESSAGE_POSITION = "after";
     };
     shellAliases = {
       "7z" = "7zz";
+      g = "git";
       lz = "lazygit";
       ll = "eza -lah --git --icons";
       lt = "eza --tree --level=2 --icons";
@@ -91,10 +94,14 @@
       df = "duf";
       pg_dump = "pg_dump --no-owner --no-privileges --format=custom --compress=9";
       rsync = "rsync -avP";
+      hyperfine = "hyperfine --warmup 3";
+      procs = "procs --tree";
+      tokei = "tokei --sort lines";
+      cpv = "rsync -ah --progress";
       glow = "glow -s dark";
       wget = "wget --hsts-file=/dev/null";
       rl = "source ${config.xdg.configHome}/zsh/.zshrc";
-      alloydb-tunnel = "autossh -M 0 -Nf alloydb";
+      alloydb = "autossh -M 0 -o ControlMaster=no -o ControlPath=none -Nf alloydb";
       cc = "claude";
       ccc = "claude --continue";
       ccr = "claude --resume";
@@ -111,6 +118,8 @@
     };
     shellGlobalAliases = {
       G = "| rg";
+      Y = "| pbcopy";
+      P = "pbpaste";
       L = "| less";
       H = "| head";
       T = "| tail";
