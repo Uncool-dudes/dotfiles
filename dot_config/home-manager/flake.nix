@@ -2,7 +2,7 @@
   description = "Ananth's home-manager configuration";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
     alloydb-auth-proxy-src = {
       url = "github:GoogleCloudPlatform/alloydb-auth-proxy";
@@ -24,7 +24,14 @@
     llm-agents.url = "github:numtide/llm-agents.nix";
   };
 
-  outputs = inputs@{ flake-parts, home-manager, nix-darwin, stylix, ... }:
+  outputs =
+    inputs@{
+      flake-parts,
+      home-manager,
+      nix-darwin,
+      stylix,
+      ...
+    }:
     let
       overlays = [
         # nixpkgs-unstable lags go.dev releases by weeks (source-build + channel
@@ -58,15 +65,29 @@
         darwinDesktop = ./modules/roles/darwin-desktop.nix;
       };
 
-      commonRoles = with roles; [ core dev ai infra secrets extras academia ];
+      commonRoles = with roles; [
+        core
+        dev
+        ai
+        infra
+        secrets
+        extras
+        academia
+      ];
 
       macHomeModules = [
         ./modules/base.nix
         ./modules/darwin/home.nix
-      ] ++ commonRoles ++ [ roles.darwinDesktop ];
+      ]
+      ++ commonRoles
+      ++ [ roles.darwinDesktop ];
     in
     flake-parts.lib.mkFlake { inherit inputs; } {
-      systems = [ "aarch64-darwin" "x86_64-linux" "aarch64-linux" ];
+      systems = [
+        "aarch64-darwin"
+        "x86_64-linux"
+        "aarch64-linux"
+      ];
 
       perSystem = { pkgs, ... }: {
         devShells.default = pkgs.mkShell {
@@ -76,17 +97,22 @@
 
       flake = {
         darwinConfigurations."Ananths-MacBook-Pro" = nix-darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
           specialArgs = { inherit inputs; };
           modules = [
             ./modules/darwin
             home-manager.darwinModules.home-manager
-            { nixpkgs.overlays = overlays; }
+            {
+              nixpkgs.hostPlatform = "aarch64-darwin";
+              nixpkgs.overlays = overlays;
+            }
             {
               home-manager.useGlobalPkgs = true;
               home-manager.useUserPackages = true;
               home-manager.backupFileExtension = "bak";
-              home-manager.extraSpecialArgs = { username = "uncool"; inherit inputs; };
+              home-manager.extraSpecialArgs = {
+                username = "uncool";
+                inherit inputs;
+              };
               home-manager.users.uncool = { ... }: {
                 imports = macHomeModules;
                 _module.args.username = "uncool";
@@ -97,16 +123,33 @@
 
         homeConfigurations =
           let
-            mkHome = { system, modules }:
+            mkHome =
+              { system, modules }:
               home-manager.lib.homeManagerConfiguration {
-                pkgs = import inputs.nixpkgs { inherit system overlays; config.allowUnfree = true; };
+                pkgs = import inputs.nixpkgs {
+                  inherit system overlays;
+                  config.allowUnfree = true;
+                };
                 inherit modules;
-                extraSpecialArgs = { username = "uncool"; inherit inputs; };
+                extraSpecialArgs = {
+                  username = "uncool";
+                  inherit inputs;
+                };
               };
-          in {
-            "uncool@mac"    = mkHome { system = "aarch64-darwin"; modules = macHomeModules; };
-            "uncool@ubuntu" = mkHome { system = "x86_64-linux";   modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/ubuntu.nix ]; };
-            "uncool@arch"   = mkHome { system = "x86_64-linux";   modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/arch.nix   ]; };
+          in
+          {
+            "uncool@mac" = mkHome {
+              system = "aarch64-darwin";
+              modules = macHomeModules;
+            };
+            "uncool@ubuntu" = mkHome {
+              system = "x86_64-linux";
+              modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/ubuntu.nix ];
+            };
+            "uncool@arch" = mkHome {
+              system = "x86_64-linux";
+              modules = [ ./modules/base.nix ] ++ commonRoles ++ [ ./modules/arch.nix ];
+            };
           };
       };
     };
