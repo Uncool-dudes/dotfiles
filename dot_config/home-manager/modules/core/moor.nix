@@ -1,0 +1,4 @@
+{ ... }:
+{
+  programs.moor.enable = true;
+}

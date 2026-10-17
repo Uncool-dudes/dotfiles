@@ -17,7 +17,15 @@
     ../core/stylix.nix
     ../core/jq.nix
     ../core/ripgrep.nix
+    ../core/ripgrep-all.nix
+    ../core/lnav.nix
+    ../core/goaccess.nix
+    ../core/moor.nix
+    ../core/tmux.nix
+    ../core/sesh.nix
     ../core/nix-tools.nix
     ../core/packages.nix
+    ../core/scripts.nix
+    ../core/navi.nix
   ];
 }

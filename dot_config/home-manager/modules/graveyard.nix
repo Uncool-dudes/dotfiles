@@ -20,4 +20,12 @@
 # virtualenv - redundant, programs.uv already manages python venvs
 # topgrade   - brew upgrade already runs on darwin switch; removed as unused tool
 # alloydb-auth-proxy - needs direct GCP VPC/IAM access, use ssh tunnel via dev-api.ratch.ai instead
+# difftastic   - no real multi-hue syntax highlighting, only bold/dim/red/green;
+#                tried as git diff.external + difftool + lazygit diffRenderer, reverted to delta
+# toolong      - no config/theme support at all (confirmed via --help + README),
+#                replaced hl-log-viewer with it, looked bad with default styling, ditched
+# ov           - themed as $PAGER replacement for less, but its real advantages
+#                (column mode, multi-highlight) are already owned by mlr/lnav/fx/jq;
+#                for plain man/diff paging it added complexity with no functional win.
+#                swapped to moor (walles/moor, formerly "moar") instead
 { }
