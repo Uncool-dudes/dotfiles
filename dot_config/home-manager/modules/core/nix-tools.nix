@@ -1,4 +1,10 @@
-{ config, pkgs, inputs, ... }: {
+{
+  config,
+  pkgs,
+  inputs,
+  ...
+}:
+{
   home.packages = with pkgs; [
     deadnix
     inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.home-manager
@@ -14,7 +20,12 @@
     clean = {
       enable = true;
       dates = "weekly";
-      extraArgs = [ "--keep" "5" "--keep-since" "14d" ];
+      extraArgs = [
+        "--keep"
+        "5"
+        "--keep-since"
+        "14d"
+      ];
     };
   };
 }

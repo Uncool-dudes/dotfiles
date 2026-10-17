@@ -19,7 +19,10 @@ let
 
 in
 {
-  home.packages = [ pkgs.poppler-utils pkgs.trash-cli ];
+  home.packages = [
+    pkgs.poppler-utils
+    pkgs.trash-cli
+  ];
 
   programs.yazi = {
     enable = true;
@@ -31,9 +34,21 @@ in
     };
     keymap = {
       mgr.prepend_keymap = [
-        { run = "plugin chmod"; on = [ "c" "m" ]; }
-        { run = "plugin smart-filter"; on = [ "f" ]; }
-        { run = "plugin restore"; on = [ "u" ]; }
+        {
+          run = "plugin chmod";
+          on = [
+            "c"
+            "m"
+          ];
+        }
+        {
+          run = "plugin smart-filter";
+          on = [ "f" ];
+        }
+        {
+          run = "plugin restore";
+          on = [ "u" ];
+        }
       ];
     };
     settings = {
@@ -54,12 +69,28 @@ in
         fetch_workers = 10;
       };
       opener = {
-        markdown = [ { run = ''glow "$@"''; block = true; } ];
-        json = [ { run = ''fx "$@"''; block = true; } ];
+        markdown = [
+          {
+            run = ''glow "$@"'';
+            block = true;
+          }
+        ];
+        json = [
+          {
+            run = ''fx "$@"'';
+            block = true;
+          }
+        ];
       };
       open.prepend_rules = [
-        { mime = "text/markdown"; use = "markdown"; }
-        { mime = "application/json"; use = "json"; }
+        {
+          mime = "text/markdown";
+          use = "markdown";
+        }
+        {
+          mime = "application/json";
+          use = "json";
+        }
       ];
     };
   };

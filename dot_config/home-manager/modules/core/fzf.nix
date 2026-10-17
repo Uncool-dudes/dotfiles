@@ -11,11 +11,17 @@
     ];
     fileWidget = {
       command = "fd --type f --follow --hidden --exclude .git";
-      options = [ "--preview" "'bat -n --color=always {}'" ];
+      options = [
+        "--preview"
+        "'bat -n --color=always {}'"
+      ];
     };
     changeDirWidget = {
       command = "fd --type d --follow";
-      options = [ "--preview" "'eza --tree --level=2 --icons --color=always {}'" ];
+      options = [
+        "--preview"
+        "'eza --tree --level=2 --icons --color=always {}'"
+      ];
     };
   };
 }

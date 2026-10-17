@@ -144,17 +144,44 @@
     enable = true;
     settings = {
       prSections = [
-        { title = "My PRs"; filters = "is:open author:@me"; }
-        { title = "Needs my review"; filters = "is:open review-requested:@me"; }
-        { title = "ratchio"; filters = "is:open org:ratchio"; }
-        { title = "Uncool-dudes"; filters = "is:open org:Uncool-dudes"; }
-        { title = "apaag-solutions-lab"; filters = "is:open org:apaag-solutions-lab"; }
+        {
+          title = "My PRs";
+          filters = "is:open author:@me";
+        }
+        {
+          title = "Needs my review";
+          filters = "is:open review-requested:@me";
+        }
+        {
+          title = "ratchio";
+          filters = "is:open org:ratchio";
+        }
+        {
+          title = "Uncool-dudes";
+          filters = "is:open org:Uncool-dudes";
+        }
+        {
+          title = "apaag-solutions-lab";
+          filters = "is:open org:apaag-solutions-lab";
+        }
       ];
       issuesSections = [
-        { title = "My Issues"; filters = "is:open author:@me"; }
-        { title = "ratchio"; filters = "is:open org:ratchio"; }
-        { title = "Uncool-dudes"; filters = "is:open org:Uncool-dudes"; }
-        { title = "apaag-solutions-lab"; filters = "is:open org:apaag-solutions-lab"; }
+        {
+          title = "My Issues";
+          filters = "is:open author:@me";
+        }
+        {
+          title = "ratchio";
+          filters = "is:open org:ratchio";
+        }
+        {
+          title = "Uncool-dudes";
+          filters = "is:open org:Uncool-dudes";
+        }
+        {
+          title = "apaag-solutions-lab";
+          filters = "is:open org:apaag-solutions-lab";
+        }
       ];
       defaults = {
         preview.open = true;

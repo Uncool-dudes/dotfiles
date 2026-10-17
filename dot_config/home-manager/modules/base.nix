@@ -4,7 +4,8 @@
 { pkgs, username, ... }: {
   home = {
     inherit username;
-    homeDirectory = if pkgs.stdenv.hostPlatform.isDarwin then "/Users/${username}" else "/home/${username}";
+    homeDirectory =
+      if pkgs.stdenv.hostPlatform.isDarwin then "/Users/${username}" else "/home/${username}";
     stateVersion = "25.05";
     sessionPath = [
       "/nix/var/nix/profiles/default/bin"

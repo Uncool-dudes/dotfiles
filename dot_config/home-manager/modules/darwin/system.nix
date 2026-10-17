@@ -3,8 +3,14 @@
   nixpkgs.config.allowUnfree = true;
 
   nix.settings = {
-    experimental-features = [ "nix-command" "flakes" ];
-    trusted-users = [ "root" "uncool" ];
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    trusted-users = [
+      "root"
+      "uncool"
+    ];
     auto-optimise-store = true;
     extra-substituters = [
       "https://cachix.cachix.org"

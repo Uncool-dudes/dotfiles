@@ -26,20 +26,65 @@
           format = "                             {user-name} working {at-symbol-colored}{host-name-colored}";
         }
         "break"
-        { type = "custom"; format = "┌{$1} {#1}System Information{#} {$1}┐"; }
+        {
+          type = "custom";
+          format = "┌{$1} {#1}System Information{#} {$1}┐";
+        }
         "break"
-        { key = "Machine      "; keyColor = "green";   type = "host"; }
-        { key = "Uptime       "; keyColor = "red";     type = "uptime"; }
-        { key = "Resolution   "; keyColor = "yellow";  type = "display"; compactType = "original-with-refresh-rate"; }
-        { key = "CPU          "; keyColor = "yellow";  type = "cpu"; }
-        { key = "GPU          "; keyColor = "blue";    type = "gpu"; }
-        { key = "Memory       "; keyColor = "magenta"; type = "memory"; }
-        { key = "Local IP     "; keyColor = "red";     type = "localip"; compact = true; }
-        { key = "Public IP    "; keyColor = "cyan";    type = "publicip"; timeout = 1000; }
+        {
+          key = "Machine      ";
+          keyColor = "green";
+          type = "host";
+        }
+        {
+          key = "Uptime       ";
+          keyColor = "red";
+          type = "uptime";
+        }
+        {
+          key = "Resolution   ";
+          keyColor = "yellow";
+          type = "display";
+          compactType = "original-with-refresh-rate";
+        }
+        {
+          key = "CPU          ";
+          keyColor = "yellow";
+          type = "cpu";
+        }
+        {
+          key = "GPU          ";
+          keyColor = "blue";
+          type = "gpu";
+        }
+        {
+          key = "Memory       ";
+          keyColor = "magenta";
+          type = "memory";
+        }
+        {
+          key = "Local IP     ";
+          keyColor = "red";
+          type = "localip";
+          compact = true;
+        }
+        {
+          key = "Public IP    ";
+          keyColor = "cyan";
+          type = "publicip";
+          timeout = 1000;
+        }
         "break"
-        { type = "custom"; format = "└{$1}────────────────────{$1}┘"; }
+        {
+          type = "custom";
+          format = "└{$1}────────────────────{$1}┘";
+        }
         "break"
-        { type = "colors"; paddingLeft = 34; symbol = "circle"; }
+        {
+          type = "colors";
+          paddingLeft = 34;
+          symbol = "circle";
+        }
       ];
     };
   };
