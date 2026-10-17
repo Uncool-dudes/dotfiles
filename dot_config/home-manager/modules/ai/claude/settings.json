@@ -49,7 +49,31 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash -c 'file=$(echo \"$CLAUDE_TOOL_INPUT\" | jq -r \".file_path // .path // empty\"); [[ \"$file\" == *.nix ]] && nixfmt \"$file\" || true'"
+            "command": "bash -c 'file=$(jq -r \".tool_input.file_path // empty\"); [[ \"$file\" == *.nix ]] && nixfmt \"$file\"; true'"
+          },
+          {
+            "type": "command",
+            "command": "bash -c 'file=$(jq -r \".tool_input.file_path // empty\"); [[ \"$file\" == *.go ]] && { goimports -w \"$file\"; gofumpt -w \"$file\"; }; true'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "atuin hook claude-code"
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "atuin hook claude-code"
           }
         ]
       }
@@ -61,6 +85,10 @@
           {
             "type": "command",
             "command": "rtk hook claude"
+          },
+          {
+            "type": "command",
+            "command": "atuin hook claude-code"
           }
         ]
       }
@@ -69,7 +97,7 @@
   "worktree": {
     "baseRef": "fresh"
   },
-  "enableWorkflows": false,
+  "enableWorkflows": true,
   "workflowKeywordTriggerEnabled": false,
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
@@ -81,10 +109,11 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark-ansi",
   "editorMode": "normal",
+  "voiceEnabled": true,
   "preferredNotifChannel": "ghostty",
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
-  "remoteControlAtStartup": false,
+  "remoteControlAtStartup": true,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
