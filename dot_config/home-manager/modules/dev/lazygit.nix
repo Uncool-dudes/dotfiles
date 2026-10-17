@@ -30,7 +30,7 @@
         overrideGpg = true;
         diffRenderers = [
           {
-            command = "delta --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format=\"lazygit-edit://{path}:{line}\"";
+            command = "delta --paging=never --hyperlinks --hyperlinks-file-link-format=\"lazygit-edit://{path}:{line}\"";
             colorArg = "always";
           }
         ];
@@ -46,6 +46,21 @@
           command = "gh pr create --fill --web";
           context = "global";
           loadingText = "Creating pull request on GitHub";
+        }
+        {
+          key = "w";
+          context = "localBranches";
+          description = "New worktree (sibling <repo>.worktrees/<branch>)";
+          prompts = [
+            {
+              type = "input";
+              title = "Branch name for new worktree:";
+              key = "Branch";
+              initialValue = "{{.SelectedLocalBranch.Name}}";
+            }
+          ];
+          command = ''sh -c 'top=$(git rev-parse --show-toplevel); git worktree add "$(dirname "$top")/$(basename "$top").worktrees/{{.Form.Branch}}" {{.Form.Branch}} 2>/dev/null || git worktree add -b {{.Form.Branch}} "$(dirname "$top")/$(basename "$top").worktrees/{{.Form.Branch}}"' '';
+          loadingText = "Creating worktree";
         }
       ];
 
