@@ -6,9 +6,15 @@
     enableZshIntegration = pkgs.stdenv.hostPlatform.isLinux;
 
     settings = {
+      # using ghostty's bundled native theme directly instead of stylix's
+      # generated one (disabled in modules/core/stylix.nix); theme.nix's
+      # flexoki-dark scheme is kept in sync with this for every other app.
+      theme = "Oxocarbon";
+
       font-family = "Iosevka SS08";
-      font-size = 19;
+      font-size = 15;
       adjust-cell-height = 10;
+      font-thicken = true;
 
       cursor-style = "bar";
       cursor-click-to-move = true;
@@ -19,6 +25,7 @@
       window-padding-x = 15;
       window-padding-y = 15;
       window-padding-balance = true;
+      macos-titlebar-style = "native";
 
       mouse-scroll-multiplier = "precision:0.5,discrete:1";
       scrollback-limit = 50000000;
@@ -37,6 +44,7 @@
 
       macos-auto-secure-input = true;
       clipboard-paste-protection = true;
+      clipboard-read = "allow";
 
       gtk-single-instance = true;
       macos-option-as-alt = true;

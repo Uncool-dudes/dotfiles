@@ -1,19 +1,22 @@
-# modules/jq.nix
-# Colors mirror themes/base16-oxocarbon-dark.yaml (base0X hex below, as 24-bit
-# SGR); jq has no stylix target, so this needs manual sync if the scheme changes.
-{ ... }:
+# Colors are driven by [[theme.active]] (modules/core/theme.nix); jq has no
+# stylix target, so SGR codes are built from config.theme.colors.baseXX.rgb.
+{ config, ... }:
+let
+  c = config.theme.colors;
+  sgr = attrs: k: "${attrs}38;2;${toString c.${k}.rgb.r};${toString c.${k}.rgb.g};${toString c.${k}.rgb.b}";
+in
 {
   programs.jq = {
     enable = true;
     colors = {
-      null = "2;38;2;82;82;82"; # base03, dimmed
-      false = "0;38;2;238;83;150"; # base08
-      true = "0;38;2;66;190;101"; # base0B
-      numbers = "0;38;2;255;111;0"; # base0A
-      strings = "0;38;2;61;219;217"; # base0C
-      arrays = "1;38;2;51;177;255"; # base0D
-      objects = "1;38;2;190;149;255"; # base0E
-      objectKeys = "1;38;2;130;207;255"; # base0F
+      null = sgr "2;" "base03"; # dimmed
+      false = sgr "0;" "base08";
+      true = sgr "0;" "base0B";
+      numbers = sgr "0;" "base09";
+      strings = sgr "0;" "base0C";
+      arrays = sgr "1;" "base0D";
+      objects = sgr "1;" "base0E";
+      objectKeys = sgr "1;" "base0F";
     };
   };
 }

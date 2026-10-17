@@ -1,19 +1,21 @@
 # modules/k9s.nix
-# k9s theme mirrors themes/base16-oxocarbon-dark.yaml (base0X hex below);
-# k9s has no stylix target, so this needs manual sync if the scheme changes.
-{ ... }:
+# Colors are driven by [[theme.active]] (modules/core/theme.nix); k9s has no
+# stylix target, so this reads config.theme.colors instead of a hardcoded
+# palette.
+{ config, ... }:
 let
-  base00 = "#161616"; # bg
-  base02 = "#393939"; # selection/current-line
-  base03 = "#525252"; # comment/dim
-  base05 = "#f2f4f8"; # fg
-  base08 = "#ee5396"; # red
-  base09 = "#ff7eb6"; # pink
-  base0A = "#ff6f00"; # orange
-  base0B = "#42be65"; # green
-  base0C = "#3ddbd9"; # cyan
-  base0D = "#33b1ff"; # blue
-  base0E = "#be95ff"; # purple
+  c = config.theme.colors;
+  hex = k: "#${c.${k}.hex}";
+  base00 = hex "base00"; # bg
+  base02 = hex "base02"; # selection/current-line
+  base03 = hex "base03"; # comment/dim
+  base05 = hex "base05"; # fg
+  base08 = hex "base08"; # red
+  base09 = hex "base09"; # orange
+  base0B = hex "base0B"; # green
+  base0C = hex "base0C"; # cyan
+  base0D = hex "base0D"; # blue
+  base0E = hex "base0E"; # purple
 in
 {
   programs.k9s = {
@@ -42,9 +44,9 @@ in
           bgColor = base00;
           buttonFgColor = base05;
           buttonBgColor = base0E;
-          buttonFocusFgColor = base0A;
+          buttonFocusFgColor = base09;
           buttonFocusBgColor = base09;
-          labelFgColor = base0A;
+          labelFgColor = base09;
           fieldFgColor = base05;
         };
         frame = {
@@ -67,14 +69,14 @@ in
             modifyColor = base0E;
             addColor = base0B;
             errorColor = base08;
-            highlightColor = base0A;
+            highlightColor = base09;
             killColor = base03;
             completedColor = base03;
           };
           title = {
             fgColor = base05;
             bgColor = base02;
-            highlightColor = base0A;
+            highlightColor = base09;
             counterColor = base0E;
             filterColor = base09;
           };
@@ -82,8 +84,14 @@ in
         views = {
           charts = {
             bgColor = "default";
-            defaultDialColors = [ base0E base08 ];
-            defaultChartColors = [ base0E base08 ];
+            defaultDialColors = [
+              base0E
+              base08
+            ];
+            defaultChartColors = [
+              base0E
+              base08
+            ];
           };
           table = {
             fgColor = base05;

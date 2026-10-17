@@ -1,6 +1,7 @@
 { ... }:
 {
   imports = [
+    ../core/theme.nix
     ../core/shell.nix
     ../core/fzf.nix
     ../core/zoxide.nix
