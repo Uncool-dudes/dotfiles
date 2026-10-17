@@ -52,8 +52,6 @@ _: {
         heuristic = true;
       };
 
-      fill.symbol = " ";
-
       cmd_duration = {
         format = "[ $duration]($style) ";
         style = "bold fg:green";
