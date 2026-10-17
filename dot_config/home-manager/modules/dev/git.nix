@@ -7,6 +7,16 @@
   programs.git = {
     enable = true;
 
+    attributes = [
+      "*.go merge=mergiraf"
+      "go.mod merge=mergiraf"
+      "go.sum merge=mergiraf"
+      "*.json merge=mergiraf"
+      "*.yaml merge=mergiraf"
+      "*.yml merge=mergiraf"
+      "*.toml merge=mergiraf"
+    ];
+
     signing = {
       key = null;
       format = "ssh";
@@ -23,7 +33,8 @@
     maintenance = {
       enable = true;
       repositories = [
-        "${config.home.homeDirectory}/projects/ratch/gamma"
+        "${config.home.homeDirectory}/projects/github.com/ratchio/gamma"
+        "${config.home.homeDirectory}/projects/github.com/ratchio/goutils"
       ];
     };
 
@@ -35,15 +46,18 @@
         email = "106897936+Uncool-dudes@users.noreply.github.com";
       };
 
+      feature.manyFiles = true;
+
       core = {
         compression = 6;
         whitespace = "error";
         preloadindex = true;
-        fsmonitor = true;
+        fsmonitor = false;
         untrackedCache = true;
         quotePath = false;
         editor = config.home.sessionVariables.EDITOR;
         pager = "delta";
+        abbrev = 12;
       };
 
       init.defaultBranch = "main";
@@ -103,6 +117,11 @@
         guitool = "meld";
       };
 
+      "merge \"mergiraf\"" = {
+        name = "mergiraf merge driver";
+        driver = "${pkgs.mergiraf}/bin/mergiraf merge --git -s %S -x %X -y %Y -p %P -l %L %O %A %B";
+      };
+
       difftool = {
         prompt = false;
         "nvimdiff".cmd = ''nvim -d "$LOCAL" "$REMOTE"'';
@@ -116,6 +135,7 @@
 
       push = {
         autoSetupRemote = true;
+        useForceIfIncludes = true;
         default = "current";
         followTags = true;
         recurseSubmodules = "on-demand";
