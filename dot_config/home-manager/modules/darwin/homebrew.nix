@@ -14,6 +14,7 @@
     brews = [
       "mole"
       "rtk"
+      "jwt-ui"
     ];
 
     casks = [
@@ -47,6 +48,7 @@
       "renamer"
       "steam"
       "superhuman"
+      "tg-pro"
       "ti-connect-ce"
       "typora"
       "qview"

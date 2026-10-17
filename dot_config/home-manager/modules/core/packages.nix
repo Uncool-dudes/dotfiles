@@ -6,9 +6,7 @@
     tokei
     duf
     dust
-    ov
     chezmoi
-    ripgrep-all
     neovim
     ffmpeg
     imagemagick
@@ -19,5 +17,21 @@
     gnutar
     zstd
     wget
+    shellcheck
+    shfmt
+    up
+    pastel
+    lnav
+    deadbranch
+    sttr
+    hostctl
+    mutagen
+    goaccess
+    lazyrsync
+    dirsearch
+    cariddi
+    rustscan
+    openapi-tui
+    monolith
   ];
 }

@@ -11,5 +11,7 @@
     iperf3
     nmap
     dive
+    redpanda-client
+    trivy
   ];
 }
