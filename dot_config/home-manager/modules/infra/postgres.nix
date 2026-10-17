@@ -29,6 +29,7 @@ let
   mkStanza = name: { host, user }: ''
     [${name}]
     host=${host}
+    ${lib.optionalString (host == "localhost") "hostaddr=127.0.0.1"}
     port=5432
     user=${user}
     application_name=cli-${name}
