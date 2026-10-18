@@ -15,6 +15,11 @@
 
 - Never call Agent0 (Dash0 MCP `runTask`/Agent0 tools).
 
+## Guardrails
+
+- Don't assume an unfamiliar stack (e.g. .NET) - check actual tooling in use first.
+- Prefer bulleted lists/rules over TypeScript code examples; embrace generics where applicable.
+
 ## Tools
 
 Modern CLI over standard:

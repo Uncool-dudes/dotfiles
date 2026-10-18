@@ -110,6 +110,10 @@
   "theme": "dark-ansi",
   "editorMode": "normal",
   "voiceEnabled": true,
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
   "preferredNotifChannel": "ghostty",
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
