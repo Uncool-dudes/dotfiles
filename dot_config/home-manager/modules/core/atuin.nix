@@ -1,17 +1,11 @@
-{ pkgs, ... }:
-let
-  # Pinned to the last nixpkgs rev with a cached aarch64-darwin Hydra build
-  # for atuin (18.21.0) - tracking nixpkgs-unstable directly rebuilds from
-  # source on every version bump since darwin lags linux on Hydra.
-  atuinPkgs = import (pkgs.fetchzip {
-    url = "https://github.com/NixOS/nixpkgs/archive/6c6973cdf55fbe86579846439ec5ddd9a1198e46.tar.gz";
-    hash = "sha256-1IdgiLnf3wkTshSSnjUOPY9HMWG0gZsf/EuuufwMUrE=";
-  }) { system = pkgs.stdenv.hostPlatform.system; };
-in
+{ inputs, pkgs, ... }:
 {
   programs.atuin = {
     enable = true;
-    package = atuinPkgs.atuin;
+    # atuin's own flake tracks its releases directly, with a cached
+    # aarch64-darwin build on numtide's cache - no nixpkgs-bump lag to pin
+    # around, unlike the old nixpkgs-rev pin this replaced.
+    package = inputs.atuin.packages.${pkgs.stdenv.hostPlatform.system}.atuin;
     enableZshIntegration = false;
     daemon.enable = true;
     settings = {

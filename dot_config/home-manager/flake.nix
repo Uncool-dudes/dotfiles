@@ -22,6 +22,10 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     llm-agents.url = "github:numtide/llm-agents.nix";
+    # Not following nixpkgs here on purpose - its own locked nixpkgs is what
+    # the cached aarch64-darwin build was built against; following ours would
+    # likely turn that cache hit back into a from-source build.
+    atuin.url = "github:atuinsh/atuin";
   };
 
   outputs =
