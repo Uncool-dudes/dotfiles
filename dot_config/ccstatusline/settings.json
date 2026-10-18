@@ -1,0 +1,140 @@
+{
+  "version": 4,
+  "lines": [
+    [
+      {
+        "id": "1313703f-b756-43c1-8b41-3fb535aa263e",
+        "type": "context-percentage-usable",
+        "color": "hex:42be65",
+        "rawValue": true
+      },
+      {
+        "id": "5cb5bd79-fd92-4e06-98dc-443bbd4e4b5d",
+        "type": "separator",
+        "character": " "
+      },
+      {
+        "id": "3",
+        "type": "context-bar",
+        "color": "hex:3ddbd9",
+        "rawValue": true,
+        "metadata": {
+          "display": "slider-only"
+        }
+      },
+      {
+        "id": "4",
+        "type": "separator",
+        "character": " · "
+      },
+      {
+        "id": "5",
+        "type": "git-branch",
+        "color": "hex:be95ff",
+        "metadata": {
+          "hide": "no-git"
+        }
+      },
+      {
+        "id": "6",
+        "type": "separator",
+        "character": " · "
+      },
+      {
+        "id": "7",
+        "type": "git-changes",
+        "color": "hex:ee5396",
+        "metadata": {
+          "hide": "no-git"
+        }
+      },
+      {
+        "id": "16",
+        "type": "flex-separator"
+      },
+      {
+        "id": "8",
+        "type": "session-usage",
+        "color": "hex:42be65",
+        "rawValue": true
+      },
+      {
+        "id": "9",
+        "type": "separator",
+        "character": " - "
+      },
+      {
+        "id": "10",
+        "type": "reset-timer",
+        "color": "hex:3ddbd9",
+        "rawValue": true,
+        "metadata": {
+          "compact": "true"
+        }
+      },
+      {
+        "id": "11",
+        "type": "separator",
+        "character": " · "
+      },
+      {
+        "id": "12",
+        "type": "weekly-usage",
+        "color": "hex:33b1ff",
+        "rawValue": true,
+        "metadata": {
+          "invert": "false"
+        }
+      },
+      {
+        "id": "13",
+        "type": "separator",
+        "character": " - "
+      },
+      {
+        "id": "14",
+        "type": "weekly-reset-timer",
+        "color": "hex:3ddbd9",
+        "rawValue": true,
+        "metadata": {
+          "display": "time",
+          "hours": "true",
+          "compact": "true"
+        }
+      }
+    ],
+    [
+      {
+        "id": "17",
+        "type": "flex-separator"
+      },
+      {
+        "id": "15",
+        "type": "claude-account-email",
+        "color": "hex:dde1e6",
+        "rawValue": true
+      }
+    ]
+  ],
+  "flexMode": "full",
+  "compactThreshold": 60,
+  "colorLevel": 3,
+  "defaultPaddingSide": "both",
+  "inheritSeparatorColors": false,
+  "globalBold": false,
+  "gitCacheTtlSeconds": 5,
+  "minimalistMode": false,
+  "powerline": {
+    "enabled": false,
+    "separators": [
+      ""
+    ],
+    "separatorInvertBackground": [
+      false
+    ],
+    "startCaps": [],
+    "endCaps": [],
+    "autoAlign": false,
+    "continueThemeAcrossLines": false
+  }
+}

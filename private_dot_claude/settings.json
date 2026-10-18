@@ -1,4 +1,8 @@
 {
+  "statusLine": {
+    "type": "command",
+    "command": "ccstatusline"
+  },
   "attribution": {
     "commit": "",
     "pr": ""
@@ -160,5 +164,14 @@
     "Bash(bat *)",
     "Bash(eza *)",
     "Bash(just *)"
-  ]
+  ],
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "path": "/nix/store/ik7587smsp24vdiggbsyjd74z5rjn80l-source",
+        "source": "directory"
+      }
+    }
+  }
 }

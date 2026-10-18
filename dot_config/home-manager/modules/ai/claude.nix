@@ -1,30 +1,5 @@
 { inputs, pkgs, ... }:
 let
-  # NOTE: keep in sync with modules/ai/packages.nix override - patches bar chars
-  # in compiled bundle by literal string match, likely to break on version bump.
-  ccstatusline =
-    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.ccstatusline.overrideAttrs
-      (old: {
-        # upstream package.nix only copies dist/ccstatusline.js, but that
-        # entry file dynamically imports sibling chunks in the same dir -
-        # copy the whole dist/ so those resolve.
-        installPhase = ''
-          runHook preInstall
-          mkdir -p $out/bin
-          cp $src/dist/*.js $out/bin/
-          chmod +x $out/bin/ccstatusline.js
-          mv $out/bin/ccstatusline.js $out/bin/ccstatusline
-          substituteInPlace $out/bin/ccstatusline \
-            --replace-quiet "#!/usr/bin/env node" "#!${pkgs.nodejs}/bin/node"
-          runHook postInstall
-        '';
-        postInstall = ''
-          substituteInPlace $out/bin/ccstatusline-tgzfz3x2.js $out/bin/index-wzd62dxf.js \
-            --replace-quiet '▓' '-' \
-            --replace-quiet '░' '·'
-        '';
-      });
-
   # Copies a plugin source tree and flips the `user-invocable` /
   # `disable-model-invocation` frontmatter flags on named skills, instead of
   # deleting them - reversible and inspectable (`cat $out/skills/<name>/SKILL.md`)
@@ -278,44 +253,17 @@ in
     # nixpkgs' claude-code lags upstream releases by several patch versions;
     # llm-agents.nix rebuilds daily against the actual latest release.
     package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
-    context = ./claude/CLAUDE.md;
-    rulesDir = ./claude/instructions;
-    # Single-file, argument-driven, explicit-invoke-only prompts belong here,
-    # not in skills/ - no auto-trigger-by-description concern to manage.
-    commandsDir = ./claude/commands;
     # Deploys the plugin's own hook scripts declaratively instead of the
     # hand-copied files that were sitting in ~/.claude/hooks/ untracked -
     # single source of truth, and whole-directory deploy keeps sibling
     # requires (caveman-config.js, cavecrew-model-overrides.js, etc) intact.
     hooksDir = "${caveman}/src/hooks";
 
-    # dash0 is NOT here - it carries a live bearer token, and mcpServers
-    # values land in the world-readable Nix store. It's chezmoi-managed
-    # instead, as its own personal plugin at ~/.claude/skills/dash0-mcp,
-    # with the token injected from 1Password at template-render time.
-    mcpServers = {
-      github = {
-        type = "http";
-        url = "https://api.githubcopilot.com/mcp/";
-      };
-
-      MCP_DOCKER = {
-        command = "docker";
-        args = [
-          "mcp"
-          "gateway"
-          "run"
-          "--profile"
-          "ai_coding"
-        ];
-      };
-    };
-    settings = builtins.fromJSON (builtins.readFile ./claude/settings.json) // {
-      statusLine = {
-        type = "command";
-        command = "${ccstatusline}/bin/ccstatusline";
-      };
-    };
+    # context/rulesDir/commandsDir/settings/mcpServers moved to chezmoi
+    # (~/.claude/CLAUDE.md, rules/, commands/, settings.json,
+    # skills/hm-mcp/) - mutable runtime config, not reproducible-build
+    # material. ccstatusline itself stays a nix package, on PATH, so
+    # chezmoi's settings.json can reference it by bare command name.
 
     # Without this, settings.json's enabledPlugins references to
     # gopls-lsp@claude-plugins-official / rust-analyzer-lsp@claude-plugins-official
@@ -365,9 +313,4 @@ in
     );
   };
 
-  home.file = {
-    ".config/ccstatusline/settings.json".source = ./claude/ccstatusline-settings.json;
-    # No workflowsDir option in the claude-code module - deployed directly.
-    ".claude/workflows/go-review.js".source = ./claude/workflows/go-review.js;
-  };
 }
