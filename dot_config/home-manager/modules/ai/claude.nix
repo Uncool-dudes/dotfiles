@@ -206,6 +206,50 @@ let
       ];
   };
 
+  claude-mem-src = pkgs.fetchFromGitHub {
+    owner = "thedotmack";
+    repo = "claude-mem";
+    rev = "b85cd123daf8e5bd59edb2d1c7b98e0bba28b3a0";
+    hash = "sha256-Gily9VzCtRT1+t2Z1pKLLR8WoW0EPX/250vBmLY/iZE=";
+  };
+
+  claude-mem = setSkillInvocation {
+    name = "claude-mem";
+    # The plugin itself lives under plugin/ in this monorepo, not the repo root.
+    src = "${claude-mem-src}/plugin";
+    # Discarded in the full command-trim pass - never used.
+    overrides =
+      fullyOff [
+        "version-bump"
+        "wowerpoint"
+      ]
+      # Explicit actions with distinctive, phrase-matchable triggers -
+      # hide from `/`, keep auto-trigger.
+      ++ hideKeepAuto [
+        "agent-cost-report"
+        "babysit"
+        "ccs-align"
+        "cloud-sync"
+        "design-is"
+        "do"
+        "handoff"
+        "how-it-works"
+        "knowledge-agent"
+        "make-plan"
+        "mem-search"
+        "mode-creator"
+        "oh-my-issues"
+        "screenpipe"
+        "smart-explore"
+        "standup"
+        "timeline-report"
+        "what-the"
+      ];
+    # learn-codebase, pathfinder, weekly-digests stay visible: each runs a
+    # full-codebase scan or multi-agent fan-out, expensive enough to want a
+    # deliberate `/` invocation rather than risk an accidental auto-fire.
+  };
+
   mattpocock-skills = pkgs.fetchFromGitHub {
     owner = "mattpocock";
     repo = "skills";
@@ -289,6 +333,7 @@ in
     plugins = {
       caveman = caveman;
       cc-skills-golang = cc-skills-golang;
+      claude-mem = claude-mem;
     };
 
     skills = {
