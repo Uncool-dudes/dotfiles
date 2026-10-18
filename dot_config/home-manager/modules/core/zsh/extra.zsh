@@ -14,19 +14,15 @@ TIMEFMT='%J  %U user %S system %P cpu %*E total'
 ZSH_AUTOSUGGEST_USE_ASYNC=1
 ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=100
 
-# ── Vi mode ──────────────────────────────────────────────────────
-bindkey -v
-export KEYTIMEOUT=1
-bindkey -M viins '^R' atuin-search
-bindkey -M viins '^T' fzf-file-widget
-bindkey -M viins '^G' _navi_widget
-bindkey -M viins '\es' sesh-sessions
-bindkey -M viins '\ec' fzf-cd-widget
-bindkey -M viins '\ee' edit-command-line
-bindkey -M vicmd '\ee' edit-command-line
+# ── Keybinds (emacs mode - vi mode trial ended) ───────────────────
+bindkey -e
+bindkey -M emacs '^R' atuin-search
+bindkey -M emacs '^T' fzf-file-widget
+bindkey -M emacs '^G' _navi_widget
+bindkey -M emacs '\es' sesh-sessions
+bindkey -M emacs '\ec' fzf-cd-widget
 bindkey -M emacs '\ee' edit-command-line
 bindkey -r '^X^E'
-bindkey -M viins ' ' magic-space
 bindkey -M emacs ' ' magic-space
 
 function clear-screen-or-self-insert() {
