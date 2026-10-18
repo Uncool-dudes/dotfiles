@@ -3,19 +3,11 @@ let
   yazi-rs-plugins = pkgs.fetchFromGitHub {
     owner = "yazi-rs";
     repo = "plugins";
-    rev = "f703392df78b5fba5e8f9f1ad0b1cb6d3def9736";
-    hash = "sha256-O1yYAhsf7xMqUrTTSLac06WSxCvUQqedH3DWqGwn/Ok=";
+    rev = "9166202cc1694c98bac3a639874d6f4c0eaa2dab";
+    hash = "sha256-3ddGRQSzxyurNcyYJA+9LTLXTCjBFGATTqdkuGKixzA=";
   };
 
   yazi-rs-plugin = name: pkgs.runCommand name { } "cp -r ${yazi-rs-plugins}/${name} $out";
-
-  # upstream archived/deprecated; pinned only through yazi v26.9.1 - may break on future yazi bumps
-  restore-yazi = pkgs.fetchFromGitHub {
-    owner = "boydaihungst";
-    repo = "restore.yazi";
-    rev = "864dd054e0c8029dc90e8a62067945cf053d6533";
-    hash = "sha256-HRnHjCTvcuX0R2uDQQRqCF8sWtIquSyt8veSgk7MTqk=";
-  };
 
 in
 {
@@ -29,8 +21,6 @@ in
     shellWrapperName = "yy";
     plugins = {
       chmod = yazi-rs-plugin "chmod.yazi";
-      smart-filter = yazi-rs-plugin "smart-filter.yazi";
-      restore = restore-yazi;
     };
     keymap = {
       mgr.prepend_keymap = [
@@ -40,14 +30,6 @@ in
             "c"
             "m"
           ];
-        }
-        {
-          run = "plugin smart-filter";
-          on = [ "f" ];
-        }
-        {
-          run = "plugin restore";
-          on = [ "u" ];
         }
       ];
     };
