@@ -1,0 +1,14 @@
+{{- $user := onepasswordRead "op://Ratch/Jenkins/j_username" -}}
+{{- $token := onepasswordRead "op://Ratch/Jenkins/j_password" -}}
+{{- $basic := printf "%s:%s" $user $token | b64enc -}}
+{
+  "mcpServers": {
+    "jenkins": {
+      "type": "http",
+      "url": "https://dev2.ratch.ai/jenkinsdev/mcp-server/mcp",
+      "headers": {
+        "Authorization": "Basic {{ $basic }}"
+      }
+    }
+  }
+}
