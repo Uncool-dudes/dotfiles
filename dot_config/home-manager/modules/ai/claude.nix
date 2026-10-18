@@ -236,6 +236,9 @@ in
     package = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.claude-code;
     context = ./claude/CLAUDE.md;
     rulesDir = ./claude/instructions;
+    # Single-file, argument-driven, explicit-invoke-only prompts belong here,
+    # not in skills/ - no auto-trigger-by-description concern to manage.
+    commandsDir = ./claude/commands;
     # Deploys the plugin's own hook scripts declaratively instead of the
     # hand-copied files that were sitting in ~/.claude/hooks/ untracked -
     # single source of truth, and whole-directory deploy keeps sibling
@@ -243,9 +246,15 @@ in
     hooksDir = "${caveman}/src/hooks";
 
     # dash0 is NOT here - it carries a live bearer token, and mcpServers
-    # values land in the world-readable Nix store. Keep it unmanaged
-    # (`claude mcp add`), only migrate servers with no secrets.
+    # values land in the world-readable Nix store. It's chezmoi-managed
+    # instead, as its own personal plugin at ~/.claude/skills/dash0-mcp,
+    # with the token injected from 1Password at template-render time.
     mcpServers = {
+      github = {
+        type = "http";
+        url = "https://api.githubcopilot.com/mcp/";
+      };
+
       MCP_DOCKER = {
         command = "docker";
         args = [
@@ -264,8 +273,19 @@ in
       };
     };
 
-    # Official plugins (gopls-lsp, rust-analyzer-lsp) have no external repo -
-    # bundled with the CLI itself, kept as enabledPlugins in settings.json instead.
+    # Without this, settings.json's enabledPlugins references to
+    # gopls-lsp@claude-plugins-official / rust-analyzer-lsp@claude-plugins-official
+    # dangle after a config wipe - the marketplace registration itself was only
+    # ever imperative state in ~/.claude/plugins/known_marketplaces.json.
+    marketplaces = {
+      claude-plugins-official = pkgs.fetchFromGitHub {
+        owner = "anthropics";
+        repo = "claude-plugins-official";
+        rev = "ea10b213686c90bb1984b2016937310e05336cf3";
+        hash = "sha256-Tfs8Ig1rzLvaAuTZwqGUzKCK0TMWE2SddYss+H/04ug=";
+      };
+    };
+
     plugins = {
       caveman = caveman;
       cc-skills-golang = cc-skills-golang;
@@ -274,10 +294,6 @@ in
     skills = {
       "test-driven-development" = "${obra-superpowers}/skills/test-driven-development";
       "overkill" = "${claude-overkill}/plugins/overkill/skills/overkill";
-      "commit" = ./claude/skills/commit;
-      "pr" = ./claude/skills/pr;
-      "worktree" = ./claude/skills/worktree;
-      "resolve" = ./claude/skills/resolve;
     }
     // (
       let
@@ -306,5 +322,7 @@ in
 
   home.file = {
     ".config/ccstatusline/settings.json".source = ./claude/ccstatusline-settings.json;
+    # No workflowsDir option in the claude-code module - deployed directly.
+    ".claude/workflows/go-review.js".source = ./claude/workflows/go-review.js;
   };
 }
