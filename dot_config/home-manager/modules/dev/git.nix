@@ -83,12 +83,11 @@
         decorate = true;
         date = "format:%Y-%m-%d %H:%M";
         follow = true;
-        showSignature = true;
         diffMerges = "first-parent";
         excludeDecoration = "refs/remotes/origin/HEAD";
       };
 
-      format.pretty = "format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)'";
+      format.pretty = "format:%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(auto)%d%C(reset)%n";
 
       pretty.compact = "format:%C(auto)%h%d %s %C(dim)(%an, %ad)%Creset";
 
@@ -153,6 +152,8 @@
         fsckObjects = true;
         recurseSubmodules = "on-demand";
         writeCommitGraph = true;
+        showForcedUpdates = true;
+        output = "compact";
       };
 
       pull.rebase = true;
@@ -223,16 +224,16 @@
         ba = "branch -a";
         sw = "switch";
         swc = "switch -c";
-        co = "checkout";
         s = "status -sb";
         d = "diff";
         staged = "diff --staged";
         last = "show -w HEAD";
         lg = "log --graph --all";
-        tree = "log --graph --oneline --all --decorate";
+        lgc = "log --graph --all --pretty=compact";
         main-line = "log --first-parent --oneline";
         what-changed = "log --ancestry-path --oneline --no-merges";
         who = "shortlog -sn --no-merges";
+        f = "fetch --all";
         p = "push";
         pf = "push --force-with-lease";
         pl = "pull --rebase";
