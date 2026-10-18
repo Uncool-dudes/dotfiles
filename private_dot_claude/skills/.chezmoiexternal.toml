@@ -1,0 +1,22 @@
+# Hook-based "mods" (filetree, skins, reflect-mod, etc.) go here, not through
+# home-manager's programs.claude-code.plugins: that option's mkPluginEntry
+# wrapper (nix-community/home-manager#9906) symlinks each top-level plugin
+# dir separately, and Claude Code >= 2.1.257 refuses to load a declared
+# component path or hooks module through that symlink chain as "escapes
+# plugin directory". chezmoi externals materialize a real directory here,
+# not a nix-store symlink, so that check can't trigger at all.
+#
+# Each entry: a GitHub archive pinned to a tag/commit, extracted straight
+# into ~/.claude/skills/<name>, stripping the repo's own top-level directory.
+
+# Only the mod/ subdirectory of this repo is the plugin we want (the root
+# "claude-reflect" plugin can't load at all - its name is reserved, see
+# claude plugin validate). include + the extra stripComponents pulls just
+# that subtree out and flattens it.
+["reflect-mod"]
+    type = "archive"
+    url = "https://github.com/BayramAnnakov/claude-reflect/archive/b6c42326903af3dd2bf3772b979730a44d8548ca.tar.gz"
+    exact = true
+    stripComponents = 2
+    include = ["*/mod/**"]
+    refreshPeriod = "168h"
