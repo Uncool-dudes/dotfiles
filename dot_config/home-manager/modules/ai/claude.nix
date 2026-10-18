@@ -25,11 +25,116 @@ let
         '';
       });
 
-  caveman = pkgs.fetchFromGitHub {
+  # Copies a plugin source tree and flips the `user-invocable` /
+  # `disable-model-invocation` frontmatter flags on named skills, instead of
+  # deleting them - reversible and inspectable (`cat $out/skills/<name>/SKILL.md`)
+  # rather than a silent `rm -rf`. Setting both false+true fully neutralizes a
+  # skill (no slash command, no auto-trigger) without touching its content.
+  #
+  # overrides: list of { skill, userInvocable ? null, disableModelInvocation ? null }
+  # - userInvocable = false          -> hidden from `/` list, auto-trigger still works
+  # - disableModelInvocation = true  -> no auto-trigger, slash command still works
+  # - both set                       -> skill fully off, equivalent to the old trim
+  # dropCommands: commands/*.toml have no invocation-flag equivalent (that
+  # frontmatter schema is skills-only) - the only off switch is deleting the file.
+  setSkillInvocation =
+    {
+      name,
+      src,
+      overrides,
+      dropCommands ? [ ],
+    }:
+    pkgs.runCommand "${name}-patched" { nativeBuildInputs = [ pkgs.yq-go ]; } (
+      ''
+        cp -r ${src} $out
+        chmod -R u+w $out
+      ''
+      + pkgs.lib.concatMapStrings (cmd: ''
+        rm -f "$out/commands/${cmd}.md" "$out/commands/${cmd}.toml"
+      '') dropCommands
+      + ''
+        patch_field() {
+          local file="$1" key="$2" value="$3"
+          [ -f "$file" ] || { echo "setSkillInvocation: missing $file" >&2; exit 1; }
+          local fm body
+          fm=$(awk '/^---$/{c++; next} c==1' "$file")
+          body=$(awk '/^---$/{c++; next} c>=2' "$file")
+          fm=$(echo "$fm" | yq -p yaml -o yaml ".\"$key\" = $value")
+          { printf -- '---\n%s\n---\n' "$fm"; printf '%s\n' "$body"; } > "$file.new"
+          mv "$file.new" "$file"
+        }
+      ''
+      + pkgs.lib.concatMapStrings (
+        o:
+        pkgs.lib.optionalString (o.userInvocable or null != null) ''
+          patch_field "$out/skills/${o.skill}/SKILL.md" "user-invocable" "${
+            if o.userInvocable then "true" else "false"
+          }"
+        ''
+        + pkgs.lib.optionalString (o.disableModelInvocation or null != null) ''
+          patch_field "$out/skills/${o.skill}/SKILL.md" "disable-model-invocation" "${
+            if o.disableModelInvocation then "true" else "false"
+          }"
+        ''
+      ) overrides
+    );
+
+  # Two shapes every setSkillInvocation overrides list reduces to:
+  # off entirely, or hidden from `/` with auto-trigger kept.
+  fullyOff = map (skill: {
+    inherit skill;
+    userInvocable = false;
+    disableModelInvocation = true;
+  });
+  hideKeepAuto = map (skill: {
+    inherit skill;
+    userInvocable = false;
+  });
+
+  caveman-src = pkgs.fetchFromGitHub {
     owner = "JuliusBrussee";
     repo = "caveman";
-    rev = "d262ab3882952a59312ff3537cd86d894523c5ab";
-    hash = "sha256-2xZHdWkWJrPAJ8++qW0Xmb3eORZ41e+GsZjIphqTtlI=";
+    rev = "bad48a0e1df55e05e3f52249afa35ecc1909ee76";
+    hash = "sha256-G2i54t+5fFCRI3lXP6fXV9oPWwIKklmx6F3EfrqntBY=";
+  };
+
+  caveman = setSkillInvocation {
+    name = "caveman";
+    src = caveman-src;
+    # Discarded in the full command-trim pass - a one-off repo-setup action,
+    # not used after initial activation.
+    dropCommands = [ "caveman-init" ];
+    overrides =
+      # Caveman Cloud gateway/billing skills - unrelated product behind the
+      # same plugin name as the text-compression mode we actually use, plus
+      # two discards from the full command-trim pass. Fully off.
+      fullyOff [
+        "caveman-setup"
+        "caveman-discover"
+        "caveman-evidence-review"
+        "caveman-manage"
+        "caveman-optimize"
+        "caveman-commit"
+        "megacave"
+      ]
+      ++ hideKeepAuto [
+        # Daily-driver text mode - keep auto-triggering on natural-language
+        # cues, just stop cluttering the `/` list as their own commands.
+        "caveman"
+        "caveman-review"
+        # Internal methodology/decision-aid skills - meant to be adopted from
+        # context, never typed by hand.
+        "cavecrew"
+        "caveman-explore"
+        "investigate-first"
+        "lean-build"
+        "migration"
+        "safe-refactor"
+        "surgical-patch"
+        "verify-and-stop"
+      ];
+    # caveman-help/-learn/-stats stay visible: deliberate explicit actions
+    # with no reliable natural-language trigger, not worth a command wrapper.
   };
 
   cc-skills-golang-src = pkgs.fetchFromGitHub {
@@ -39,28 +144,67 @@ let
     hash = "sha256-GYayraudW1jRetezgPZe3BUOSAc7N94HH/hlAGNXjzc=";
   };
 
-  # Dropped: unused in this stack (graphql, wire/dig DI, cobra/viper CLI,
-  # oops/do/slog samber libs not adopted here).
-  cc-skills-golang-droppedSkills = [
-    "golang-graphql"
-    "golang-google-wire"
-    "golang-samber-oops"
-    "golang-samber-do"
-    "golang-samber-slog"
-    "golang-uber-dig"
-    "golang-spf13-cobra"
-    "golang-spf13-viper"
-  ];
-
-  cc-skills-golang = pkgs.runCommand "cc-skills-golang-trimmed" { } (
-    ''
-      cp -r ${cc-skills-golang-src} $out
-      chmod -R u+w $out
-    ''
-    + pkgs.lib.concatMapStrings (skill: ''
-      rm -rf $out/skills/${skill}
-    '') cc-skills-golang-droppedSkills
-  );
+  cc-skills-golang = setSkillInvocation {
+    name = "cc-skills-golang";
+    src = cc-skills-golang-src;
+    # Unused in this stack: graphql, wire/dig DI, cobra/viper CLI,
+    # oops/do/slog samber libs not adopted here, plus discards from the full
+    # command-trim pass. Fully off.
+    overrides =
+      fullyOff [
+        "golang-graphql"
+        "golang-google-wire"
+        "golang-samber-oops"
+        "golang-samber-do"
+        "golang-samber-slog"
+        "golang-uber-dig"
+        "golang-spf13-cobra"
+        "golang-spf13-viper"
+        "golang-cli"
+        "golang-continuous-integration"
+        "golang-stay-updated"
+      ]
+      # Contextual guidance applied automatically during Go work - none of
+      # these are deliberate user-typed actions, unlike caveman-stats.
+      # Hide from `/`, keep auto-trigger.
+      ++ hideKeepAuto [
+        "golang-benchmark"
+        "golang-code-style"
+        "golang-concurrency"
+        "golang-context"
+        "golang-data-structures"
+        "golang-database"
+        "golang-dependency-injection"
+        "golang-dependency-management"
+        "golang-design-patterns"
+        "golang-documentation"
+        "golang-error-handling"
+        "golang-gopls"
+        "golang-grpc"
+        "golang-how-to"
+        "golang-lint"
+        "golang-modernize"
+        "golang-naming"
+        "golang-observability"
+        "golang-performance"
+        "golang-pkg-go-dev"
+        "golang-popular-libraries"
+        "golang-project-layout"
+        "golang-refactoring"
+        "golang-safety"
+        "golang-samber-hot"
+        "golang-samber-lo"
+        "golang-samber-mo"
+        "golang-samber-ro"
+        "golang-security"
+        "golang-stretchr-testify"
+        "golang-structs-interfaces"
+        "golang-swagger"
+        "golang-testing"
+        "golang-troubleshooting"
+        "golang-uber-fx"
+      ];
+  };
 
   mattpocock-skills = pkgs.fetchFromGitHub {
     owner = "mattpocock";
