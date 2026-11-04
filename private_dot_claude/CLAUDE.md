@@ -15,6 +15,11 @@
 
 - Never call Agent0 (Dash0 MCP `runTask`/Agent0 tools).
 
+## Task tracking
+
+- Spec-driven dev tickets -> GitHub Issues (`issue_write` MCP tool), filed in the repo the work belongs to.
+- Everything else (personal, ad-hoc/short-lived dev reminders) -> Things, via `things` skill.
+
 ## Guardrails
 
 - Don't assume an unfamiliar stack (e.g. .NET) - check actual tooling in use first.

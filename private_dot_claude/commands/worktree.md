@@ -18,9 +18,13 @@ Convention: worktrees live in a **sibling** directory `<repo>.worktrees/<name>` 
 - **Create**: `$arg1` is anything other than `list`/`rm` (it's the worktree name) - run `wt add "$arg1" "$arg2"`, where `$arg2` is the base branch, omitted to default to `main`. `wt` resolves the branch itself: local → remote-tracking → new-from-base, and prints `WORKTREE_PATH: <path>` on success.
   After it succeeds, this Claude Code session doesn't auto-follow: use `EnterWorktree` with the printed path explicitly if the user wants the session switched into it - Claude Code's own worktree tool hardcodes `.claude/worktrees/` inside the repo, which isn't this layout. On `ExitWorktree`, use `action: "keep"` - Claude didn't create this worktree through its own `name`-based tracking, so the default exit behavior shouldn't be trusted to leave it alone.
 
+- **Create from a PR**: user names a PR number instead of a branch - run `wt pr <number>`, which looks up the PR's head branch via `gh` and delegates to `wt add`.
+
 - **List**: `$arg1` is `list` - `wt list` (= `git worktree list`).
 
 - **Remove**: `$arg1` is `rm` - `$arg2` is the worktree name - run `wt rm "$arg2"`. Uncommitted changes in that worktree: the plain remove refuses - ask the user before passing `--force` as `$arg3`, never force by default.
+
+- **Clean up merged/closed**: `wt clean` - removes worktrees whose branch's PR is merged or closed (via `gh pr view`), then runs `gh poi --state merged,closed` to delete the now-unblocked local branches.
 
 ## Never
 

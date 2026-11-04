@@ -1,7 +1,7 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "ccstatusline"
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "attribution": {
     "commit": "",
@@ -14,11 +14,13 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet[1m]",
+  "model": "opus",
   "availableModels": [
     "claude-sonnet-5[1m]",
     "claude-sonnet-4-6[1m]",
     "claude-sonnet-4-6",
+    "claude-opus-5-5[1m]",
+    "claude-opus-5-5",
     "claude-haiku-4-5"
   ],
   "enforceAvailableModels": true,
@@ -103,21 +105,38 @@
   },
   "enableWorkflows": true,
   "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "ccstatusline"
+  },
   "enabledPlugins": {
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true
   },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "directory",
+        "path": "/nix/store/ik7587smsp24vdiggbsyjd74z5rjn80l-source"
+      }
+    }
+  },
   "effortLevel": "medium",
+  "modelSettings": {
+    "claude-sonnet-5": {
+      "autoCompactWindow": 800000
+    }
+  },
+  "advisorModel": "opus",
   "promptSuggestionEnabled": false,
   "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "tap"
+  },
   "skipWorkflowUsageWarning": true,
   "theme": "dark-ansi",
   "editorMode": "normal",
-  "voiceEnabled": true,
-  "voice": {
-    "enabled": true,
-    "mode": "hold"
-  },
   "preferredNotifChannel": "ghostty",
   "autoCompactEnabled": true,
   "switchModelsOnFlag": false,
@@ -125,6 +144,7 @@
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
+  "voiceEnabled": true,
   "allow": [
     "Bash(git push *)",
     "Bash(git push)",
@@ -164,14 +184,5 @@
     "Bash(bat *)",
     "Bash(eza *)",
     "Bash(just *)"
-  ],
-  "$schema": "https://json.schemastore.org/claude-code-settings.json",
-  "extraKnownMarketplaces": {
-    "claude-plugins-official": {
-      "source": {
-        "path": "/nix/store/ik7587smsp24vdiggbsyjd74z5rjn80l-source",
-        "source": "directory"
-      }
-    }
-  }
+  ]
 }
