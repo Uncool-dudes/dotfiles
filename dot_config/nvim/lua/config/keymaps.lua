@@ -6,13 +6,8 @@ vim.keymap.del("n", "<leader>bb")
 vim.keymap.del("n", "[b")
 vim.keymap.del("n", "]b")
 vim.keymap.del("n", "<leader>wm")
-vim.keymap.del("n", "]d")
-vim.keymap.del("n", "[d")
 vim.keymap.del("n", "]D")
 vim.keymap.del("n", "[D")
-
-vim.keymap.set("n", ";", function() vim.diagnostic.goto_next() end, { desc = "Next diagnostic" })
-vim.keymap.set("n", ",", function() vim.diagnostic.goto_prev() end, { desc = "Prev diagnostic" })
 
 vim.keymap.del("n", "<leader>K")
 vim.keymap.del("n", "<leader>L")
@@ -37,7 +32,7 @@ vim.keymap.del("n", "<leader>qd")
 vim.keymap.del("n", "<leader>ql")
 vim.keymap.del("n", "<leader>qS")
 
-vim.keymap.set("n", "zz", function()
+vim.keymap.set("n", "<leader>z", function()
   if vim.o.foldlevel == 0 then
     vim.cmd("normal! zR")
   else

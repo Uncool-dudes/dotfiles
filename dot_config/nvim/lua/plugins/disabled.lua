@@ -23,7 +23,7 @@ return {
         topdelete = { text = "" },
         changedelete = { text = "" },
       },
-      sign_column = false,
+      signcolumn = false,
       linehl = true,
       numhl = false,
     },
