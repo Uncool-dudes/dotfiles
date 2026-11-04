@@ -15,6 +15,7 @@
         prs = "pr list --author @me";
         ready = "pr ready";
         approve = "pr review --approve";
+        approve-tushar = "!GH_TOKEN=$(op read 'op://Ratch/Tushar PAT Token/credential') gh pr review --approve \"$@\"";
         reviewer = "pr edit --add-reviewer";
       };
     };

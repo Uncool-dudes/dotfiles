@@ -107,7 +107,10 @@ _cache_eval() {
   local resolved="${bin:A}"
   if [[ ! -f "$cache" || ! -f "$stamp" || "$(<$stamp)" != "$resolved" ]]; then
     mkdir -p "${cache:h}"
-    "$name" "${@:2}" > "$cache" 2>/dev/null
+    # Invoke by store path: tools like starship/direnv embed their own
+    # argv[0] in the generated script, so a profile symlink path would
+    # go stale when the profile layout changes.
+    "$resolved" "${@:2}" > "$cache" 2>/dev/null
     print -r -- "$resolved" > "$stamp"
   fi
   [[ -f "$cache" ]] && source "$cache"
@@ -124,6 +127,7 @@ _cache_eval navi    widget zsh
 zsh-defer _cache_eval chezmoi completion zsh
 zsh-defer _cache_eval pnpm    completion zsh
 zsh-defer _cache_eval sesh    completion zsh
+zsh-defer _cache_eval loadout completion zsh
 
 # ── sesh picker (outside tmux) ───────────────────────────────────
 function sesh-sessions() {
@@ -224,6 +228,27 @@ function sshf() {
 
 # ── Home-manager ─────────────────────────────────────────────────
 function hms() { nh home switch -c uncool@mac "$@" }
+
+# ── loadout ──────────────────────────────────────────────────────
+# claude starts through loadout, so a repo's profile settings, MCP servers and
+# skills apply; with no profile it is plain claude. Defined only when the
+# installed loadout knows --optional, so an older build can never break claude.
+# Entering a repo also syncs its skills, quietly, once per repo.
+if (( $+commands[loadout] )) && [[ $(loadout exec --help 2>/dev/null) == *--optional* ]]; then
+  # DO_NOT_TRACK stays set for other tools, but Claude Code treats it as a
+  # telemetry opt-out that also stops feature-flag fetching, which the
+  # advisor tool needs.
+  claude() { env -u DO_NOT_TRACK loadout exec --optional -- "$@" }
+  autoload -Uz add-zsh-hook
+  _loadout_chpwd() {
+    local top
+    top=$(git rev-parse --show-toplevel 2>/dev/null) || return 0
+    [[ $top == ${_loadout_last:-} ]] && return 0
+    _loadout_last=$top
+    loadout sync --quiet --optional
+  }
+  add-zsh-hook chpwd _loadout_chpwd
+fi
 
 # ── gcloud ───────────────────────────────────────────────────────
 local _gcloud_sdk="/opt/homebrew/share/google-cloud-sdk"

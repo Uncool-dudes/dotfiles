@@ -2,7 +2,16 @@
 {
   programs.ghostty = {
     enable = true;
-    package = null;
+    # Pinned to 1.3.1: 1.4.0 broken. Drop override once a fixed release lands.
+    package = pkgs.ghostty-bin.overrideAttrs (
+      finalAttrs: _: {
+        version = "1.3.1";
+        src = pkgs.fetchurl {
+          url = "https://release.files.ghostty.org/${finalAttrs.version}/Ghostty.dmg";
+          hash = "sha256-GM/ysKbO6Q7q2cfTBk6AiiUqQLryFKp1LB7LeTuPX2k=";
+        };
+      }
+    );
     enableZshIntegration = pkgs.stdenv.hostPlatform.isLinux;
 
     settings = {
@@ -11,7 +20,7 @@
       # flexoki-dark scheme is kept in sync with this for every other app.
       theme = "Oxocarbon";
 
-      font-family = "Iosevka SS08";
+      font-family = "WumpusMono Nerd Font Mono";
       font-size = 15;
       adjust-cell-height = 10;
       font-thicken = true;
@@ -35,7 +44,9 @@
 
       window-inherit-working-directory = true;
       notify-on-command-finish = "unfocused";
-      window-save-state = "always";
+      window-save-state = "never";
+      # nix store is read-only; version bumps come from flake.lock
+      auto-update = "off";
 
       quick-terminal-position = "bottom";
       quick-terminal-size = "35%";

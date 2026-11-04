@@ -20,6 +20,7 @@
     env = {
       GOBIN = "${config.home.homeDirectory}/go/bin";
       GOPRIVATE = [
+        "github.com/apaag-solutions-lab"
         "github.com/fabrikiot"
         "github.com/ratchio"
       ];
@@ -80,5 +81,7 @@
     hyperfine
     rsync
     weaver
+    spicedb
+    spicedb-zed
   ];
 }

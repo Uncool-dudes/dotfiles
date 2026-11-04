@@ -125,6 +125,7 @@ in
       auto_expand = true;
       destructive_warning = true;
       table_format = "psql";
+      keyring = false;
     };
   };
 

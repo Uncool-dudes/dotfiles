@@ -26,6 +26,10 @@
     # the cached aarch64-darwin build was built against; following ours would
     # likely turn that cache hit back into a from-source build.
     atuin.url = "github:atuinsh/atuin";
+    loadout = {
+      url = "github:Uncool-dudes/loadout";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
