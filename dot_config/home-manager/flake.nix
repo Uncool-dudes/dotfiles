@@ -4,10 +4,6 @@
   inputs = {
     nixpkgs.url = "https://channels.nixos.org/nixpkgs-unstable/nixexprs.tar.zst";
     nixpkgs-master.url = "github:NixOS/nixpkgs/master";
-    alloydb-auth-proxy-src = {
-      url = "github:GoogleCloudPlatform/alloydb-auth-proxy";
-      flake = false;
-    };
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -46,19 +42,6 @@
         # promotion gate). go_1_27 is already merged and cached on nixpkgs master.
         (final: prev: {
           go = (import inputs.nixpkgs-master { system = prev.stdenv.hostPlatform.system; }).go_1_27;
-        })
-
-        # Not packaged in nixpkgs or homebrew; built from upstream source so
-        # `nix flake update` keeps it current instead of manual version bumps.
-        (final: prev: {
-          alloydb-auth-proxy = prev.buildGoModule {
-            pname = "alloydb-auth-proxy";
-            version = inputs.alloydb-auth-proxy-src.shortRev or "unstable";
-            src = inputs.alloydb-auth-proxy-src;
-            vendorHash = "sha256-rxvy3G72IxMspdHMSFnd7pdb80520NZr/TKVAkAgPpA=";
-            doCheck = false;
-            meta.mainProgram = "alloydb-auth-proxy";
-          };
         })
       ];
 
