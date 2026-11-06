@@ -87,27 +87,16 @@
       };
 
       flake = {
+        # System only. The user environment is the standalone
+        # homeConfigurations."uncool@mac" (hms): no sudo, faster switches, and
+        # one owner for dotfiles instead of two generations overwriting each other.
         darwinConfigurations."Ananths-MacBook-Pro" = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit inputs; };
           modules = [
             ./modules/darwin
-            home-manager.darwinModules.home-manager
             {
               nixpkgs.hostPlatform = "aarch64-darwin";
               nixpkgs.overlays = overlays;
-            }
-            {
-              home-manager.useGlobalPkgs = true;
-              home-manager.useUserPackages = true;
-              home-manager.backupFileExtension = "bak";
-              home-manager.extraSpecialArgs = {
-                username = "uncool";
-                inherit inputs;
-              };
-              home-manager.users.uncool = { ... }: {
-                imports = macHomeModules;
-                _module.args.username = "uncool";
-              };
             }
           ];
         };
