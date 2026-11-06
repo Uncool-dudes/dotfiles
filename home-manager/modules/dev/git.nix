@@ -3,7 +3,15 @@
   pkgs,
   ...
 }:
+let
+  email = "106897936+Uncool-dudes@users.noreply.github.com";
+  # Public half of the SSH key 1Password signs with - not a secret, so it
+  # lives here instead of behind an onepasswordRead that needs Touch ID.
+  signingKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAUxgXsXOayn+GQZz8Q5rWmKZpGo0TsdhSd7xA4PXkaD";
+in
 {
+  xdg.configFile."git/allowed_signers".text = "${email} ${signingKey}\n";
+
   programs.git = {
     enable = true;
 
@@ -18,7 +26,7 @@
     ];
 
     signing = {
-      key = null;
+      key = signingKey;
       format = "ssh";
       signByDefault = true;
       signer =
@@ -36,15 +44,12 @@
     # read-only store-backed config.
     maintenance.enable = true;
 
-    includes = [
-      { path = "~/.config/git/signing.inc"; }
-      { path = "~/.config/git/maintenance.inc"; }
-    ];
+    includes = [ { path = "~/.config/git/maintenance.inc"; } ];
 
     settings = {
       user = {
         name = "Ananth Pullur";
-        email = "106897936+Uncool-dudes@users.noreply.github.com";
+        inherit email;
       };
 
       feature.manyFiles = true;
