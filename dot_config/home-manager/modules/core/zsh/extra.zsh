@@ -95,9 +95,11 @@ _auto_ls_on_cd() { eza }
 add-zsh-hook chpwd _auto_ls_on_cd
 
 # ── Cached eval ──────────────────────────────────────────────────
-# Staleness is checked by resolved store path, not mtime - nix store
-# files all carry epoch 1970 mtimes, so "cache -ot bin" never fires
-# on a version bump and silently serves a stale init script forever.
+# Staleness is keyed on the PATH location plus the resolved store path, not
+# mtime - nix store files all carry epoch 1970 mtimes, so "cache -ot bin"
+# never fires on a version bump. The PATH location is part of the key because
+# some tools (starship) embed their profile path in the generated script, so
+# a profile layout change with an unchanged store path must still regenerate.
 _cache_eval() {
   local name="$1"
   local cache="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/${name}.zsh"
@@ -105,13 +107,11 @@ _cache_eval() {
   local bin="${commands[$name]:-$(whence $name 2>/dev/null)}"
   [[ -z "$bin" ]] && return
   local resolved="${bin:A}"
-  if [[ ! -f "$cache" || ! -f "$stamp" || "$(<$stamp)" != "$resolved" ]]; then
+  local key="${bin} ${resolved}"
+  if [[ ! -f "$cache" || ! -f "$stamp" || "$(<$stamp)" != "$key" ]]; then
     mkdir -p "${cache:h}"
-    # Invoke by store path: tools like starship/direnv embed their own
-    # argv[0] in the generated script, so a profile symlink path would
-    # go stale when the profile layout changes.
     "$resolved" "${@:2}" > "$cache" 2>/dev/null
-    print -r -- "$resolved" > "$stamp"
+    print -r -- "$key" > "$stamp"
   fi
   [[ -f "$cache" ]] && source "$cache"
 }
