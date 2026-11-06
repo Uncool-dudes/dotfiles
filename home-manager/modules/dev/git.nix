@@ -30,15 +30,16 @@
 
     ignores = [ "**/.claude/settings.local.json" ];
 
-    maintenance = {
-      enable = true;
-      repositories = [
-        "${config.home.homeDirectory}/projects/github.com/ratchio/gamma"
-        "${config.home.homeDirectory}/projects/github.com/ratchio/goutils"
-      ];
-    };
+    # Only the launchd schedule lives here. The repo list is machine state:
+    # the ghq wrapper in zsh/extra.zsh registers every ghq repo into
+    # maintenance.inc, since `git maintenance register` can't write to this
+    # read-only store-backed config.
+    maintenance.enable = true;
 
-    includes = [ { path = "~/.config/git/signing.inc"; } ];
+    includes = [
+      { path = "~/.config/git/signing.inc"; }
+      { path = "~/.config/git/maintenance.inc"; }
+    ];
 
     settings = {
       user = {

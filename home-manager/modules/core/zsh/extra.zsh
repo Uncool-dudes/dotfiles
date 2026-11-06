@@ -56,6 +56,19 @@ zstyle ':fzf-tab:*' fzf-flags --height=40% --layout=reverse --border
 
 # ── Functions ────────────────────────────────────────────────────
 function gcd() { cd "$(ghq list --full-path | fzf --height 40%)" }
+# ghq has no post-clone hook, so new repos get registered for background
+# `git maintenance` here. See git.nix for why the list lives in maintenance.inc.
+function ghq-maintenance-sync() {
+  local repo
+  for repo in $(command ghq list --full-path); do
+    git -C "$repo" maintenance register --config-file ~/.config/git/maintenance.inc 2>/dev/null
+  done
+}
+function ghq() {
+  command ghq "$@" || return
+  [[ $1 == (get|create) ]] && ghq-maintenance-sync
+  return 0
+}
 function y() {
   local target="$PWD"
   local -a rest=("$@")
