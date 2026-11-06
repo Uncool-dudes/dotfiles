@@ -101,7 +101,8 @@
       glow = "glow -s dark";
       wget = "wget --hsts-file=/dev/null";
       rl = "source ${config.xdg.configHome}/zsh/.zshrc";
-      alloydb = "autossh -M 0 -o ControlMaster=no -o ControlPath=none -Nf alloydb";
+      # Each autossh -f is a separate daemon; a second one loops forever failing to bind :5432.
+      alloydb = "lsof -nP -iTCP:5432 -sTCP:LISTEN >/dev/null && echo 'alloydb tunnel already up on :5432' || autossh -M 0 -Nf alloydb";
       cc = "claude";
       ccc = "claude --continue";
       ccr = "claude --resume";
