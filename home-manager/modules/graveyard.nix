@@ -28,4 +28,7 @@
 #                (column mode, multi-highlight) are already owned by mlr/lnav/fx/jq;
 #                for plain man/diff paging it added complexity with no functional win.
 #                swapped to moor (walles/moor, formerly "moar") instead
+# age, sops    - never wired up; every secret goes through chezmoi's
+#                onepasswordRead. Bring back with sops-nix if secrets ever
+#                need to live in the Nix config
 { }
