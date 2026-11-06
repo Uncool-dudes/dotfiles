@@ -1,0 +1,144 @@
+{
+  "addyosmani": {
+    "owner": "addyosmani",
+    "repo": "web-quality-skills",
+    "rev": "afa8da942115f2961fdbfa80807ea0b232ff6c00",
+    "hash": "sha256-RW+30OFUYxNO/SqPJ/bmwAn965GOoxjeuKBMFBtESHE=",
+    "path": "skills"
+  },
+  "akin-ozer": {
+    "owner": "akin-ozer",
+    "repo": "cc-devops-skills",
+    "rev": "276af751e659315aaf56d3ad13d7c26f4e72e28a",
+    "hash": "sha256-RSUkDMyn37BfjbgENydpsVwJQ0v0dJnP+njJLLuKunc=",
+    "path": "devops-skills-plugin/skills"
+  },
+  "blader": {
+    "owner": "blader",
+    "repo": "humanizer",
+    "rev": "8c307f367c91bd974002f10f2be2965d642c13df",
+    "hash": "sha256-PkMQTzYs/0uUa6/liyndLCblx30N96XYlVQYc0c8Hfo=",
+    "include": [
+      "SKILL.md"
+    ]
+  },
+  "caveman": {
+    "owner": "JuliusBrussee",
+    "repo": "caveman",
+    "rev": "bad48a0e1df55e05e3f52249afa35ecc1909ee76",
+    "hash": "sha256-G2i54t+5fFCRI3lXP6fXV9oPWwIKklmx6F3EfrqntBY=",
+    "path": "skills"
+  },
+  "claude-mem": {
+    "owner": "thedotmack",
+    "repo": "claude-mem",
+    "rev": "b85cd123daf8e5bd59edb2d1c7b98e0bba28b3a0",
+    "hash": "sha256-Gily9VzCtRT1+t2Z1pKLLR8WoW0EPX/250vBmLY/iZE=",
+    "path": "plugin/skills"
+  },
+  "google": {
+    "owner": "google",
+    "repo": "skills",
+    "rev": "a342dc55cc21bfc712c97a04a01b12c05648e92b",
+    "hash": "sha256-Ruah2I/SYBkDo/FuufIyYrW4Y1o84DMg/q7gEBH/dhY=",
+    "path": "skills/cloud"
+  },
+  "google-developers": {
+    "owner": "google",
+    "repo": "skills",
+    "rev": "a342dc55cc21bfc712c97a04a01b12c05648e92b",
+    "hash": "sha256-Ruah2I/SYBkDo/FuufIyYrW4Y1o84DMg/q7gEBH/dhY=",
+    "path": "skills/developers"
+  },
+  "hqhq1025": {
+    "owner": "hqhq1025",
+    "repo": "skill-optimizer",
+    "rev": "b9ffd1513e84136b72e2b6f041dc1ebfd9e23a84",
+    "hash": "sha256-bmlc9nD0Tz62sy+Grvt6ZWhuNQjk6AjuMy0aLPw+ZE8=",
+    "path": "skills"
+  },
+  "impeccable": {
+    "owner": "pbakaus",
+    "repo": "impeccable",
+    "rev": "936867543ac2576920d663cc9803597f6044f3ac",
+    "hash": "sha256-npARJG21iGscxuqpcFalSxRjEl8/I+/nGLqzOebhtVU=",
+    "path": ".agent/skills"
+  },
+  "mattpocock": {
+    "owner": "mattpocock",
+    "repo": "skills",
+    "rev": "49dd158d1076134a641b33efb035946536778336",
+    "hash": "sha256-NljCSZNI3sZ+vbCw7pRdrwR7try4BxOFp4gdjuWYtzs=",
+    "path": "skills/engineering"
+  },
+  "neolab": {
+    "owner": "NeoLabHQ",
+    "repo": "context-engineering-kit",
+    "rev": "23e2428e809d77717f8acc9659c374a3a1fcb93e",
+    "hash": "sha256-HiF7c6a6EPsIbGka/ZFqggx9OfJm90N1w3Fh7IRv81s=",
+    "path": "plugins/customaize-agent/skills"
+  },
+  "obra": {
+    "owner": "obra",
+    "repo": "superpowers",
+    "rev": "bb92a77741419a4ab5f06e711a283343f1ada0c3",
+    "hash": "sha256-UCVI+T7j1Xh1LDkrvnJduis7eHFqrizCyGTWAGW5d6U=",
+    "path": "skills"
+  },
+  "ollygarden": {
+    "owner": "ollygarden",
+    "repo": "opentelemetry-agent-skills",
+    "rev": "06b42b61399c8bb3ed54d14ca0daa8c0c4cbaaa9",
+    "hash": "sha256-b3VnPDVwNw4Gl2o6FkPdG13oNFOivPx2jKuorFKPg+0=",
+    "path": "skills"
+  },
+  "overkill": {
+    "owner": "santiago-vargas-de-kruijf",
+    "repo": "claude-overkill",
+    "rev": "60c7bbbab99669e3fc39e60cdf4f05d473ab194c",
+    "hash": "sha256-Ovm5dgeOPa0o0t+mjmp9idVGsGFWx24Y3H7UOAquxxw=",
+    "path": "plugins/overkill/skills"
+  },
+  "pstack": {
+    "owner": "cursor",
+    "repo": "plugins",
+    "rev": "519d36aa98955bf680db01bcde5fdfba686dc901",
+    "hash": "sha256-BHLbamlLNZmPn6uqO2pKAghL/l9TqtQI3YQTZnUQ2Cg=",
+    "path": "pstack/skills"
+  },
+  "samber": {
+    "owner": "samber",
+    "repo": "cc-skills-golang",
+    "rev": "8e899e20ff0cd4dc524af3993e4c62d8ee8c5717",
+    "hash": "sha256-GYayraudW1jRetezgPZe3BUOSAc7N94HH/hlAGNXjzc=",
+    "path": "skills"
+  },
+  "sentry": {
+    "owner": "getsentry",
+    "repo": "sentry-agent-skills",
+    "rev": "9f54eb021916a7cff2c04a9f4e4c1f9439f3202c",
+    "hash": "sha256-lxmtMdtAYMZIU2x/YEvgIcpStG7nq2Mbhyn17yMuefQ=",
+    "path": "skills"
+  },
+  "svelte": {
+    "owner": "sveltejs",
+    "repo": "ai-tools",
+    "rev": "b2589f890e9c5c4a788a557315aa5012d1fba4ba",
+    "hash": "sha256-Pd3OmDtpyPZZ7IG74zyzB1Q9PHSPjqj1+a9qk71H9Q0=",
+    "path": "tools/skills"
+  },
+  "taste": {
+    "owner": "Leonxlnx",
+    "repo": "taste-skill",
+    "rev": "6010f91a9935f1c167dfc500fb1a475681892e6b",
+    "hash": "sha256-25Hc9DiKiDSq+Ae3bTwv9nnk7KziP0cp3Q8srpXE47U=",
+    "path": "skills"
+  },
+  "trailofbits": {
+    "owner": "trailofbits",
+    "repo": "skills",
+    "rev": "5c99c03fb8a9ea568432ecbcba5d86e9f4ac2bf0",
+    "hash": "sha256-WP1bZebw67PbZPTsR/RngCV3tInkNPZW3NZyTPhW2gk=",
+    "path": "plugins"
+  }
+}

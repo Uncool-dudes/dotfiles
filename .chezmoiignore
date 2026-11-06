@@ -1,1 +1,2 @@
-.config/home-manager/flake.lock
+home-manager
+home-manager/**

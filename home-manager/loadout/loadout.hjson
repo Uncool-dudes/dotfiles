@@ -1,0 +1,370 @@
+{
+  # Profiles for `loadout`. Edit freely: ~/.config/loadout/loadout.hjson links
+  # here, so changes apply on the next `loadout sync`, with no rebuild.
+  #
+  # HJSON quoteless strings run to the end of the line, so write lists one
+  # item per line and never put several items between [ ] on one line.
+
+  # Linked into ~/.claude/skills by `loadout sync --global`, which every
+  # home-manager switch runs. Keep this to skills useful in every repository.
+  global: [
+    base
+  ]
+
+  # Who may start each skill (both | user | model):
+  #   user  = slash command only, the model never auto-triggers it, so it costs
+  #           no description tokens
+  #   model = auto-trigger only, hidden from the / menu
+  #   both  = as the author wrote it (the default)
+  invocation: {
+    # --- caveman: mode and methodology skills, adopted from context ---
+    caveman/caveman: model
+    caveman/caveman-review: model
+    caveman/cavecrew: model
+    caveman/caveman-explore: model
+    caveman/investigate-first: model
+    caveman/lean-build: model
+    caveman/migration: model
+    caveman/safe-refactor: model
+    caveman/surgical-patch: model
+    caveman/verify-and-stop: model
+
+    # --- claude-mem: explicit actions are slash commands only ---
+    claude-mem/mem-search: model
+    claude-mem/smart-explore: model
+    claude-mem/make-plan: model
+    claude-mem/agent-cost-report: user
+    claude-mem/babysit: user
+    claude-mem/ccs-align: user
+    claude-mem/cloud-sync: user
+    claude-mem/design-is: user
+    claude-mem/do: user
+    claude-mem/handoff: user
+    claude-mem/how-it-works: user
+    claude-mem/knowledge-agent: user
+    claude-mem/mode-creator: user
+    claude-mem/oh-my-issues: user
+    claude-mem/screenpipe: user
+    claude-mem/standup: user
+    claude-mem/timeline-report: user
+    claude-mem/what-the: user
+
+    # --- prose polish: runs only when asked ---
+    blader/humanizer: user
+    overkill/overkill: user
+
+    # --- go: contextual guidance applied while writing Go ---
+    samber/*: model
+
+    # --- gcp ---
+    google/google-cloud-waf-cost-optimization: model
+    google/google-cloud-waf-operational-excellence: model
+    google/google-cloud-waf-performance-optimization: model
+    google/google-cloud-waf-reliability: model
+    google/google-cloud-waf-security: model
+    google-developers/retrieving-developer-knowledge: model
+
+    # --- security: slow or token-heavy audits are yours to start ---
+    trailofbits/differential-review: user
+    trailofbits/variant-analysis: user
+    trailofbits/audit-context-building: user
+    trailofbits/semgrep-rule-creator: user
+    trailofbits/codeql: user
+    trailofbits/semgrep: user
+    trailofbits/sharp-edges: model
+    trailofbits/property-based-testing: model
+    trailofbits/sarif-parsing: model
+
+    # --- devops: generators stay auto-triggerable, validators are yours to start ---
+    akin-ozer/jenkinsfile-validator: user
+    akin-ozer/github-actions-validator: user
+    akin-ozer/dockerfile-validator: user
+
+    # --- observability ---
+    ollygarden/otel-telemetrygen: user
+    ollygarden/otel-upgrade: user
+    ollygarden/otel-span-events-to-logs-migration: user
+    sentry/sentry-fix-issues: user
+    sentry/sentry-create-alert: user
+    sentry/sentry-otel-exporter-setup: user
+    addyosmani/web-quality-audit: user
+    taste/taste-skill: model
+    impeccable/impeccable: user
+    svelte/svelte-code-writer: model
+    svelte/svelte-core-bestpractices: model
+    ollygarden/otel-collector: model
+    ollygarden/otel-ottl: model
+    ollygarden/otel-semantic-conventions: model
+    ollygarden/otel-sdk-versions: model
+    ollygarden/otel-weaver: model
+    ollygarden/otel-telemetry-emissions: model
+
+    # --- skill tuning ---
+    hqhq1025/skill-miner: user
+    hqhq1025/skill-personalizer: user
+    neolab/test-skill: user
+    neolab/test-prompt: user
+    neolab/create-rule: user
+    neolab/create-skill: user
+    neolab/apply-anthropic-skill-best-practices: user
+    neolab/agent-evaluation: user
+
+    # --- pstack: authors ship slash-command only, opened up to auto-trigger ---
+    pstack/*: both
+  }
+
+  profiles: {
+    # Global. Selected by the `global` list above. Domain-agnostic only: code
+    # skills live in `dev`, which stack profiles extend.
+    base: {
+      skills: [
+        mattpocock/research
+        blader/humanizer
+        overkill/overkill
+        caveman/caveman
+        caveman/caveman-compress
+        claude-mem/mem-search
+        claude-mem/make-plan
+        claude-mem/handoff
+      ]
+    }
+
+    # Skills for any code repository. Not global: a repo needs a `projects`
+    # entry to get them.
+    dev: {
+      skills: [
+        mattpocock/code-review
+        mattpocock/codebase-design
+        mattpocock/diagnosing-bugs
+        mattpocock/domain-modeling
+        mattpocock/implement
+        mattpocock/implement-spec
+        mattpocock/to-spec
+        mattpocock/to-tickets
+        obra/test-driven-development
+        caveman/cavecrew
+        caveman/investigate-first
+        caveman/safe-refactor
+        caveman/surgical-patch
+        caveman/verify-and-stop
+        claude-mem/smart-explore
+        claude-mem/do
+      ]
+    }
+
+    # Situational methods, opt in with --profile.
+    methods: {
+      skills: [
+        caveman/lean-build
+        caveman/migration
+        claude-mem/learn-codebase
+        claude-mem/pathfinder
+        mattpocock/improve-codebase-architecture
+      ]
+    }
+
+    # claude-mem utilities, opt in with --profile.
+    mem-tools: {
+      skills: [
+        claude-mem/agent-cost-report
+        claude-mem/babysit
+        claude-mem/ccs-align
+        claude-mem/cloud-sync
+        claude-mem/design-is
+        claude-mem/how-it-works
+        claude-mem/knowledge-agent
+        claude-mem/mode-creator
+        claude-mem/oh-my-issues
+        claude-mem/screenpipe
+        claude-mem/standup
+        claude-mem/timeline-report
+        claude-mem/weekly-digests
+        claude-mem/what-the
+      ]
+    }
+
+    # CI and container authoring. Opt-in: add `devops` to a repo in `projects`.
+    devops: {
+      skills: [
+        akin-ozer/jenkinsfile-generator
+        akin-ozer/jenkinsfile-validator
+        akin-ozer/github-actions-generator
+        akin-ozer/github-actions-validator
+        akin-ozer/dockerfile-generator
+        akin-ozer/dockerfile-validator
+      ]
+    }
+
+    go: {
+      extends: [
+        dev
+      ]
+      skills: [
+        samber/*
+      ]
+      # Not used in this stack: graphql, wire/dig/do DI, cobra/viper, the
+      # oops/slog samber libraries, and generic CI and update guidance.
+      exclude: [
+        samber/golang-graphql
+        samber/golang-google-wire
+        samber/golang-samber-oops
+        samber/golang-samber-do
+        samber/golang-samber-slog
+        samber/golang-uber-dig
+        samber/golang-spf13-cobra
+        samber/golang-spf13-viper
+        samber/golang-cli
+        samber/golang-continuous-integration
+        samber/golang-stay-updated
+      ]
+      # Type-checked references, call hierarchy and diagnostics from the
+      # gopls on PATH, instead of grepping for symbols.
+      mcp_servers: {
+        gopls: {
+          type: stdio
+          command: gopls
+          args: [
+            mcp
+          ]
+        }
+      }
+    }
+
+    gcp: {
+      skills: [
+        google/gcloud
+        google/alloydb-basics
+        google/spanner-basics
+        google/google-cloud-waf-cost-optimization
+        google/google-cloud-waf-operational-excellence
+        google/google-cloud-waf-performance-optimization
+        google/google-cloud-waf-reliability
+        google/google-cloud-waf-security
+        google-developers/retrieving-developer-knowledge
+      ]
+    }
+
+    security: {
+      skills: [
+        trailofbits/differential-review
+        trailofbits/variant-analysis
+        trailofbits/audit-context-building
+        trailofbits/semgrep-rule-creator
+        trailofbits/codeql
+        trailofbits/semgrep
+        trailofbits/sharp-edges
+        trailofbits/property-based-testing
+        trailofbits/sarif-parsing
+      ]
+    }
+
+    # otel-go is left out on purpose: SDK setup goes through goutils/otel.
+    observability: {
+      skills: [
+        ollygarden/otel-collector
+        ollygarden/otel-ottl
+        ollygarden/otel-semantic-conventions
+        ollygarden/otel-sdk-versions
+        ollygarden/otel-weaver
+        ollygarden/otel-telemetry-emissions
+        ollygarden/otel-telemetrygen
+        ollygarden/otel-collector-builder
+        ollygarden/otel-declarative-config
+        ollygarden/otel-upgrade
+        ollygarden/otel-span-events-to-logs-migration
+        google/cloud-logging-query-generation
+        google/cloud-monitoring-promql-query
+        google/cloud-trace-querying
+        sentry/sentry-fix-issues
+        sentry/sentry-create-alert
+        sentry/sentry-otel-exporter-setup
+      ]
+      # Read-only Dash0 queries. Auth is the OAuth login claude already holds.
+      mcp_servers: {
+        dash0: {
+          type: http
+          url: "https://api.europe-west4.gcp.dash0.com/mcp"
+        }
+      }
+    }
+
+    # Browser code. seo and the single-topic audits are left out on purpose:
+    # web-quality-audit covers them.
+    frontend: {
+      extends: [
+        dev
+      ]
+      skills: [
+        addyosmani/web-quality-audit
+        ollygarden/otel-browser
+        sentry/sentry-react-sdk
+        taste/taste-skill
+        impeccable/impeccable
+        svelte/svelte-code-writer
+        svelte/svelte-core-bestpractices
+      ]
+      # Official Svelte docs and svelte-autofixer. Auth-free remote endpoint.
+      mcp_servers: {
+        svelte: {
+          type: http
+          url: "https://mcp.svelte.dev/mcp"
+        }
+        # Drives the installed Google Chrome, so no bundled browser download.
+        # pnpm dlx over nixpkgs playwright-mcp: its nix browsers are Linux-only.
+        playwright: {
+          type: stdio
+          command: pnpm
+          args: [
+            dlx
+            "@playwright/mcp@latest"
+          ]
+        }
+      }
+    }
+
+    # cursor/plugins pstack, on trial. Opt-in: add `pstack` to a repo in
+    # `projects`.
+    pstack: {
+      skills: [
+        pstack/*
+      ]
+    }
+
+    skill-tuning: {
+      skills: [
+        hqhq1025/skill-miner
+        hqhq1025/skill-personalizer
+        neolab/test-skill
+        neolab/test-prompt
+        neolab/create-rule
+        neolab/create-skill
+        neolab/apply-anthropic-skill-best-practices
+        neolab/agent-evaluation
+      ]
+    }
+  }
+
+  # Which profiles apply to which repo, keyed by ghq path. Worktrees resolve to
+  # the same entry. A starting point: add repos as you go, then `loadout sync`
+  # needs no flags there.
+  projects: {
+    github.com/ratchio/gamma: [
+      go
+      observability
+      gcp
+      pstack
+    ]
+    github.com/ratchio/goutils: [
+      go
+    ]
+    github.com/ratchio/alpha: [
+      go
+    ]
+    github.com/Uncool-dudes/loadout: [
+      go
+    ]
+    github.com/ratchio/ratch-recruiter-ui-original: [
+      frontend
+    ]
+  }
+}
