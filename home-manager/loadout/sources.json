@@ -22,6 +22,15 @@
       "SKILL.md"
     ]
   },
+  "career-ops": {
+    "owner": "career-ops-hq",
+    "repo": "career-ops",
+    "ref": "0339acb4176f67ba3eee76e16276998d87ed869a",
+    "rev": "0339acb4176f67ba3eee76e16276998d87ed869a",
+    "hash": "sha256-UhfeRyRbOQf7sZsTeLOwRdI3xu1BJPAt6z4chQ/0LtY=",
+    "path": "claude-directory/skills",
+    "pinned": true
+  },
   "caveman": {
     "owner": "JuliusBrussee",
     "repo": "caveman",

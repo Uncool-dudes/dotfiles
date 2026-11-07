@@ -342,6 +342,16 @@
         neolab/agent-evaluation
       ]
     }
+
+    # career-ops router. Its modes and scripts live in the ~/career-ops
+    # checkout (modules/ai/career-ops.nix), which the skill finds on its own.
+    # That checkout ships its own project copy, so this is only for repos
+    # outside it.
+    career: {
+      skills: [
+        career-ops/career-ops
+      ]
+    }
   }
 
   # Which profiles apply to which repo, keyed by ghq path. Worktrees resolve to
@@ -365,6 +375,9 @@
     ]
     github.com/ratchio/ratch-recruiter-ui-original: [
       frontend
+    ]
+    github.com/Uncool-dudes/resume: [
+      career
     ]
   }
 }
