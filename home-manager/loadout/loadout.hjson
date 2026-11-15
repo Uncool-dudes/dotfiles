@@ -330,6 +330,19 @@
       ]
     }
 
+    # No Rust-specific source is pinned yet. These pstack principles carry the
+    # type-driven domain modeling the Rust repos lean on.
+    rust: {
+      extends: [
+        dev
+      ]
+      skills: [
+        pstack/principle-type-system-discipline
+        pstack/principle-model-the-domain
+        pstack/principle-test-behavior-not-implementation
+      ]
+    }
+
     skill-tuning: {
       skills: [
         hqhq1025/skill-miner
@@ -378,6 +391,9 @@
     ]
     github.com/Uncool-dudes/resume: [
       career
+    ]
+    github.com/apaag-solutions-lab/electro-mail: [
+      rust
     ]
   }
 }
