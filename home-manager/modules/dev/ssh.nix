@@ -40,7 +40,7 @@
   xdg.configFile."1Password/ssh/agent.toml".text = ''
     # work
     [[ssh-keys]]
-    item = "phdcv4pk2nnveztrlokotosm44"
+    item = "wk6q4lponk4lcpvgy3v3zkoc7i"
 
     # homelab
     [[ssh-keys]]
