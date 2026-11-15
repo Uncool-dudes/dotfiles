@@ -49,6 +49,10 @@
     # GitHub Signing - commit signing (op-ssh-sign) goes through the agent.
     [[ssh-keys]]
     item = "ks42nayh7uclm6mhmclydhncpm"
+
+    # boss-aws - EC2 WireGuard server
+    [[ssh-keys]]
+    item = "oevbxdpuhgmkaurtrwl4g3sara"
   '';
 
   # Public halves only, used as IdentityFile hints; private keys stay in 1Password.
@@ -56,6 +60,8 @@
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOSLck8cSsQKyHWuplLX3j6quLixr+xB5kNYWccXtM3G\n";
   home.file.".ssh/homelab.pub".text =
     "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINW1CCEFlyAt7Xd0/MdYDsbWB8n51oKJVTA3lYSwnIEl\n";
+  home.file.".ssh/boss-aws.pub".text =
+    "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfDAsQ5t7esn7/wC44QkSqZMnB5CWfA8xUBeg3prZTv\n";
 
   programs.ssh = {
     enable = true;
@@ -127,6 +133,18 @@
         HostName = "dev2.ratch.ai";
         User = "ananth";
         IdentityFile = "~/.ssh/work.pub";
+      };
+
+      "boss-aws" = {
+        HostName = "ec2-13-206-78-239.ap-south-1.compute.amazonaws.com";
+        User = "ubuntu";
+        IdentityFile = "~/.ssh/boss-aws.pub";
+      };
+
+      # Same box over the wg0 tunnel (networking.wg-quick.interfaces.wg0).
+      "10.50.0.*" = {
+        User = "ubuntu";
+        IdentityFile = "~/.ssh/boss-aws.pub";
       };
 
       "git.ananthp.dev" = {

@@ -124,4 +124,24 @@
   };
 
   services.tailscale.enable = true;
+
+  # Split tunnel to the EC2 WireGuard server: only 10.50.0.0/24 routes through
+  # it. The module also installs wireguard-tools and wireguard-go system-wide.
+  # Private key lives outside the nix store (world-readable) and git; create it
+  # once by hand, root-owned, mode 600.
+  networking.wg-quick.interfaces.wg0 = {
+    address = [ "10.50.0.2/24" ];
+    privateKeyFile = "/etc/wireguard/wg0.key";
+    # wg-quick's default 1420 exceeds the path MTU to EC2 here; packets over
+    # ~1280 vanish, so SSH authenticates then hangs on the first full-size reply.
+    mtu = 1280;
+    peers = [
+      {
+        publicKey = "zTV0WvxF/qDHtuTbNs7hc4IwXmwV+3Q0CliD08a/lQY=";
+        endpoint = "ec2-13-206-78-239.ap-south-1.compute.amazonaws.com:51820";
+        allowedIPs = [ "10.50.0.0/24" ];
+        persistentKeepalive = 25;
+      }
+    ];
+  };
 }
