@@ -239,9 +239,6 @@ function sshf() {
   fi
 }
 
-# ── Home-manager ─────────────────────────────────────────────────
-function hms() { nh home switch -c uncool@mac "$@" }
-
 # ── loadout ──────────────────────────────────────────────────────
 # claude starts through loadout, so a repo's profile settings, MCP servers and
 # skills apply; with no profile it is plain claude. Defined only when the
