@@ -2,16 +2,17 @@
 {
   nixpkgs.config.allowUnfree = true;
 
-  nix.settings = {
-    experimental-features = [
-      "nix-command"
-      "flakes"
-    ];
+  # Determinate owns the daemon and /etc/nix/nix.conf; these land in
+  # /etc/nix/nix.custom.conf. flakes/nix-command are on by default there.
+  determinateNix.enable = true;
+  determinateNix.customSettings = {
+    # Safe on macOS as of Nix 2.35.3: the .tmp-link collision (NixOS/nix#7273,
+    # fixed in #14676) and the race with concurrent GC (#15904) are both fixed.
+    auto-optimise-store = true;
     trusted-users = [
       "root"
       "uncool"
     ];
-    auto-optimise-store = true;
     extra-substituters = [
       "https://cachix.cachix.org"
       "https://cache.numtide.com"

@@ -18,7 +18,8 @@
     darwinFlake = "${config.home.homeDirectory}/.config/home-manager";
     homeFlake = "${config.home.homeDirectory}/.config/home-manager";
     clean = {
-      enable = true;
+      # macOS cleanup runs as a root daemon: see modules/darwin/nh-clean.nix.
+      enable = !pkgs.stdenv.hostPlatform.isDarwin;
       dates = "weekly";
       extraArgs = [
         "--keep"

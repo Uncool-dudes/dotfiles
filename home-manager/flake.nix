@@ -16,6 +16,8 @@
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Not following nixpkgs: the module pins the determinate-nixd build it ships.
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
     flake-parts.url = "github:hercules-ci/flake-parts";
     llm-agents.url = "github:numtide/llm-agents.nix";
     # Not following nixpkgs here on purpose - its own locked nixpkgs is what
@@ -108,6 +110,7 @@
         darwinConfigurations."Ananths-MacBook-Pro" = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit inputs; };
           modules = [
+            inputs.determinate.darwinModules.default
             ./modules/darwin
             {
               nixpkgs.hostPlatform = "aarch64-darwin";
