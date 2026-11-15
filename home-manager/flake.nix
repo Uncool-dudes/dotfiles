@@ -26,6 +26,21 @@
       url = "github:Uncool-dudes/loadout";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+
+    # Plain sources, not flakes: tracked here so `nix flake update` bumps them
+    # with everything else. Pin one on purpose by putting a rev/tag in its URL.
+    claude-plugins-official = {
+      url = "github:anthropics/claude-plugins-official";
+      flake = false;
+    };
+    yazi-rs-plugins = {
+      url = "github:yazi-rs/plugins";
+      flake = false;
+    };
+    wumpus-mono = {
+      url = "github:vaughantype/wumpus-mono";
+      flake = false;
+    };
   };
 
   outputs =

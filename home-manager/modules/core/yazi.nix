@@ -1,13 +1,6 @@
-{ pkgs, ... }:
+{ inputs, pkgs, ... }:
 let
-  yazi-rs-plugins = pkgs.fetchFromGitHub {
-    owner = "yazi-rs";
-    repo = "plugins";
-    rev = "9166202cc1694c98bac3a639874d6f4c0eaa2dab";
-    hash = "sha256-3ddGRQSzxyurNcyYJA+9LTLXTCjBFGATTqdkuGKixzA=";
-  };
-
-  yazi-rs-plugin = name: pkgs.runCommand name { } "cp -r ${yazi-rs-plugins}/${name} $out";
+  yazi-rs-plugin = name: pkgs.runCommand name { } "cp -r ${inputs.yazi-rs-plugins}/${name} $out";
 
 in
 {

@@ -52,12 +52,7 @@ in
     # dangle after a config wipe - the marketplace registration itself was only
     # ever imperative state in ~/.claude/plugins/known_marketplaces.json.
     marketplaces = {
-      claude-plugins-official = pkgs.fetchFromGitHub {
-        owner = "anthropics";
-        repo = "claude-plugins-official";
-        rev = "ea10b213686c90bb1984b2016937310e05336cf3";
-        hash = "sha256-Tfs8Ig1rzLvaAuTZwqGUzKCK0TMWE2SddYss+H/04ug=";
-      };
+      claude-plugins-official = inputs.claude-plugins-official;
     };
 
     plugins = {
