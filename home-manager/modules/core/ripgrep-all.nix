@@ -1,7 +1,10 @@
 { pkgs, ... }:
+let
+  # Default build bundles traineddata for every language (~1 GiB).
+  tesseract = pkgs.tesseract.override { enableLanguages = [ "eng" ]; };
+in
 {
-  home.packages = [ pkgs.tesseract ];
-
+  home.packages = [ tesseract ];
   programs.ripgrep-all = {
     enable = true;
     custom_adapters = [
@@ -16,7 +19,7 @@
           "bmp"
           "gif"
         ];
-        binary = "${pkgs.tesseract}/bin/tesseract";
+        binary = "${tesseract}/bin/tesseract";
         args = [
           "stdin"
           "stdout"
