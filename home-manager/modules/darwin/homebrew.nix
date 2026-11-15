@@ -9,8 +9,6 @@
       autoUpdate = false;
     };
 
-    caskArgs.no_quarantine = true;
-
     brews = [
       "blueutil"
       "mole"
