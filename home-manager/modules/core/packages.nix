@@ -17,7 +17,6 @@
     gnutar
     zstd
     wget
-    shellcheck
     shfmt
     up
     pastel
@@ -28,7 +27,6 @@
     mutagen
     goaccess
     lazyrsync
-    dirsearch
     cariddi
     rustscan
     openapi-tui

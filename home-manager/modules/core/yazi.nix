@@ -6,7 +6,6 @@ in
 {
   home.packages = [
     pkgs.poppler-utils
-    pkgs.trash-cli
   ];
 
   programs.yazi = {

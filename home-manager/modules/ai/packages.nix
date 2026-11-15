@@ -1,8 +1,8 @@
 { inputs, pkgs, ... }: {
   home.packages = with pkgs; [
     abtop
+    # Runtime for the claude-mem plugin's worker daemon, which finds it on PATH.
     bun
-    inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.clauth
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.skills
     inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.mcporter
     # NOTE: patches bar chars in compiled bundle by literal string match - upstream
