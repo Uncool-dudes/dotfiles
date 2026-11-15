@@ -34,6 +34,10 @@
       "hazel"
       "iina"
       "jetbrains-toolbox"
+      # Cask over nix-darwin's services.karabiner-elements: that module recopies
+      # the driver app on every switch (re-prompting for permissions) and nixpkgs
+      # lags upstream.
+      "karabiner-elements"
       "little-snitch"
       "megasync"
       "microsoft-auto-update"

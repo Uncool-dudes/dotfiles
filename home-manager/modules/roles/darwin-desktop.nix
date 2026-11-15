@@ -8,6 +8,7 @@
     ../darwin-desktop/aria2.nix
     ../darwin-desktop/yt-dlp.nix
     ../darwin-desktop/packages.nix
+    ../darwin-desktop/karabiner.nix
   ];
 
   # Spotlight/Alfred don't index the symlinks linkApps creates; stateVersion
