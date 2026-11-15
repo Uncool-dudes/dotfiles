@@ -20,7 +20,7 @@
       # flexoki-dark scheme is kept in sync with this for every other app.
       theme = "Oxocarbon";
 
-      font-family = "WumpusMono Nerd Font Mono";
+      font-family = "Iosevka SS08";
       font-size = 15;
       adjust-cell-height = 10;
       font-thicken = true;
