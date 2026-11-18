@@ -26,6 +26,9 @@
       ];
       GOCACHE = "${config.xdg.cacheHome}/go-build";
       GOMODCACHE = "${config.xdg.cacheHome}/go-mod";
+      # Without it the package dir is part of the build cache key, so every
+      # git worktree of a repo compiles into its own copy of the cache.
+      GOFLAGS = "-trimpath";
     };
   };
 
