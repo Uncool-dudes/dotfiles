@@ -77,7 +77,11 @@
     golangci-lint
     rustup
     sccache
-    convco
+    # nixpkgs' Rust hook forbids vendored libgit2, and convco's git2 wants the
+    # SHA-256 build, which plain libgit2 lacks. Drop once nixpkgs adds it.
+    (convco.overrideAttrs (o: {
+      buildInputs = o.buildInputs ++ [ (libgit2.override { withExperimentalSha256 = true; }) ];
+    }))
     git-absorb
     git-branchless
     mergiraf
