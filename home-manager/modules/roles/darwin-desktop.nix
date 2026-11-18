@@ -9,6 +9,7 @@
     ../darwin-desktop/karabiner.nix
     ../darwin-desktop/alfred.nix
     ../darwin-desktop/licenses.nix
+    ../darwin-desktop/login-items.nix
   ];
 
   # Spotlight/Alfred don't index the symlinks linkApps creates; stateVersion
