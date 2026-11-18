@@ -87,27 +87,65 @@
     };
   };
 
-  # Spotlight shortcut off so Alfred owns Cmd+Space; indexing stays on because
-  # Alfred's app/file search reads the Spotlight index. The hotkeys use
-  # -dict-add since CustomUserPreferences would replace the whole
-  # AppleSymbolicHotKeys dict and wipe every other shortcut customization.
-  # 64 = Show Spotlight search (Cmd+Space), 65 = Finder search (Cmd+Opt+Space);
-  # parameters are (char, keyCode, modifier mask): 32/49 = space,
-  # 1048576 = Cmd, 1572864 = Cmd+Opt.
+  # macOS shortcuts turned off so other tools own the keys:
+  # - Spotlight: Alfred owns Cmd+Space; indexing stays on because Alfred's
+  #   app/file search reads the Spotlight index.
+  # - Input sources: Karabiner makes right option a control key, so
+  #   Ctrl+Space switched language.
+  # - Mission Control and Spaces: BetterTouchTool owns window/space shortcuts
+  #   (its space actions switch natively, not by sending these shortcuts), and
+  #   Ctrl+arrows stay free for terminals and editors.
+  # - Keyboard focus (Ctrl+F1-F8), VoiceOver (Cmd+F5) and Terminal's man page
+  #   services (Cmd+Shift+M/A): collide with IDE bindings (e.g. JetBrains
+  #   Find Action) and are easy to trigger by accident.
+  # The hotkeys use -dict-add since CustomUserPreferences would replace the
+  # whole AppleSymbolicHotKeys dict (or NSServicesStatus) and wipe every other
+  # customization.
+  # parameters are (char, keyCode, modifier mask): char 65535 = none,
+  # keyCode 49 = space, 18 = 1, 123-126 = left/right/down/up, F1-F8 =
+  # 122/120/99/118/96/97/98/100; mask 262144 = Ctrl, 131072 = Shift,
+  # 524288 = Opt, 1048576 = Cmd, 8388608 = Fn (set on arrow and F keys).
   system.activationScripts.postActivation.text =
     let
       user = config.system.primaryUser;
       asUser = ''launchctl asuser "$(id -u ${user})" sudo --user=${user} --'';
-      hotkeyOff = id: modifiers: ''
+      hotkeyOff = id: char: keyCode: modifiers: ''
         ${asUser} /usr/bin/defaults write com.apple.symbolichotkeys AppleSymbolicHotKeys -dict-add ${id} \
-          '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>32</integer><integer>49</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>'
+          '<dict><key>enabled</key><false/><key>value</key><dict><key>parameters</key><array><integer>${char}</integer><integer>${keyCode}</integer><integer>${modifiers}</integer></array><key>type</key><string>standard</string></dict></dict>'
+      '';
+      serviceOff = name: ''
+        ${asUser} /usr/bin/defaults write pbs NSServicesStatus -dict-add '${name}' \
+          '<dict><key>enabled_context_menu</key><false/><key>enabled_services_menu</key><false/><key>presentation_modes</key><dict><key>ContextMenu</key><false/><key>ServicesMenu</key><false/></dict></dict>'
       '';
     in
     ''
       /usr/bin/mdimport /Applications &
 
-      ${hotkeyOff "64" "1048576"}
-      ${hotkeyOff "65" "1572864"}
+      ${hotkeyOff "64" "32" "49" "1048576"} # Show Spotlight search: Cmd+Space
+      ${hotkeyOff "65" "32" "49" "1572864"} # Finder search window: Cmd+Opt+Space
+      ${hotkeyOff "60" "32" "49" "262144"} # Previous input source: Ctrl+Space
+      ${hotkeyOff "61" "32" "49" "786432"} # Next input source: Ctrl+Opt+Space
+      ${hotkeyOff "32" "65535" "126" "8650752"} # Mission Control: Ctrl+Up
+      ${hotkeyOff "34" "65535" "126" "8781824"} # Mission Control: Ctrl+Shift+Up
+      ${hotkeyOff "33" "65535" "125" "8650752"} # Application windows: Ctrl+Down
+      ${hotkeyOff "35" "65535" "125" "8781824"} # Application windows: Ctrl+Shift+Down
+      ${hotkeyOff "79" "65535" "123" "8650752"} # Move left a space: Ctrl+Left
+      ${hotkeyOff "80" "65535" "123" "8781824"} # Move left a space: Ctrl+Shift+Left
+      ${hotkeyOff "81" "65535" "124" "8650752"} # Move right a space: Ctrl+Right
+      ${hotkeyOff "82" "65535" "124" "8781824"} # Move right a space: Ctrl+Shift+Right
+      ${hotkeyOff "118" "65535" "18" "262144"} # Switch to Desktop 1: Ctrl+1
+      ${hotkeyOff "12" "65535" "122" "8650752"} # Turn keyboard access on/off: Ctrl+F1
+      ${hotkeyOff "7" "65535" "120" "8650752"} # Move focus to menu bar: Ctrl+F2
+      ${hotkeyOff "8" "65535" "99" "8650752"} # Move focus to Dock: Ctrl+F3
+      ${hotkeyOff "9" "65535" "118" "8650752"} # Move focus to active/next window: Ctrl+F4
+      ${hotkeyOff "10" "65535" "96" "8650752"} # Move focus to window toolbar: Ctrl+F5
+      ${hotkeyOff "11" "65535" "97" "8650752"} # Move focus to floating window: Ctrl+F6
+      ${hotkeyOff "13" "65535" "98" "8650752"} # Change the way Tab moves focus: Ctrl+F7
+      ${hotkeyOff "57" "65535" "100" "8650752"} # Move focus to status menus: Ctrl+F8
+      ${hotkeyOff "59" "65535" "96" "9437184"} # Turn VoiceOver on/off: Cmd+F5
+      ${serviceOff "com.apple.Terminal - Open man Page in Terminal - openManPage"} # Cmd+Shift+M
+      ${serviceOff "com.apple.Terminal - Search man Page Index in Terminal - searchManPages"} # Cmd+Shift+A
+      ${asUser} /System/Library/CoreServices/pbs -flush
       ${asUser} /usr/bin/defaults -currentHost write com.apple.Spotlight MenuItemHidden -int 1
       ${asUser} /System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings -u
     '';
