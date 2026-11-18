@@ -84,6 +84,11 @@
         DSDontWriteNetworkStores = true;
         DSDontWriteUSBStores = true;
       };
+      # Triggers live in modules/darwin-desktop/bettertouchtool/*.bttpreset,
+      # imported by hand; this setting isn't part of a preset export.
+      "com.hegenberg.BetterTouchTool" = {
+        BTTFocusFollowsMouseEnabled = true;
+      };
       # License key comes from 1Password via restore-licenses, not from here.
       "pl.maketheweb.cleanshotx" = {
         analyticsAllowed = false;
