@@ -8,6 +8,7 @@
     ../darwin-desktop/packages.nix
     ../darwin-desktop/karabiner.nix
     ../darwin-desktop/alfred.nix
+    ../darwin-desktop/licenses.nix
   ];
 
   # Spotlight/Alfred don't index the symlinks linkApps creates; stateVersion
