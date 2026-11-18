@@ -105,10 +105,10 @@
 
       flake = {
         # System only. The user environment is the standalone
-        # homeConfigurations."uncool@Ananths-MacBook-Pro" (`nh home switch`): no
+        # homeConfigurations."ananth@mac" (`nh home switch`): no
         # sudo, faster switches, and one owner for dotfiles instead of two
         # generations overwriting each other.
-        darwinConfigurations."Ananths-MacBook-Pro" = nix-darwin.lib.darwinSystem {
+        darwinConfigurations."mac" = nix-darwin.lib.darwinSystem {
           specialArgs = { inherit inputs; };
           modules = [
             inputs.determinate.darwinModules.default
@@ -123,7 +123,11 @@
         homeConfigurations =
           let
             mkHome =
-              { system, modules }:
+              {
+                system,
+                modules,
+                username ? "uncool",
+              }:
               home-manager.lib.homeManagerConfiguration {
                 pkgs = import inputs.nixpkgs {
                   inherit system overlays;
@@ -131,14 +135,15 @@
                 };
                 inherit modules;
                 extraSpecialArgs = {
-                  username = "uncool";
+                  inherit username;
                   inherit inputs;
                 };
               };
           in
           {
-            "uncool@Ananths-MacBook-Pro" = mkHome {
+            "ananth@mac" = mkHome {
               system = "aarch64-darwin";
+              username = "ananth";
               modules = macHomeModules;
             };
             "uncool@ubuntu" = mkHome {

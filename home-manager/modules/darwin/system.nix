@@ -1,4 +1,7 @@
 { config, ... }:
+let
+  user = "ananth";
+in
 {
   nixpkgs.config.allowUnfree = true;
 
@@ -11,7 +14,7 @@
     auto-optimise-store = true;
     trusted-users = [
       "root"
-      "uncool"
+      user
     ];
     extra-substituters = [
       "https://cachix.cachix.org"
@@ -23,7 +26,9 @@
     ];
   };
 
-  networking.hostName = "Ananths-MacBook-Pro";
+  networking.hostName = "mac";
+  networking.computerName = "mac";
+  networking.localHostName = "mac";
 
   # sudo_local survives macOS updates, unlike edits to /etc/pam.d/sudo.
   # reattach: without pam_reattach, Touch ID fails inside tmux/screen.
@@ -181,8 +186,8 @@
 
   system.stateVersion = 7;
 
-  users.users.uncool.home = "/Users/uncool";
-  system.primaryUser = "uncool";
+  users.users.${user}.home = "/Users/${user}";
+  system.primaryUser = user;
 
   # Little Snitch filters outbound; this covers inbound.
   networking.applicationFirewall = {
