@@ -63,6 +63,7 @@
 
     masApps = {
       "Amphetamine" = 937984704;
+      "EdgeView 3" = 1580323719;
       "Keka" = 470158793;
       "WhatsApp" = 310633997;
       "Gestimer 2" = 6447125648;
