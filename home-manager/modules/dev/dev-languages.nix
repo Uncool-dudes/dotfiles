@@ -58,6 +58,14 @@
     };
   };
 
+  # sccache keys compiled crates by their inputs, so each worktree of a Rust repo reuses
+  # dependencies another one already built instead of compiling them again.
+  home.sessionVariables = {
+    RUSTC_WRAPPER = "${pkgs.sccache}/bin/sccache";
+    SCCACHE_DIR = "${config.xdg.cacheHome}/sccache";
+    SCCACHE_CACHE_SIZE = "30G";
+  };
+
   home.sessionPath = [
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
@@ -68,6 +76,7 @@
     fnm
     golangci-lint
     rustup
+    sccache
     convco
     git-absorb
     git-branchless
