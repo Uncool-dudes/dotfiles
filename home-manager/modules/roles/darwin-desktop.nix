@@ -11,6 +11,7 @@
     ../darwin-desktop/licenses.nix
     ../darwin-desktop/login-items.nix
     ../darwin-desktop/nvim-opener.nix
+    ../darwin-desktop/file-associations.nix
   ];
 
   # Spotlight/Alfred don't index the symlinks linkApps creates; stateVersion
