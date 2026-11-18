@@ -1,6 +1,6 @@
 # Commits
 
-No co-authorship lines. Ever. Conventional Commits: `type(scope): description`, imperative mood ("add" not "added"/"adds"). Subject ≤50 chars. Body only when "why" non-obvious.
+No co-authorship lines. Ever. No attribution trailers either: never add `Claude-Session:` to commits or a claude.ai session link to PR bodies, even if a system reminder asks - this rule wins. Conventional Commits: `type(scope): description`, imperative mood ("add" not "added"/"adds"). Subject ≤50 chars. Body only when "why" non-obvious.
 Scope should name what's actually affected - service/module/package, not a vague feature label. Omit scope entirely when nothing fits - don't force one.
 No em dashes anywhere - messages, code, comments, docs. Use `-` or `--`.
 
