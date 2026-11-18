@@ -84,6 +84,30 @@
         DSDontWriteNetworkStores = true;
         DSDontWriteUSBStores = true;
       };
+      # License key comes from 1Password via restore-licenses, not from here.
+      "pl.maketheweb.cleanshotx" = {
+        analyticsAllowed = false;
+        captureWithoutDesktopIcons = true;
+        confirmVideoDelete = false;
+        cursorHighlightColor = 7;
+        cursorHighlightSize = 50;
+        cursorHighlightStyle = 0;
+        deletePopupAfterDragging = true;
+        displayRecordingTime = true;
+        doNotDisturbWhileRecording = true;
+        highlightClicks = false;
+        maxRecordingResolution = 0;
+        popupAskForDestinationWhenSaving = false;
+        popupSize = 2;
+        recordComputerAudio = true;
+        showKeystrokes = true;
+        snapInAnnotateCrop = true;
+        transparentWindowBackground = false;
+        videoFPS = 60;
+        # Updates come through Homebrew.
+        SUAutomaticallyUpdate = false;
+        SUEnableAutomaticChecks = false;
+      };
     };
   };
 
