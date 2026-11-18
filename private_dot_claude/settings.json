@@ -9,8 +9,8 @@
   },
   "permissions": {
     "allow": [
-      "Write(//Users/uncool/projects/ratch/localconfigs/**)",
-      "Edit(//Users/uncool/projects/ratch/localconfigs/**)"
+      "Write(~/projects/ratch/localconfigs/**)",
+      "Edit(~/projects/ratch/localconfigs/**)"
     ],
     "defaultMode": "auto"
   },
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/Users/uncool/.claude/hooks/caveman-activate.js\"",
+            "command": "node \"$HOME/.claude/hooks/caveman-activate.js\"",
             "timeout": 5,
             "statusMessage": "Loading caveman mode..."
           }
@@ -42,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/Users/uncool/.claude/hooks/caveman-mode-tracker.js\"",
+            "command": "node \"$HOME/.claude/hooks/caveman-mode-tracker.js\"",
             "timeout": 5,
             "statusMessage": "Tracking caveman mode..."
           }
