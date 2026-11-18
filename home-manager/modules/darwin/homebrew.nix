@@ -23,6 +23,7 @@
       "balenaetcher"
       "bettertouchtool"
       "calibre"
+      "claude"
       "cleanshot"
       "devonthink"
       "docker-desktop"
