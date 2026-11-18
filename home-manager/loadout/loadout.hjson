@@ -343,6 +343,22 @@
       ]
     }
 
+    # Drives a running Tauri debug app: screenshots, clicks, DOM, logs, IPC. The
+    # app needs the tauri-plugin-mcp-bridge plugin at the same version, so bump
+    # both together.
+    tauri: {
+      mcp_servers: {
+        tauri: {
+          type: stdio
+          command: pnpm
+          args: [
+            dlx
+            "@hypothesi/tauri-mcp-server@0.13.2"
+          ]
+        }
+      }
+    }
+
     skill-tuning: {
       skills: [
         hqhq1025/skill-miner
@@ -394,6 +410,7 @@
     ]
     github.com/apaag-solutions-lab/electro-mail: [
       rust
+      tauri
     ]
   }
 }
