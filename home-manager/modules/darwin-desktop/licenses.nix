@@ -9,7 +9,13 @@ let
     text = ''
       support="$HOME/Library/Application Support"
 
-      mkdir -p "$support/BetterTouchTool" "$support/Hazel" "$support/Soulver 3"
+      mkdir -p "$support/Alfred" "$support/BetterTouchTool" "$support/Hazel" "$support/Soulver 3"
+
+      # Alfred may tie this file to the Mac it was activated on; if Alfred
+      # still shows "Activate Powerpack", re-enter the code from 1Password.
+      op document get "Alfred Powerpack license file" --vault Private \
+        --out-file "$support/Alfred/powerpack6.NJ4QLC4T0X.dat" --force
+      echo "Alfred Powerpack license restored"
 
       op document get "BetterTouchTool license file" --vault Private \
         --out-file "$support/BetterTouchTool/bettertouchtool.bttlicense" --force
@@ -31,7 +37,17 @@ let
       done
       echo "Soulver license restored"
 
-      echo "Restart BetterTouchTool, Hazel, CleanShot and Soulver to pick up the licenses."
+      # Every login registers a new device and accounts cap out at 5, so skip
+      # when this Mac is already logged in.
+      if /usr/local/bin/mullvad account get | grep -q '^Mullvad account:'; then
+        echo "Mullvad already logged in"
+      else
+        /usr/local/bin/mullvad account login \
+          "$(op read --no-newline "op://Private/Mullvad VPN/account number")"
+        echo "Mullvad logged in"
+      fi
+
+      echo "Restart Alfred, BetterTouchTool, Hazel, CleanShot and Soulver to pick up the licenses."
     '';
   };
 in
