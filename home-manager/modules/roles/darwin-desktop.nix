@@ -5,6 +5,7 @@
     ../darwin-desktop/wumpus-mono.nix
     ../darwin-desktop/aria2.nix
     ../darwin-desktop/packages.nix
+    ../darwin-desktop/paste.nix
     ../darwin-desktop/karabiner.nix
     ../darwin-desktop/alfred.nix
     ../darwin-desktop/licenses.nix
