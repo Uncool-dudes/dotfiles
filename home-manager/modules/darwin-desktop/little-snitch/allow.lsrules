@@ -297,9 +297,10 @@
         "nixos.org",
         "flakehub.com",
         "determinate.systems",
-        "cachix.org"
+        "cachix.org",
+        "numtide.com"
       ],
-      "notes": "Nix binary caches, channels, installer"
+      "notes": "Nix binary caches (substituters), channels, installer"
     },
     {
       "action": "allow",
@@ -395,6 +396,30 @@
       "process": "any",
       "remote-addresses": "100.64.0.0-100.127.255.255",
       "notes": "Tailnet (Tailscale CGNAT range): own devices stay reachable on Untrusted"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-hosts": [
+        "gitlab.gnome.org"
+      ],
+      "notes": "Nix flake input hosted on GNOME GitLab"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "ghostty.org"
+      ],
+      "notes": "ghostty.nix fetches the Ghostty DMG from release.files.ghostty.org"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-hosts": [
+        "atuin.ananthp.dev"
+      ],
+      "notes": "Atuin history sync (Nix binary, path changes per update)"
     }
   ]
 }
