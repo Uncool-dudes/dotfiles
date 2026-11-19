@@ -19,6 +19,7 @@
       "adobe-creative-cloud"
       "gcloud-cli"
       "1password"
+      "1password-cli"
       "alfred"
       "balenaetcher"
       "bettertouchtool"
