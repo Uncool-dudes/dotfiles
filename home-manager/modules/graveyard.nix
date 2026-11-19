@@ -31,4 +31,6 @@
 # age, sops    - never wired up; every secret goes through chezmoi's
 #                onepasswordRead. Bring back with sops-nix if secrets ever
 #                need to live in the Nix config
+# MCP_DOCKER   - docker mcp gateway was a Docker Desktop plugin; dropped
+#                with the switch to OrbStack
 { }
