@@ -11,6 +11,9 @@
 
     brews = [
       "blueutil"
+      # Brew over nixpkgs: `cloudflared service install` writes its own binary
+      # path into a launchd plist, so keep it at a fixed /opt/homebrew path.
+      "cloudflared"
       "mole"
       "rtk"
     ];
@@ -48,7 +51,6 @@
       "microsoft-word"
       "mochi"
       "mullvad-vpn"
-      "ngrok"
       "paste"
       "popclip"
       "postman"
