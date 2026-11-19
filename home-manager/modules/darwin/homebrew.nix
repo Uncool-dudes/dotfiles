@@ -49,6 +49,7 @@
       "mochi"
       "mullvad-vpn"
       "ngrok"
+      "paste"
       "popclip"
       "postman"
       "renamer"
