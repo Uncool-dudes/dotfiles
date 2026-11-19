@@ -1,0 +1,400 @@
+{
+  "name": "Ananth allow rules",
+  "description": "Pre-allows known-good traffic so Little Snitch only asks about new connections. Apps are matched by code ID (team ID + bundle ID), which survives app updates. Unsigned Nix binaries change path on every update, so their infrastructure is allowed by domain for any process instead. Format: https://help.obdev.at/littlesnitch6/adv-lsrules-file-format",
+  "rules": [
+    {
+      "action": "allow",
+      "process": "identifier.EQHXZ8M8AV/com.google.Chrome",
+      "remote": "any",
+      "notes": "Browser"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.EQHXZ8M8AV/com.google.Chrome.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.EQHXZ8M8AV/com.google.GoogleUpdater",
+      "remote-domains": [
+        "google.com",
+        "googleapis.com",
+        "gvt1.com"
+      ],
+      "notes": "Chrome updates"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.6XHFYUTQGX/com.superhuman.electron",
+      "remote": "any",
+      "notes": "Mail client"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.6XHFYUTQGX/com.superhuman.electron.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.Q6L2SF6YDW/com.anthropic.claudefordesktop",
+      "remote": "any",
+      "notes": "Claude desktop"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.Q6L2SF6YDW/com.anthropic.claudefordesktop.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.57T9237FN3/net.whatsapp.WhatsApp",
+      "remote": "any",
+      "notes": "Messaging"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.2BUA8C4S2C/com.1password.1password",
+      "remote": "any",
+      "notes": "Password sync"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.2BUA8C4S2C/com.1password.1password.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.CKG9MXH72F/net.mullvad.vpn",
+      "remote": "any",
+      "notes": "VPN client"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.HUAQ24HBR6/dev.kdrag0n.MacVirt",
+      "remote": "any",
+      "notes": "OrbStack: image pulls and container traffic"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.T9RH74Y7L9/mega.mac",
+      "remote": "any",
+      "notes": "MEGA sync"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.8LAYR367YV/org.zotero.zotero",
+      "remote": "any",
+      "notes": "Zotero sync and metadata lookups"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.Q4GN9WTQK5/com.msteedman.mochi",
+      "remote": "any",
+      "notes": "Mochi sync"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.Q4GN9WTQK5/com.msteedman.mochi.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.679S2QUWR8/com.devon-technologies.think",
+      "remote": "any",
+      "notes": "DEVONthink web capture and sync"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.H7H8Q7M5CK/com.postmanlabs.mac",
+      "remote": "any",
+      "notes": "API client: hits arbitrary hosts by design"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.H7H8Q7M5CK/com.postmanlabs.mac.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.VSCode",
+      "remote": "any",
+      "notes": "Extensions, remote dev"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.VSCode.helper",
+      "remote": "any",
+      "notes": "Network helper: Chromium/Electron apps connect from a separate helper process with its own code ID"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.2ZEFAR8TH3/com.jetbrains.toolbox",
+      "remote-domains": [
+        "jetbrains.com",
+        "intellij.net"
+      ],
+      "notes": "IDE downloads"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.Word",
+      "remote": "any",
+      "notes": "Office: OneDrive, licensing"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.Excel",
+      "remote": "any",
+      "notes": "Office: OneDrive, licensing"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.Powerpoint",
+      "remote": "any",
+      "notes": "Office: OneDrive, licensing"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.UBF8T346G9/com.microsoft.autoupdate2",
+      "remote-domains": [
+        "microsoft.com",
+        "office.com",
+        "office.net",
+        "msedge.net"
+      ],
+      "notes": "Office updates"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.JQ525L2MZD/com.adobe.Acrobat.Pro",
+      "remote-domains": [
+        "adobe.com",
+        "adobe.io",
+        "adobelogin.com",
+        "acrobat.com"
+      ],
+      "notes": "Acrobat licensing, sign-in, cloud documents"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.4788TTJ39Y/com.wiheads.paste-direct",
+      "remote-domains": [
+        "pasteapp.io"
+      ],
+      "notes": "Paste account and subscription"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.XZZXE9SED4/com.runningwithcrayons.Alfred",
+      "remote-domains": [
+        "alfredapp.com"
+      ],
+      "notes": "Alfred updates and Powerpack check"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.DAFVSXZ82P/com.hegenberg.BetterTouchTool",
+      "remote-domains": [
+        "folivora.ai"
+      ],
+      "notes": "BTT updates and license"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.AFJU4P8ZV4/pl.maketheweb.cleanshotx",
+      "remote-domains": [
+        "cleanshot.com",
+        "cleanshot.cloud"
+      ],
+      "notes": "CleanShot updates, license, cloud uploads"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.6W6K75YWQ9/com.pilotmoon.popclip",
+      "remote-domains": [
+        "pilotmoon.com"
+      ],
+      "notes": "PopClip updates and extensions"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.86Z3GCJ4MF/com.noodlesoft.Hazel",
+      "remote-domains": [
+        "noodlesoft.com"
+      ],
+      "notes": "Hazel updates"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.SBA8TXW9N6/app.soulver.mac",
+      "remote-domains": [
+        "soulver.app",
+        "paddle.com"
+      ],
+      "notes": "Soulver updates, Paddle license, currency rates"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.9525X5D6XV/com.tunabellysoftware.tgpro",
+      "remote-domains": [
+        "tunabellysoftware.com",
+        "paddle.com"
+      ],
+      "notes": "TG Pro updates and Paddle license"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.67CQ77V27R/com.colliderli.iina",
+      "remote-domains": [
+        "iina.io",
+        "github.com",
+        "githubusercontent.com"
+      ],
+      "notes": "IINA updates"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.9HWK5273G4/abnerworks.Typora",
+      "remote-domains": [
+        "typora.io"
+      ],
+      "notes": "Typora updates and license"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.JLMPQHK86H/com.culturedcode.ThingsMac",
+      "remote-domains": [
+        "culturedcode.com"
+      ],
+      "notes": "Things Cloud sync"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.2BUA8C4S2C/com.1password.op",
+      "remote-domains": [
+        "1password.com"
+      ],
+      "notes": "1Password CLI (Homebrew cask, signed)"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.NTY7FVCEKP/net.kovidgoyal.calibre",
+      "remote-domains": [
+        "calibre-ebook.com"
+      ],
+      "notes": "calibre updates and metadata"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "nixos.org",
+        "flakehub.com",
+        "determinate.systems",
+        "cachix.org"
+      ],
+      "notes": "Nix binary caches, channels, installer"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "github.com",
+        "githubusercontent.com",
+        "ghcr.io",
+        "githubcopilot.com"
+      ],
+      "notes": "git, flake inputs, Homebrew bottles (ghcr.io), GitHub MCP"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "brew.sh"
+      ],
+      "notes": "Homebrew API"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "golang.org",
+        "go.dev"
+      ],
+      "notes": "Go module proxy and checksum DB"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "npmjs.org",
+        "pypi.org",
+        "pythonhosted.org",
+        "crates.io"
+      ],
+      "notes": "Language package registries"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "anthropic.com",
+        "claude.ai"
+      ],
+      "notes": "Claude Code (Nix binary, path changes per update)"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "tailscale.com",
+        "tailscale.io"
+      ],
+      "notes": "Tailscale control plane and DERP relays (tailscaled is a Nix binary)"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-domains": [
+        "argotunnel.com"
+      ],
+      "notes": "cloudflared tunnels (Homebrew binary, path changes per upgrade)"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-hosts": [
+        "api.cloudflare.com"
+      ],
+      "notes": "cloudflared tunnels (Homebrew binary, path changes per upgrade)"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.APPLE/com.apple.ssh",
+      "remote": "any",
+      "ports": "22",
+      "protocol": "tcp",
+      "notes": "ssh: Ratch servers, boss-aws, GitHub"
+    },
+    {
+      "action": "allow",
+      "process": "identifier.APPLE/com.apple.ssh",
+      "remote": "any",
+      "ports": "2222-2223",
+      "protocol": "tcp",
+      "notes": "ssh: personal / ssh.ananthp.dev (2222), git.ananthp.dev (2223)"
+    },
+    {
+      "action": "allow",
+      "process": "any",
+      "remote-addresses": "100.64.0.0-100.127.255.255",
+      "notes": "Tailnet (Tailscale CGNAT range): own devices stay reachable on Untrusted"
+    }
+  ]
+}
