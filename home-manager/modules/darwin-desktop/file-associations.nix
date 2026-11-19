@@ -45,7 +45,8 @@ let
       "org.xiph.ogg-audio"
     ];
 
-    "com.interversehq.qview" = [
+    # EdgeView 3, from the Mac App Store.
+    "com.djhan.EdgeView-3" = [
       "public.image"
       "public.png"
       "public.jpeg"

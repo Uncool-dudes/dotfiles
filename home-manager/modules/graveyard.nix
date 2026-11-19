@@ -37,6 +37,8 @@
 # balenaetcher - replaced by caligula (TUI ISO flasher)
 # renamer      - Finder batch rename / vidir cover it
 # adobe-creative-cloud - only Acrobat was needed; adobe-acrobat-pro cask instead
+# qview        - cask disabled upstream (fails Gatekeeper); EdgeView 3 from
+#                the Mac App Store replaces it as the image viewer
 # MCP_DOCKER   - docker mcp gateway was a Docker Desktop plugin; dropped
 #                with the switch to OrbStack
 { }

@@ -313,7 +313,7 @@
               "BTTUUID" : "465E54D5-0C2A-47C3-ADDF-3658BAC897EE",
               "BTTPredefinedActionType" : 177,
               "BTTPredefinedActionName" : "Show  or  Hide Specific Application",
-              "BTTAppToShowOrHide" : "/Applications/qView.app",
+              "BTTAppToShowOrHide" : "/Applications/EdgeView.app",
               "BTTShowHideAppConfig" : "{\"BTTShowHideSpecificAppMoveToSpace\":\"BTTShowHideSpecificAppHiddenToCurrentSpace\",\"BTTShowHideSpecificAppOnlyShow\":false,\"BTTShowHideSpecificAppOnlyHide\":false,\"BTTShowHideSpecificAffectedWindow\":\"BTTShowHideSpecificAppAffectLastUsedWindow\",\"BTTShowHideSpecificMinimizeInstead\":false,\"BTTShowHideSpecificAppRegex\":\"\",\"BTTShowHideSpecificAppOnlyTreatActiveAsVisible\":true,\"BTTShowHideSpecificAppOnlyIfRunning\":false,\"BTTShowHideSpecificAppCMDN\":false,\"BTTShowHideSpecificAppMoveToCurrentSpace\":false,\"BTTShowHideSpecificAppMoveAllToCurrentSpace\":false}",
               "BTTOrder" : 15
             }
@@ -469,11 +469,11 @@
       ]
     },
     {
-      "BTTAppBundleIdentifier" : "com.interversehq.qView",
-      "BTTAppName" : "qView",
+      "BTTAppBundleIdentifier" : "com.djhan.EdgeView-3",
+      "BTTAppName" : "EdgeView",
       "BTTAppAutoInvertIcon" : 1,
       "BTTAppProcessMatchMode" : 2,
-      "BTTAppProcessName" : "qView",
+      "BTTAppProcessName" : "EdgeView",
       "BTTTriggers" : [
         {
           "BTTLastUpdatedAt" : 1783759675.243012,

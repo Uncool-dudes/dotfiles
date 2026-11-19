@@ -59,7 +59,6 @@
       "ti-connect-ce"
       "typora"
       "visual-studio-code"
-      "qview"
       "yubico-authenticator"
       "zotero"
     ];
