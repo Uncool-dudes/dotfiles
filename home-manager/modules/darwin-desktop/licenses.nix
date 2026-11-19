@@ -37,6 +37,17 @@ let
       done
       echo "Soulver license restored"
 
+      # Root-owned. The encoded fields may be keyed to this Mac's "Little
+      # Snitch Encryption Key" in the System keychain; if Little Snitch still
+      # shows as unregistered, enter the key from the "Little Snitch" item.
+      ls_registration="$(mktemp)"
+      op document get "Little Snitch registration file" --vault Private \
+        --out-file "$ls_registration" --force
+      sudo install -m 644 -o root -g wheel "$ls_registration" \
+        "/Library/Application Support/Objective Development/Little Snitch/registration.xpl"
+      rm -f "$ls_registration"
+      echo "Little Snitch license restored"
+
       # Every login registers a new device and accounts cap out at 5, so skip
       # when this Mac is already logged in.
       if /usr/local/bin/mullvad account get | grep -q '^Mullvad account:'; then
@@ -47,7 +58,7 @@ let
         echo "Mullvad logged in"
       fi
 
-      echo "Restart Alfred, BetterTouchTool, Hazel, CleanShot and Soulver to pick up the licenses."
+      echo "Restart Alfred, BetterTouchTool, Hazel, CleanShot, Soulver and Little Snitch to pick up the licenses."
     '';
   };
 in
