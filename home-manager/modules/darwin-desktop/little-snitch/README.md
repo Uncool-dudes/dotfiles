@@ -1,9 +1,11 @@
 # Little Snitch
 
-Rules live here; Little Snitch pulls them by URL. Nothing in Nix wires this
-up: subscriptions and profiles exist only inside Little Snitch, so a fresh
-machine needs the one-time setup below. The license is restored by
-`restore-licenses` (see `../licenses.nix`).
+Rules live here; Little Snitch pulls them by URL. Subscriptions, profiles
+and network triggers exist only inside Little Snitch, so they're kept as a
+model snapshot in 1Password instead: run `backup-little-snitch` after
+changing anything in the app, and `restore-licenses` restores license and
+model on a fresh machine (see `../licenses.nix`). The setup below is what
+that snapshot contains, for rebuilding by hand.
 
 ## Subscriptions (Rules -> Rule Groups -> "+" -> Subscribe)
 
