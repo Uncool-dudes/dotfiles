@@ -1,0 +1,14 @@
+#!/bin/sh
+# Emits .settings.json (the chezmoi-owned settings), keeping the live file's
+# extraKnownMarketplaces. home-manager owns that key: programs.claude-code
+# .marketplaces in home-manager/modules/ai/claude.nix merges a /nix/store
+# path into it on every switch, and a copy kept here goes stale on the next
+# flake update.
+set -eu
+
+jq --slurpfile live /dev/stdin '
+  if ($live[0].extraKnownMarketplaces // null) != null
+  then . + {extraKnownMarketplaces: $live[0].extraKnownMarketplaces}
+  else .
+  end
+' "$CHEZMOI_SOURCE_DIR/private_dot_claude/.settings.json"

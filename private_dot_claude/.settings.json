@@ -113,14 +113,6 @@
     "gopls-lsp@claude-plugins-official": true,
     "rust-analyzer-lsp@claude-plugins-official": true
   },
-  "extraKnownMarketplaces": {
-    "claude-plugins-official": {
-      "source": {
-        "source": "directory",
-        "path": "/nix/store/ik7587smsp24vdiggbsyjd74z5rjn80l-source"
-      }
-    }
-  },
   "effortLevel": "medium",
   "modelSettings": {
     "claude-sonnet-5": {
