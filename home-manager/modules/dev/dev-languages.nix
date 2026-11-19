@@ -66,6 +66,25 @@
     SCCACHE_CACHE_SIZE = "30G";
   };
 
+  # Full debuginfo makes a Tauri app's dev target/ about 4.5G per worktree. Line tables
+  # still give file:line in panics and backtraces for workspace crates; dependencies
+  # get none, since stepping into them is rare. A repo's own [profile.dev] wins.
+  home.file.".cargo/config.toml".source = (pkgs.formats.toml { }).generate "cargo-config.toml" {
+    profile.dev = {
+      debug = "line-tables-only";
+      package."*".debug = false;
+    };
+  };
+
+  # Read-only on purpose: `rustup default`/`set`/`override` then fail loudly instead of
+  # drifting from this file. Pin per-repo versions with rust-toolchain.toml. The minimal
+  # profile skips rust-docs (~900M per toolchain); repos list the components they need.
+  home.file.".rustup/settings.toml".source = (pkgs.formats.toml { }).generate "rustup-settings.toml" {
+    version = "12";
+    default_toolchain = "1.100";
+    profile = "minimal";
+  };
+
   home.sessionPath = [
     "$HOME/go/bin"
     "$HOME/.cargo/bin"
