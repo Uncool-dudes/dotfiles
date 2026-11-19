@@ -4,8 +4,7 @@ let
   # stay in login-items.nix: changing the browser shows a confirmation
   # dialog, so that step only runs when the browser isn't already Chrome.
   handlers = {
-    # Installed through Creative Cloud, not Homebrew; duti skips it until
-    # Acrobat is there.
+    # adobe-acrobat-pro cask; duti skips it until Acrobat is installed.
     "com.adobe.Acrobat.Pro" = [ "com.adobe.pdf" ];
 
     "com.aone.keka" = [

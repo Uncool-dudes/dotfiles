@@ -2,7 +2,6 @@
 {
   imports = [
     ../darwin-desktop/ghostty.nix
-    ../darwin-desktop/kitty.nix
     ../darwin-desktop/wumpus-mono.nix
     ../darwin-desktop/aria2.nix
     ../darwin-desktop/packages.nix

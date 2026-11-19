@@ -31,6 +31,12 @@
 # age, sops    - never wired up; every secret goes through chezmoi's
 #                onepasswordRead. Bring back with sops-nix if secrets ever
 #                need to live in the Nix config
+# kitty        - redundant with ghostty; config was modules/darwin-desktop/kitty.nix
+#                (git history has it)
+# nvd          - nh already prints package diffs on switch
+# balenaetcher - replaced by caligula (TUI ISO flasher)
+# renamer      - Finder batch rename / vidir cover it
+# adobe-creative-cloud - only Acrobat was needed; adobe-acrobat-pro cask instead
 # MCP_DOCKER   - docker mcp gateway was a Docker Desktop plugin; dropped
 #                with the switch to OrbStack
 { }

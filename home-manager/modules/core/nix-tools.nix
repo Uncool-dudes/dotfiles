@@ -10,7 +10,6 @@
     inputs.home-manager.packages.${pkgs.stdenv.hostPlatform.system}.home-manager
     nil
     nixfmt
-    nvd
   ];
 
   programs.nh = {

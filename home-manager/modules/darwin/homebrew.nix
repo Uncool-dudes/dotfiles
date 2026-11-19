@@ -19,12 +19,11 @@
     ];
 
     casks = [
-      "adobe-creative-cloud"
+      "adobe-acrobat-pro"
       "gcloud-cli"
       "1password"
       "1password-cli"
       "alfred"
-      "balenaetcher"
       "bettertouchtool"
       "calibre"
       "claude"
@@ -54,7 +53,6 @@
       "paste"
       "popclip"
       "postman"
-      "renamer"
       "soulver"
       "superhuman"
       "tg-pro"

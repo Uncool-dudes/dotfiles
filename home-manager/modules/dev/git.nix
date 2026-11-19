@@ -14,6 +14,9 @@ in
 
   programs.git = {
     enable = true;
+    # Default git drags in Python and Perl (~1.4G closure) for send-email,
+    # svn and p4, none of which are used.
+    package = pkgs.gitMinimal;
 
     attributes = [
       "*.go merge=mergiraf"
