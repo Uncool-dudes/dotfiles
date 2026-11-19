@@ -83,6 +83,10 @@
         IdentitiesOnly = true;
         HashKnownHosts = true;
         UpdateHostKeys = true;
+        # Background tunnels (autossh -f) can't answer the first-connect prompt
+        # and fail silently. accept-new trusts unseen hosts but still refuses a
+        # changed key, so MITM protection for known hosts is kept.
+        StrictHostKeyChecking = "accept-new";
       };
 
       "*.ratch.ai" = {
