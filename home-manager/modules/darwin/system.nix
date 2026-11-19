@@ -37,6 +37,11 @@ in
     reattach = true;
   };
 
+  # macOS default is 5 min; re-prompting that often defeats Touch ID's convenience.
+  security.sudo.extraConfig = ''
+    Defaults timestamp_timeout=30
+  '';
+
   # Key remaps live in Karabiner (modules/darwin-desktop/karabiner/). Mapping
   # stays enabled with no entries so activation clears any hidutil remap that
   # would otherwise stack under Karabiner's.
@@ -45,9 +50,18 @@ in
   system.defaults = {
     dock = {
       autohide = true;
+      autohide-delay = 0.0;
+      autohide-time-modifier = 0.2;
       tilesize = 57;
       mru-spaces = false;
       show-recents = false;
+      expose-group-apps = true;
+      # Hot corners. Top-left stays off: the Apple menu lives there and
+      # misfires are common.
+      wvous-tl-corner = 1; # disabled
+      wvous-tr-corner = 12; # Notification Center, where it slides in
+      wvous-bl-corner = 3; # application windows
+      wvous-br-corner = 14; # Quick Note (macOS default)
       persistent-apps = [
         "/Applications/Google Chrome.app"
         "/System/Applications/Calendar.app"
@@ -71,6 +85,56 @@ in
       AppleShowAllExtensions = true;
       ShowPathbar = true;
       FXEnableExtensionChangeWarning = false;
+      _FXSortFoldersFirst = true;
+      # Search the current folder, not the whole Mac.
+      FXDefaultSearchScope = "SCcf";
+      ShowStatusBar = true;
+      QuitMenuItem = true;
+    };
+
+    # Karabiner leaves the Globe key alone, so stop it opening the emoji picker.
+    hitoolbox.AppleFnUsageType = "Do Nothing";
+
+    # Upgrades only when started by hand. Download is a system-level key,
+    # set via CustomSystemPreferences below.
+    SoftwareUpdate.AutomaticallyInstallMacOSUpdates = false;
+    CustomSystemPreferences."com.apple.SoftwareUpdate".AutomaticDownload = false;
+
+    WindowManager = {
+      # Sonoma default: clicking the wallpaper hides every window.
+      EnableStandardClickToShowDesktop = false;
+      GloballyEnabled = false; # Stage Manager
+    };
+
+    loginwindow.GuestEnabled = false;
+
+    # Reads as "Tue 18 Nov 5:07". macOS can't show the day number without the
+    # month; ShowDate = 2 would drop both.
+    menuExtraClock = {
+      Show24Hour = false;
+      ShowAMPM = false;
+      ShowDate = 1; # always
+      ShowDayOfWeek = true;
+      ShowSeconds = false;
+      IsAnalog = false;
+      FlashDateSeparators = false;
+    };
+
+    # Only battery % and the sound picker in the menu bar; the rest stay in
+    # Control Center.
+    controlcenter = {
+      BatteryShowPercentage = true;
+      Sound = true;
+      Bluetooth = false;
+      Display = false;
+      AirDrop = false;
+      FocusModes = false;
+      NowPlaying = false;
+    };
+
+    trackpad = {
+      Clicking = true;
+      TrackpadThreeFingerDrag = false;
     };
 
     NSGlobalDomain = {
@@ -82,6 +146,22 @@ in
       NSAutomaticPeriodSubstitutionEnabled = false;
       KeyRepeat = 2;
       InitialKeyRepeat = 15;
+      NSDocumentSaveNewDocumentsToCloud = false;
+      NSNavPanelExpandedStateForSaveMode = true;
+      PMPrintingExpandedStateForPrint = true;
+      # Tab moves focus through every control, not only text fields.
+      AppleKeyboardUIMode = 3;
+      # Ctrl+Cmd+drag moves a window from anywhere inside it.
+      NSWindowShouldDragOnGesture = true;
+      AppleShowScrollBars = "WhenScrolling";
+      # Clicking the scrollbar track jumps there instead of paging.
+      AppleScrollerPagingBehavior = true;
+      AppleICUForce24HourTime = false;
+      AppleWindowTabbingMode = "fullscreen";
+      NSAutomaticWindowAnimationsEnabled = false;
+      NSScrollAnimationEnabled = true;
+      # Thinner, sharper text on Retina.
+      AppleFontSmoothing = 0;
     };
 
     CustomUserPreferences = {
@@ -89,6 +169,7 @@ in
         DSDontWriteNetworkStores = true;
         DSDontWriteUSBStores = true;
       };
+      "com.apple.AdLib".allowApplePersonalizedAdvertising = false;
       # Triggers live in modules/darwin-desktop/bettertouchtool/*.bttpreset,
       # imported by hand; this setting isn't part of a preset export.
       "com.hegenberg.BetterTouchTool" = {
@@ -132,11 +213,13 @@ in
   # - Keyboard focus (Ctrl+F1-F8), VoiceOver (Cmd+F5) and Terminal's man page
   #   services (Cmd+Shift+M/A): collide with IDE bindings (e.g. JetBrains
   #   Find Action) and are easy to trigger by accident.
+  # - Screenshots (Cmd+Shift+3/4/5 and their Ctrl copy variants): CleanShot X
+  #   owns them.
   # The hotkeys use -dict-add since CustomUserPreferences would replace the
   # whole AppleSymbolicHotKeys dict (or NSServicesStatus) and wipe every other
   # customization.
   # parameters are (char, keyCode, modifier mask): char 65535 = none,
-  # keyCode 49 = space, 18 = 1, 123-126 = left/right/down/up, F1-F8 =
+  # keyCode 49 = space, 18 = 1, 20/21/23 = 3/4/5, 123-126 = left/right/down/up, F1-F8 =
   # 122/120/99/118/96/97/98/100; mask 262144 = Ctrl, 131072 = Shift,
   # 524288 = Opt, 1048576 = Cmd, 8388608 = Fn (set on arrow and F keys).
   system.activationScripts.postActivation.text =
@@ -177,6 +260,11 @@ in
       ${hotkeyOff "13" "65535" "98" "8650752"} # Change the way Tab moves focus: Ctrl+F7
       ${hotkeyOff "57" "65535" "100" "8650752"} # Move focus to status menus: Ctrl+F8
       ${hotkeyOff "59" "65535" "96" "9437184"} # Turn VoiceOver on/off: Cmd+F5
+      ${hotkeyOff "28" "51" "20" "1179648"} # Save picture of screen: Cmd+Shift+3
+      ${hotkeyOff "29" "51" "20" "1441792"} # Copy picture of screen: Ctrl+Cmd+Shift+3
+      ${hotkeyOff "30" "52" "21" "1179648"} # Save picture of area: Cmd+Shift+4
+      ${hotkeyOff "31" "52" "21" "1441792"} # Copy picture of area: Ctrl+Cmd+Shift+4
+      ${hotkeyOff "184" "53" "23" "1179648"} # Screenshot and recording options: Cmd+Shift+5
       ${serviceOff "com.apple.Terminal - Open man Page in Terminal - openManPage"} # Cmd+Shift+M
       ${serviceOff "com.apple.Terminal - Search man Page Index in Terminal - searchManPages"} # Cmd+Shift+A
       ${asUser} /System/Library/CoreServices/pbs -flush
