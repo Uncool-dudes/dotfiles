@@ -1,0 +1,1874 @@
+ObjC.import("Foundation")
+ObjC.import("AppKit")
+ObjC.import("stdlib")
+ObjC.import("IOBluetooth")
+ObjC.import("CoreBluetooth")
+ObjC.import("CoreText")
+
+// Environment variables set by Alfred (workflow settings plus Alfred's own
+// variables). Keep the names here instead of inlining them at call sites.
+const ENV_VARS = {
+    ALFRED_VERSION: "alfred_version",
+    BATTERY_ICONS: "battery_icons",
+    BLE_MARKER: "ble_marker",
+    FAVORITES: "favorites",
+    IGNORE: "ignore",
+    LIST_KEYWORD: "list_keyword",
+    LOG_LEVEL: "log_level",
+    NOTIFICATIONS: "notifications",
+    OFF_KEYWORD: "off_keyword",
+    ON_KEYWORD: "on_keyword",
+    SORT_ORDER: "sort_order",
+    SHOW_MAC_ADDRESSES: "show_mac_addresses",
+    TOGGLE_KEYWORD: "toggle_keyword",
+    WORKFLOW_BUNDLE_ID: "alfred_workflow_bundleid",
+    WORKFLOW_VERSION: "alfred_workflow_version",
+}
+
+// Known Alfred environment variables and how to parse them. Every command
+// reads the parsed values through `this.config.<key>`.
+const CONFIG_SCHEMA = {
+    alfredVersion: {
+        env: ENV_VARS.ALFRED_VERSION,
+    },
+    batteryIcons: {
+        env: ENV_VARS.BATTERY_ICONS,
+        default: "auto",
+    },
+    bleMarker: {
+        env: ENV_VARS.BLE_MARKER,
+        // Checkbox: Alfred exports "1" or "0". Shown unless switched off, so a
+        // configuration that predates the setting keeps the marker.
+        default: "1",
+        parse: value => value === "1",
+    },
+    favorites: {
+        env: ENV_VARS.FAVORITES,
+    },
+    ignore: {
+        env: ENV_VARS.IGNORE,
+    },
+    listKeyword: {
+        env: ENV_VARS.LIST_KEYWORD,
+        default: "btl",
+    },
+    offKeyword: {
+        env: ENV_VARS.OFF_KEYWORD,
+        default: "btoff",
+    },
+    onKeyword: {
+        env: ENV_VARS.ON_KEYWORD,
+        default: "bton",
+    },
+    toggleKeyword: {
+        env: ENV_VARS.TOGGLE_KEYWORD,
+        default: "btt",
+    },
+    logLevel: {
+        env: ENV_VARS.LOG_LEVEL,
+        default: "error",
+    },
+    notifications: {
+        env: ENV_VARS.NOTIFICATIONS,
+        default: "on",
+    },
+    sortOrder: {
+        env: ENV_VARS.SORT_ORDER,
+    },
+    showMacAddresses: {
+        env: ENV_VARS.SHOW_MAC_ADDRESSES,
+        parse: value => value === "1",
+    },
+    workflowBundleId: {
+        env: ENV_VARS.WORKFLOW_BUNDLE_ID,
+    },
+    workflowVersion: {
+        env: ENV_VARS.WORKFLOW_VERSION,
+    },
+}
+
+// SF Symbols glyphs (private-use-area codepoints) used for battery levels.
+// They only render when Apple's SF Pro font is installed; on stock macOS the
+// codepoints resolve to the `LastResort` placeholder font and show as tofu,
+// so the workflow falls back to emoji. See the "Battery icons" setting.
+const SF_SYMBOLS = {
+    airpodsLeft: "\u{100C8E}",
+    airpodsRight: "\u{100C8D}",
+    airpodsCase: "\u{100E6C}",
+}
+
+// Map a battery percentage to the matching SF Symbols battery glyph. The
+// buckets mirror zeitlings' "Bluetooth Device Battery" workflow.
+function sfBatteryGlyph(level) {
+    if (level >= 90) { return "\u{1006E8}" }
+    if (level >= 60) { return "\u{100EB8}" }
+    if (level >= 35) { return "\u{100EB6}" }
+    if (level >= 10) { return "\u{1006E9}" }
+    return "\u{1006EA}"
+}
+
+let sfSymbolsAvailableCache = null
+
+// Whether the installed fonts can render the SF Symbols glyphs above.
+// Resolving a glyph from the system font yields the `LastResort` placeholder
+// when no font covers the private-use range (stock macOS); any other font
+// means SF Pro (or an equivalent) is installed.
+function sfSymbolsAvailable() {
+    if (sfSymbolsAvailableCache !== null) {
+        return sfSymbolsAvailableCache
+    }
+
+    sfSymbolsAvailableCache = false
+    try {
+        let base = $.CTFontCreateUIFontForLanguage($.kCTFontUIFontSystem, 12, $())
+        let probe = $(SF_SYMBOLS.airpodsLeft)
+        let font = $.CTFontCreateForString(
+            base, probe, $.CFRangeMake(0, probe.length))
+        let name = $.CFStringGetCStringPtr(
+            $.CTFontCopyPostScriptName(font), $.kCFStringEncodingUTF8)
+        if (name !== null) {
+            sfSymbolsAvailableCache = name !== "LastResort"
+        } else {
+            // Fall back to comparing against the LastResort placeholder font
+            // when the PostScript name cannot be read as a C string.
+            let lastResort = $.CTFontCreateWithName($("LastResort"), 12, $())
+            sfSymbolsAvailableCache = !$.CFEqual(font, lastResort)
+        }
+    } catch (e) {
+        log && log.debug(`could not probe for SF Symbols support: ${e}`)
+    }
+    return sfSymbolsAvailableCache
+}
+
+// Render raw battery levels (as returned by BtManager) into the subtitle
+// fragment. `mode` is the "Battery icons" setting: "sf" forces the SF Symbols
+// glyphs, "emoji" forces emoji and anything else uses the glyphs only when the
+// SF Pro font is available. Returns null when the device reports no levels.
+function formatBatteryLabel(battery, mode) {
+    if (!battery) {
+        return null
+    }
+
+    let sf = mode === "sf" || (mode !== "emoji" && sfSymbolsAvailable())
+    if (battery.left > 0 || battery.right > 0) {
+        let parts = []
+        if (battery.left > 0) {
+            parts.push(sf ? `${SF_SYMBOLS.airpodsLeft} ${battery.left}%` : `🎧 L ${battery.left}%`)
+        }
+        if (battery.right > 0) {
+            parts.push(sf ? `${SF_SYMBOLS.airpodsRight} ${battery.right}%` : `🎧 R ${battery.right}%`)
+        }
+        if (battery.case > 0) {
+            parts.push(sf ? `${SF_SYMBOLS.airpodsCase} ${battery.case}%` : `🔋 ${battery.case}%`)
+        }
+        return parts.join("  ")
+    }
+
+    if (battery.single > 0) {
+        return sf ? `${sfBatteryGlyph(battery.single)} ${battery.single}%` : `🔋 ${battery.single}%`
+    }
+
+    if (battery.combined > 0) {
+        return sf ? `${sfBatteryGlyph(battery.combined)} ${battery.combined}%` : `🔋 ${battery.combined}%`
+    }
+
+    return null
+}
+
+class Config {
+    static getEnv(name) {
+        let value = ObjC.unwrap(
+            $.NSProcessInfo.processInfo.environment.objectForKey(name))
+        return value === undefined || value === null ? null : value
+    }
+
+    constructor() {
+        Object.keys(CONFIG_SCHEMA).forEach(key => {
+            let spec = CONFIG_SCHEMA[key]
+            let value = Config.getEnv(spec.env)
+            if (value === null && spec.default !== undefined) {
+                value = spec.default
+            }
+            this[key] = spec.parse ? spec.parse(value) : value
+        })
+    }
+}
+
+// The legacy security prefpane id is documented for the Privacy & Security
+// anchors since Ventura (13) and is still resolved by System Settings on
+// macOS 26/27, while the modern extension id is only verified on the latter.
+// The permission UI itself only runs on macOS 14+, where this link is valid
+const BLUETOOTH_PERMISSION_SETTINGS_URL = "x-apple.systempreferences:com.apple.preference.security?Privacy_Bluetooth"
+const OPEN_PERMISSION_SETTINGS_ARG = "__OPEN_BLUETOOTH_PERMISSION_SETTINGS__"
+
+let log = null
+
+// Poll `checkFn` until it returns true or `timeoutSec` elapses, servicing the
+// main NSRunLoop while waiting.
+//
+// Since macOS 26 (Tahoe) the IOBluetooth framework is an asynchronous shim on
+// top of CoreBluetooth ("IOBluetoothCoreBluetoothCoordinator"): results arrive
+// as runloop callbacks and mutating calls (setPowerState, openConnection, ...)
+// return before the operation completes. A plain sleep (delay()) never observes
+// those callbacks and a short-lived process may exit before the operation lands
+// at all, so every wait in this workflow goes through this helper instead.
+function waitFor(checkFn, timeoutSec, sliceSec = 0.3) {
+    let deadline = $.NSDate.dateWithTimeIntervalSinceNow(timeoutSec)
+    while (deadline.timeIntervalSinceNow > 0) {
+        if (checkFn()) {
+            return true
+        }
+        $.NSRunLoop.currentRunLoop.runUntilDate(
+            $.NSDate.dateWithTimeIntervalSinceNow(sliceSec))
+    }
+    return checkFn()
+}
+
+class SimpleLogger { 
+    logLevel = null
+
+    constructor(logLevel = "debug") {
+        this.logLevel = logLevel
+    }
+
+    error(msg) {
+        // errors are always goes to stdout
+        console.log(`[ERROR]: ${msg}`)
+    }
+
+    info(msg) {
+        if (this.logLevel === "info" || this.logLevel === "debug") {
+            console.log(`[INFO]: ${msg}`)
+        }
+    }
+
+    debug(msg) {
+        if (this.logLevel === "debug") {
+            console.log(`[DEBUG]: ${msg}`)
+        }
+    }
+}
+
+class BtManager {
+    constructor(currentApp, doShellScript) {
+        if (!currentApp || !doShellScript) {
+            log.error("BtManager requires currentApp and doShellScript")
+            throw new Error("BtManager requires currentApp and doShellScript")
+        }
+        this.currentApp = currentApp
+        this.doShellScript = doShellScript
+        this.controller = null
+    }
+
+    getPairedDevicesObjs() {
+        let raw_devices = $.IOBluetoothDevice.pairedDevices
+        return Array.from(ObjC.unwrap(raw_devices), device => device)
+
+    }
+
+    _normalizeAddress(address) {
+        if (!address) {
+            return null
+        }
+        let normalized = String(address).replace(/[^0-9a-f]/gi, "").toLowerCase()
+        return normalized === "" ? null : normalized
+    }
+
+    // Bluetooth vendor/product IDs are shown as hexadecimal strings by
+    // `system_profiler` and as decimal numbers by IOBluetooth. Normalize both
+    // to the four-digit lowercase form used by assets/icons/map.json.
+    _normalizeHex4(value) {
+        if (value === null || value === undefined || value === "") {
+            return null
+        }
+
+        let number
+        if (typeof value === "number") {
+            number = value
+        } else {
+            let text = String(value).trim().toLowerCase()
+            if (text.startsWith("0x")) {
+                text = text.slice(2)
+            }
+            if (!/^[0-9a-f]+$/.test(text)) {
+                return null
+            }
+            number = parseInt(text, 16)
+        }
+
+        if (!Number.isFinite(number) || number === 0) {
+            return null
+        }
+        return number.toString(16).padStart(4, "0")
+    }
+
+    getPairedDevices({ short = false } = {}) {
+        let items = this.getPairedDevicesObjs()
+
+        let devices = Array.from(items, device => {
+            let name = ObjC.unwrap(device.nameOrAddress)
+            let connected = ObjC.unwrap(device.isConnected)
+            // Since macOS 26 LE devices are served by the CoreBluetooth shim
+            // and report no Class of Device; Classic devices always do
+            let isBle = ObjC.unwrap(device.classOfDevice) === 0
+
+            // Connect/disconnect only needs the identity and link state.
+            // Skip battery reads, IDs, class-of-device values and details.
+            if (short) {
+                return {
+                    "name": name,
+                    "connected": connected,
+                    "isBle": isBle,
+                    "instance": device
+                }
+            }
+
+            let address = ObjC.unwrap(device.addressString)
+            return {
+                "name": name,
+                "connected": connected,
+                "address": address,
+                "addressKey": this._normalizeAddress(address),
+                "battery": this.getBatteryLevels(device),
+                "isBle": isBle,
+                "minorType": null,
+                "vendorID": this._normalizeHex4(ObjC.unwrap(device.vendorID)),
+                "productID": this._normalizeHex4(ObjC.unwrap(device.productID)),
+                "deviceClassMajor": ObjC.unwrap(device.deviceClassMajor),
+                "deviceClassMinor": ObjC.unwrap(device.deviceClassMinor),
+                "instance": device
+            }
+        })
+
+        if (short || !devices.some(device => device.isBle)) {
+            return devices
+        }
+
+        // Full devices carry all known facts, including the system_profiler
+        // details that are only available for LE devices.
+        let detailsByAddress = this._getBluetoothDeviceDetails()
+        devices.forEach(device => {
+            let details = detailsByAddress[device.addressKey] || {}
+            device.minorType = details.minorType || null
+            device.vendorID = device.vendorID || details.vendorID || null
+            device.productID = device.productID || details.productID || null
+        })
+
+        return devices
+    }
+
+    getDeviceByName(deviceName) {
+        let devices = this.getPairedDevices({ short: true })
+        for (let device of devices) {
+            if (device.name === deviceName) {
+                return device
+            }
+        }
+        return null
+    }
+
+    // `system_profiler` is the only source that exposes a usable device type
+    // for disconnected LE devices. It is only called when the list contains at
+    // least one LE device.
+    _getBluetoothDeviceDetails() {
+        let output = null
+        try {
+            output = this.doShellScript(
+                "/usr/sbin/system_profiler SPBluetoothDataType -json")
+        } catch (e) {
+            log.debug(`could not read bluetooth device details: ${e}`)
+            return {}
+        }
+
+        try {
+            let report = JSON.parse(output)
+            let sections = report.SPBluetoothDataType || []
+            if (!Array.isArray(sections)) {
+                sections = [sections]
+            }
+
+            let result = {}
+            sections.forEach(section => {
+                ["device_connected", "device_not_connected"].forEach(sectionKey => {
+                    let entries = section[sectionKey] || []
+                    if (!Array.isArray(entries)) {
+                        entries = [entries]
+                    }
+                    entries.forEach(entry => {
+                        let names = Object.keys(entry)
+                        if (names.length === 0) {
+                            return
+                        }
+                        let details = entry[names[0]]
+                        if (!details || !details.device_address) {
+                            return
+                        }
+                        let addressKey = this._normalizeAddress(details.device_address)
+                        if (addressKey === null) {
+                            return
+                        }
+                        result[addressKey] = {
+                            minorType: details.device_minorType || null,
+                            vendorID: this._normalizeHex4(details.device_vendorID),
+                            productID: this._normalizeHex4(details.device_productID),
+                        }
+                    })
+                })
+            })
+            log.debug(`read details for '${Object.keys(result).length}' bluetooth devices`)
+            return result
+        } catch (e) {
+            log.debug(`could not parse bluetooth device details: ${e}`)
+            return {}
+        }
+    }
+
+    _getHostController() {
+        if (this.controller === null) {
+            this.controller = $.IOBluetoothHostController.alloc.init
+        }
+        return this.controller
+    }
+
+    // Since macOS Sonoma (14) every IOBluetooth call is gated by the Bluetooth
+    // privacy permission (TCC), attributed to the app that runs this workflow -
+    // Alfred. Alfred does not declare Bluetooth usage in its bundle, so macOS
+    // never shows a permission prompt and the APIs degrade silently instead:
+    // the paired device list just comes back empty, as if nothing were paired.
+    getBluetoothAuthorization() {
+        let version = ObjC.unwrap($.NSProcessInfo.processInfo.operatingSystemVersion)
+        if (parseInt(version.majorVersion) < 14) {
+            return null
+        }
+        // 0 = not determined, 1 = restricted, 2 = denied, 3 = allowed always
+        return Number($.CBManager.authorization)
+    }
+
+    hasBluetoothPermission() {
+        let authorization = this.getBluetoothAuthorization()
+        return authorization === null || authorization === 3
+    }
+
+    getPowerState() {
+        // powerState values: 0 = off, 1 = on. Since macOS 26 the CoreBluetooth
+        // shim may briefly report an uninitialized state (2) in a freshly
+        // started process, so give it a moment before deciding
+        let state = this._getHostController().powerState
+        if (state === 2) {
+            waitFor(() => this._getHostController().powerState !== 2, 2)
+            state = this._getHostController().powerState
+        }
+        return state
+    }
+
+    isBluetoothOn() {
+        return this.getPowerState() === 1
+    }
+
+    turnOffBluetooth() {
+        return this._setPowerState(0)
+    }
+
+    turnOnBluetooth() {
+        return this._setPowerState(1)
+    }
+
+    _setPowerState(value) {
+        let controller = this._getHostController()
+        controller.powerState = value
+        // The transition is asynchronous since macOS 26: keep the process
+        // alive (and the runloop serviced) until it actually lands
+        return waitFor(() => controller.powerState === value, 3)
+    }
+
+    connectDevice(device) {
+        // macOS 26 (Tahoe)+: the JXA bridge resolves `openConnection` to the
+        // one-argument `openConnection:` selector, so the old property-style
+        // invocation silently mis-dispatches and connects nothing
+        // (https://github.com/bosha/alfred-blueman-workflow/issues/3).
+        try {
+            device.instance.openConnection(device.instance)
+            return
+        } catch (e) {
+            log.debug(`openConnection(device) failed with "${e}", falling back to legacy invocation`)
+        }
+        // Pre-Tahoe JXA bridge: zero-argument methods are invoked by plain
+        // property access
+        device.instance.openConnection
+    }
+
+    // Last-known battery levels from the IOBluetooth device object; 0 means
+    // the device does not report that value. BLE devices currently report
+    // nothing at all (all getters are 0)
+    getBatteryLevels(device) {
+        try {
+            return {
+                left: device.batteryPercentLeft,
+                right: device.batteryPercentRight,
+                case: device.batteryPercentCase,
+                single: device.batteryPercentSingle,
+                combined: device.batteryPercentCombined,
+            }
+        } catch (e) {
+            log.debug(`could not read battery level: ${e}`)
+            return null
+        }
+    }
+
+    disconnectDevice(device) {
+        // Classic-only: must not be called for BLE devices, and even for
+        // Classic ones the result has to be verified because the call can be
+        // accepted without the link actually dropping
+        device.instance.closeConnection
+        return waitFor(() => !ObjC.unwrap(device.instance.isConnected), 3)
+    }
+
+    // Unpairing uses the private `remove` selector (the same approach as
+    // blueutil). Not every IOBluetoothDevice responds to it, so the caller
+    // must be able to tell "not supported" apart from "failed"
+    canUnpair(device) {
+        try {
+            return device.instance.respondsToSelector("remove") === true
+        } catch (e) {
+            log.debug(`could not check the "remove" selector: ${e}`)
+            return false
+        }
+    }
+
+    // Returns "ok" when the device is gone from the paired list, "unsupported"
+    // when the private selector is unavailable and "failed" when the call was
+    // accepted but the device is still paired. Like every other mutating call
+    // since macOS 26 this is asynchronous, so the result is verified.
+    unpairDevice(device) {
+        if (!this.canUnpair(device)) {
+            return "unsupported"
+        }
+
+        let addressKey = this._normalizeAddress(
+            ObjC.unwrap(device.instance.addressString))
+
+        try {
+            // Zero-argument selector invoked by plain property access, the same
+            // way closeConnection/openConnection are dispatched on this bridge
+            device.instance.remove
+        } catch (e) {
+            log.debug(`remove failed with "${e}"`)
+            return "failed"
+        }
+
+        let stillPaired = () => this.getPairedDevicesObjs().some(candidate => {
+            if (addressKey !== null) {
+                return this._normalizeAddress(
+                    ObjC.unwrap(candidate.addressString)) === addressKey
+            }
+            return ObjC.unwrap(candidate.nameOrAddress) === device.name
+        })
+
+        return waitFor(() => !stillPaired(), 3) ? "ok" : "failed"
+    }
+
+}
+
+const DEFAULT_DEVICE_TYPE = "bluetooth"
+const DEVICE_ICON_DIR = "./assets/icons"
+// Dedicated action icons for the unpair confirmation (generated by
+// tools/generate_icons.swift), so the rows don't borrow device-type icons.
+const UNPAIR_ICON_PATH = `${DEVICE_ICON_DIR}/unpair.png`
+const CANCEL_ICON_PATH = `${DEVICE_ICON_DIR}/cancel.png`
+// Specific-device overrides live next to the icons so adding support for a new
+// device only requires a mapping entry and a PNG, no code changes.
+const DEVICE_ICON_MAP_PATH = "assets/icons/map.json"
+
+// `system_profiler` reports human-readable minor types for Classic and LE
+// devices. Keep the patterns ordered: "Headphones" contains "phone", and
+// "Magic Trackpad" contains "trackpad".
+const DEVICE_TYPE_BY_MINOR_TYPE = [
+    [/keyboard/i, "keyboard"],
+    [/trackpad|touchpad/i, "trackpad"],
+    [/mouse|pointing/i, "mouse"],
+    [/headphone|headset|earphone|airpod|buds/i, "headphones"],
+    [/speaker|hifi/i, "speaker"],
+    [/gamepad|game controller|joystick|controller/i, "gamecontroller"],
+    [/watch/i, "watch"],
+    [/tablet|ipad/i, "tablet"],
+    [/iphone|phone|mobile/i, "phone"],
+    [/laptop|computer|desktop/i, "computer"],
+]
+
+const DEVICE_TYPE_BY_NAME = [
+    [/keyboard|keychron/i, "keyboard"],
+    [/trackpad|touchpad/i, "trackpad"],
+    [/mouse|mx master/i, "mouse"],
+    [/airpod|headphone|headset|earbud|buds/i, "headphones"],
+    [/speaker|homepod/i, "speaker"],
+    [/gamepad|game controller|controller/i, "gamecontroller"],
+    [/watch/i, "watch"],
+    [/ipad|tablet/i, "tablet"],
+    [/iphone|phone/i, "phone"],
+    [/laptop|macbook|computer/i, "computer"],
+]
+
+const CLASS_OF_DEVICE_MAJOR = {
+    COMPUTER: 1,
+    PHONE: 2,
+    AUDIO_VIDEO: 4,
+    PERIPHERAL: 5,
+    WEARABLE: 7,
+    TOY: 8,
+}
+
+const CLASS_OF_DEVICE_MINOR = {
+    AUDIO_VIDEO: {
+        HEADSET: 1,
+        HANDS_FREE: 2,
+        LOUDSPEAKER: 5,
+        HEADPHONES: 6,
+        PORTABLE_AUDIO: 7,
+        HIFI: 10,
+        GAMING: 18,
+    },
+    PERIPHERAL: {
+        KEYBOARD: 16,
+        MOUSE: 32,
+        JOYSTICK: 33,
+        GAMEPAD: 34,
+        TRACKPAD: 37,
+        COMBO_KEYBOARD_POINTING: 48,
+    },
+}
+
+// Output-only device enrichment: adds the type and state-specific icon path
+// needed by the list. BtManager deliberately knows nothing about workflow
+// files or icons.
+class DeviceEnricher {
+    constructor(workflowRoot = null) {
+        this.workflowRoot = workflowRoot
+        this.iconMap = null
+    }
+
+    enrich(devices) {
+        devices.forEach(device => {
+            device.type = this.getDeviceType(device)
+            device.icon = this.getIconPath(device.type, device.connected)
+        })
+        return devices
+    }
+
+    getDeviceType(device) {
+        return this.getMappedType(device.vendorID, device.productID)
+            || this.typeFromMinorType(device.minorType)
+            || this.typeFromClassOfDevice(
+                device.deviceClassMajor, device.deviceClassMinor)
+            || this.typeFromName(device.name)
+            || DEFAULT_DEVICE_TYPE
+    }
+
+    // Device-specific overrides are data-driven: assets/icons/map.json maps
+    // `vendor_id:product_id` (or `vendor_id:*`) to an icon name. Adding a new
+    // device icon therefore only requires a mapping entry and a PNG.
+    getMappedType(vendorID, productID) {
+        if (!vendorID) {
+            return null
+        }
+
+        let map = this.getIconMap()
+        if (productID && map[`${vendorID}:${productID}`]) {
+            return map[`${vendorID}:${productID}`]
+        }
+        return map[`${vendorID}:*`] || null
+    }
+
+    getIconMap() {
+        if (this.iconMap !== null) {
+            return this.iconMap
+        }
+
+        this.iconMap = {}
+        if (!this.workflowRoot) {
+            log.debug("workflow root is not available for the device icon map")
+            return this.iconMap
+        }
+
+        try {
+            let path = `${this.workflowRoot}/${DEVICE_ICON_MAP_PATH}`
+            let data = $.NSData.dataWithContentsOfFile(path)
+            if (data === null || data === undefined) {
+                log.debug(`device icon map not found: ${path}`)
+                return this.iconMap
+            }
+
+            let text = ObjC.unwrap(
+                $.NSString.alloc.initWithDataEncoding(data, $.NSUTF8StringEncoding))
+            if (!text) {
+                log.debug(`device icon map is not valid UTF-8: ${path}`)
+                return this.iconMap
+            }
+
+            let parsed = JSON.parse(text)
+            if (parsed === null || typeof parsed !== "object" || Array.isArray(parsed)) {
+                log.debug(`device icon map must be a JSON object: ${path}`)
+                return this.iconMap
+            }
+
+            let map = {}
+            Object.keys(parsed).forEach(key => {
+                let icon = parsed[key]
+                if (!/^[0-9a-f]{4}:(?:[0-9a-f]{4}|\*)$/.test(key)
+                    || typeof icon !== "string"
+                    || !/^[a-z0-9_]+$/.test(icon)) {
+                    log.debug(`ignoring invalid device icon map entry: ${key}`)
+                    return
+                }
+                map[key] = icon
+            })
+            this.iconMap = map
+        } catch (e) {
+            log.debug(`could not load the device icon map: ${e}`)
+        }
+        return this.iconMap
+    }
+
+    getIconPath(type, connected = true) {
+        let icon = this.normalizeIconName(type)
+
+        // Disconnected devices use the muted `_off` variant. Custom icons may
+        // only provide the base PNG, so fall back to it when the variant is
+        // absent.
+        if (!connected) {
+            let offIcon = `${icon}_off`
+            if (this.deviceIconExists(offIcon)) {
+                return this.deviceIconPath(offIcon)
+            }
+            log.debug(`device icon variant not found: ${this.deviceIconPath(offIcon)}`)
+        }
+
+        if (this.deviceIconExists(icon)) {
+            return this.deviceIconPath(icon)
+        }
+
+        log.error(`device icon not found: ${this.deviceIconPath(icon)}`)
+        let fallback = connected
+            ? DEFAULT_DEVICE_TYPE
+            : `${DEFAULT_DEVICE_TYPE}_off`
+        if (this.deviceIconExists(fallback)) {
+            return this.deviceIconPath(fallback)
+        }
+        return this.deviceIconPath(DEFAULT_DEVICE_TYPE)
+    }
+
+    normalizeIconName(type) {
+        let icon = type || DEFAULT_DEVICE_TYPE
+        return /^[a-z0-9_]+$/.test(icon) ? icon : DEFAULT_DEVICE_TYPE
+    }
+
+    deviceIconExists(icon) {
+        if (!this.workflowRoot) {
+            return true
+        }
+        let absolute = `${this.workflowRoot}/assets/icons/${icon}.png`
+        return $.NSFileManager.defaultManager.fileExistsAtPath(absolute)
+    }
+
+    deviceIconPath(icon) {
+        return `${DEVICE_ICON_DIR}/${icon}.png`
+    }
+
+    typeFromMinorType(minorType) {
+        if (!minorType) {
+            return null
+        }
+        let value = String(minorType)
+        for (let [pattern, type] of DEVICE_TYPE_BY_MINOR_TYPE) {
+            if (pattern.test(value)) {
+                return type
+            }
+        }
+        return null
+    }
+
+    typeFromClassOfDevice(major, minor) {
+        major = Number(major)
+        minor = Number(minor)
+        if (!Number.isFinite(major) || !Number.isFinite(minor)) {
+            return null
+        }
+
+        const MAJOR = CLASS_OF_DEVICE_MAJOR
+        const AUDIO_VIDEO = CLASS_OF_DEVICE_MINOR.AUDIO_VIDEO
+        const PERIPHERAL = CLASS_OF_DEVICE_MINOR.PERIPHERAL
+
+        switch (major) {
+            case MAJOR.COMPUTER:
+                return "computer"
+            case MAJOR.PHONE:
+                return "phone"
+            case MAJOR.AUDIO_VIDEO:
+                if ([
+                    AUDIO_VIDEO.HEADSET,
+                    AUDIO_VIDEO.HANDS_FREE,
+                    AUDIO_VIDEO.HEADPHONES,
+                    AUDIO_VIDEO.PORTABLE_AUDIO,
+                ].includes(minor)) {
+                    return "headphones"
+                }
+                if ([AUDIO_VIDEO.LOUDSPEAKER, AUDIO_VIDEO.HIFI].includes(minor)) {
+                    return "speaker"
+                }
+                if (minor === AUDIO_VIDEO.GAMING) {
+                    return "gamecontroller"
+                }
+                return null
+            case MAJOR.PERIPHERAL:
+                if (minor === PERIPHERAL.KEYBOARD
+                    || minor === PERIPHERAL.COMBO_KEYBOARD_POINTING) {
+                    return "keyboard"
+                }
+                if (minor === PERIPHERAL.MOUSE) {
+                    return "mouse"
+                }
+                if (minor === PERIPHERAL.JOYSTICK || minor === PERIPHERAL.GAMEPAD) {
+                    return "gamecontroller"
+                }
+                if (minor === PERIPHERAL.TRACKPAD) {
+                    return "trackpad"
+                }
+                return null
+            case MAJOR.WEARABLE:
+                return "watch"
+            case MAJOR.TOY:
+                return "gamecontroller"
+            default:
+                return null
+        }
+    }
+
+    typeFromName(name) {
+        if (!name) {
+            return null
+        }
+        let value = String(name)
+        for (let [pattern, type] of DEVICE_TYPE_BY_NAME) {
+            if (pattern.test(value)) {
+                return type
+            }
+        }
+        return null
+    }
+}
+
+// Device list ordering. Sorters are stateless: sort() must not mutate the
+// input and must preserve the original order within groups, so switching
+// modes never reshuffles devices inside a group
+// No-op sorter: returns the devices in their natural (macOS) order. Shared by
+// the "Default" and "Alfred's order" modes; they differ only in whether the
+// list keeps the item uid, which decides if Alfred may reorder by knowledge.
+class UnsortedSorter {
+    sort(devices) {
+        return devices
+    }
+}
+
+class ConnectedFirstSorter {
+    sort(devices) {
+        return devices.filter(device => device.connected)
+            .concat(devices.filter(device => !device.connected))
+    }
+}
+
+class AlphabeticalSorter {
+    sort(devices) {
+        return devices.slice().sort((a, b) =>
+            a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+    }
+}
+
+class FavoritesFirstSorter {
+    sort(devices) {
+        return devices.filter(device => device.favorite)
+            .concat(devices.filter(device => !device.favorite))
+    }
+}
+
+class FavoritesThenConnectedSorter {
+    sort(devices) {
+        return devices.filter(device => device.favorite)
+            .concat(devices.filter(device => !device.favorite && device.connected))
+            .concat(devices.filter(device => !device.favorite && !device.connected))
+    }
+}
+
+const SORTERS = {
+    "default": new UnsortedSorter(),
+    "connected_first": new ConnectedFirstSorter(),
+    "alphabetical": new AlphabeticalSorter(),
+    "favorites_first": new FavoritesFirstSorter(),
+    "favorites_then_connected": new FavoritesThenConnectedSorter(),
+    // Applies no sorting: the list keeps the item uid so Alfred orders the
+    // results by its learned knowledge (most-used first)
+    "alfred": new UnsortedSorter(),
+}
+// "Alfred's order" delegates ordering to Alfred; every other mode sorts here
+const ALFRED_SORT_ORDER = "alfred"
+const DEFAULT_SORT_ORDER = ALFRED_SORT_ORDER
+// Alfred re-runs the Script Filter while the list is open, so connection
+// states stay current; seconds between refreshes
+const LIST_RERUN_SECONDS = 2
+
+// Shared base for the workflow's "one device name per line" configuration
+// lists (favorites and ignored devices). Each lives in a textarea workflow
+// configuration item, so users can drop a name by deleting its line in
+// Alfred's Configure Workflow pane. Names are matched case-insensitively
+// after trimming; the stored value keeps the device's canonical name.
+// Subclasses only declare where the list is stored and how it is labelled.
+class NamedList {
+    constructor(value, { envVar, configKey, label }) {
+        this.entries = NamedList.parse(value)
+        this.envVar = envVar
+        this.configKey = configKey
+        this.label = label
+    }
+
+    static parse(value) {
+        if (value === null || value === undefined) {
+            return []
+        }
+        return String(value)
+            .split("\n")
+            .map(line => line.trim())
+            .filter(line => line !== "")
+    }
+
+    // Device names come from IOBluetooth in composed (NFC) form, while text
+    // pasted into the configuration textareas is often decomposed (NFD, e.g.
+    // Cyrillic "й" as "и" + combining breve) and may contain non-breaking or
+    // other Unicode spaces. Normalize both sides so visually identical names
+    // still match.
+    static normalize(name) {
+        return String(name)
+            .normalize("NFC")
+            .replace(/\s+/g, " ")
+            .trim()
+            .toLowerCase()
+    }
+
+    get count() {
+        return this.entries.length
+    }
+
+    has(name) {
+        let key = NamedList.normalize(name)
+        return this.entries.some(entry => NamedList.normalize(entry) === key)
+    }
+
+    add(name) {
+        if (!this.has(name)) {
+            this.entries = this.entries.concat(String(name).trim())
+        }
+        return this
+    }
+
+    remove(name) {
+        let key = NamedList.normalize(name)
+        this.entries = this.entries.filter(entry => NamedList.normalize(entry) !== key)
+        return this
+    }
+
+    toggle(name) {
+        return this.has(name) ? this.remove(name) : this.add(name)
+    }
+
+    serialize() {
+        return this.entries.join("\n")
+    }
+}
+
+// Starred devices (the "favorites" workflow configuration variable)
+class Favorites extends NamedList {
+    constructor(value) {
+        super(value, {
+            envVar: ENV_VARS.FAVORITES,
+            configKey: "favorites",
+            label: "Favorites",
+        })
+    }
+}
+
+// Devices hidden from the list (the "ignore" workflow configuration variable)
+class Ignored extends NamedList {
+    constructor(value) {
+        super(value, {
+            envVar: ENV_VARS.IGNORE,
+            configKey: "ignore",
+            label: "Ignored devices",
+        })
+    }
+}
+
+class WorkflowError extends Error {
+	constructor(title, subtitle, ...params) {
+		super(...params)
+
+		this.name = "WorkflowError"
+		this.title = title
+		this.subtitle = subtitle
+	}
+}
+
+class WorkflowBase {
+	constructor(currentApp=null, config=null) {
+		if (currentApp === null || currentApp === undefined) {
+			this.currentApp = Application.currentApplication()
+			this.currentApp.includeStandardAdditions = true
+		}
+
+		this.config = config || new Config()
+
+		let args = $.NSProcessInfo.processInfo.arguments
+        if (args.count < 5) {
+            log.error("Invalid number of arguments specified")
+            return null
+        }
+        this.args = ObjC.deepUnwrap(args).slice(4)
+	}
+
+    getMacOSVersionString() {
+        let version = ObjC.unwrap($.NSProcessInfo.processInfo.operatingSystemVersion)
+        return `${version.majorVersion}.${version.minorVersion}.${version.patchVersion}`
+    }
+
+    // Resolve the workflow directory from the script path. Device icons are
+    // loaded by JXA itself, so the list command passes this to the enricher.
+    getWorkflowRoot() {
+        let args = ObjC.deepUnwrap($.NSProcessInfo.processInfo.arguments)
+        let script = args[3]
+        if (!script) {
+            return null
+        }
+
+        let scriptPath = script
+        if (!scriptPath.startsWith("/")) {
+            let cwd = ObjC.unwrap($.NSFileManager.defaultManager.currentDirectoryPath)
+            scriptPath = `${cwd}/${scriptPath}`
+        }
+
+        let sourceIndex = scriptPath.lastIndexOf("/src/")
+        if (sourceIndex !== -1) {
+            return scriptPath.substring(0, sourceIndex)
+        }
+
+        let slashIndex = scriptPath.lastIndexOf("/")
+        return slashIndex !== -1 ? scriptPath.substring(0, slashIndex) : null
+    }
+
+    openPermissionsSettings(path) {
+        $.NSWorkspace.sharedWorkspace.openURL($.NSURL.URLWithString(path))
+    }
+
+    doShellScript(command) {
+        this.currentApp.includeStandardAdditions = true
+        return this.currentApp.doShellScript(command)
+    }
+
+    shellOutput(command) {
+        try {
+            let output = this.doShellScript(command)
+            return output.trim() || "unknown"
+        } catch (e) {
+            log.debug(`could not run '${command}': ${e}`)
+            return "unknown"
+        }
+    }
+
+	setEnvVar(name, value) {
+        let bundleid = this.config.workflowBundleId
+        if (!bundleid) {
+            log.error(`"${ENV_VARS.WORKFLOW_BUNDLE_ID}" is not set`)
+            throw new Error(
+                `could not read from "${ENV_VARS.WORKFLOW_BUNDLE_ID}" env variable. Check that bundleid for workflow is set`)
+        }
+
+        Application("com.runningwithcrayons.Alfred").setConfiguration(name, {
+            toValue: value,
+            inWorkflow: bundleid,
+            exportable: true,
+        })
+
+        return true
+	}
+
+	returnErr(title, subtitle) {
+        title = title || "Error executing workflow"
+        subtitle = subtitle || "Check workflow debug window for details"
+
+        return JSON.stringify({
+            "items": [
+                {
+                    "uid": "jl-error",
+                    "title": title,
+                    "subtitle": subtitle,
+                    "valid": false,
+                }
+            ]
+        })
+	}
+
+	returnPermissionError() {
+        return JSON.stringify({
+            "items": [
+                {
+                    "uid": "jl-bt-permission",
+                    "title": "Bluetooth permission is missing",
+                    "subtitle": "Press Enter to open Privacy & Security settings, then add Alfred under Bluetooth",
+                    "valid": true,
+                    "arg": OPEN_PERMISSION_SETTINGS_ARG,
+                }
+            ]
+        })
+	}
+
+    // For commands triggered directly (turn on/off/toggle), where there is no
+    // Alfred result list to render: notify the user and open the settings pane
+    ensureBluetoothPermission() {
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        if (mgr.hasBluetoothPermission()) {
+            return true
+        }
+
+        log.error("bluetooth permission is missing for the app hosting this workflow (usually Alfred). See workflow README")
+        this.notify(
+            "Bluetooth permission is missing. Add the app running this workflow (usually Alfred) in Privacy & Security -> Bluetooth. Opening settings...",
+            {withTitle: "Blueman", subtitle: "Permission required"},
+            true
+        )
+        this.openPermissionsSettings(BLUETOOTH_PERMISSION_SETTINGS_URL)
+        return false
+    }
+
+    // Notification policy from the workflow settings: "on" (default),
+    // "errors" (only error notifications) or "off"
+    notify(message, options, isError = false) {
+        let mode = this.config.notifications
+        if (mode === "off") {
+            return
+        }
+        if (mode === "errors" && !isError) {
+            return
+        }
+        this.currentApp.displayNotification(message, options)
+    }
+
+	returnResult(data, rerun, skipKnowledge = true) {
+        let response = {
+            "items": data
+        }
+        // When true, Alfred presents the items in the returned order instead of
+        // re-ordering them by its learned knowledge. The list turns this off
+        // for "Alfred's order" mode so Alfred can apply its knowledge there.
+        if (skipKnowledge) {
+            response["skipknowledge"] = true
+        }
+        if (rerun !== undefined) {
+            response["rerun"] = rerun
+        }
+        return JSON.stringify(response)
+	}
+}
+
+class ListBtDevicesCommand extends WorkflowBase {
+    run() {
+        log.debug("running list bluetooth devices command")
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        if (!mgr.hasBluetoothPermission()) {
+            log.error("bluetooth permission is missing for the app hosting this workflow (usually Alfred). See workflow README")
+            return this.returnPermissionError()
+        }
+
+        if (!mgr.isBluetoothOn()) {
+            log.debug("bluetooth is off, offering to turn it on")
+            return this.returnResult([
+                {
+                    "uid": "bt-power-off",
+                    "title": "Bluetooth is off",
+                    "subtitle": "Press Enter to turn Bluetooth on",
+                    "icon": {
+                        "path": "./assets/off.png"
+                    },
+                    "arg": "turn-on",
+                }
+            ], LIST_RERUN_SECONDS)
+        }
+
+        let items = mgr.getPairedDevices()
+        log.debug(`got '${items.length}' paired bluetooth devices`)
+        if (items.length === 0) {
+            log.debug("no paired devices found")
+            return this.returnErr(
+                "No paired devices found", 
+                "You might want to pair device before using this workflow"
+            )
+        }
+
+        // Workflow setting: device addresses in the subtitle (off by default)
+        let showAddresses = this.config.showMacAddresses
+
+        // Workflow settings: starred and ignored devices, one name per line each
+        let favorites = new Favorites(this.config.favorites)
+        let ignored = new Ignored(this.config.ignore)
+
+        // A non-empty query also reveals ignored devices, so they can be found
+        // and un-ignored; the plain list hides them.
+        let query = this.args.at(1)
+        let hasQuery = query !== null && query !== undefined && String(query).trim() !== ""
+
+        if (hasQuery) {
+            log.debug(`filtering devices by query '${query}'`)
+            let normalizedQuery = query.toLowerCase()
+            items = items.filter(device => {
+                if (device.name.toLowerCase().includes(normalizedQuery)) {
+                    return true
+                }
+                // Hidden addresses should not leak through search
+                return showAddresses && device.address.toLowerCase().includes(normalizedQuery)
+            })
+
+            if (items.length === 0) {
+                log.debug(`No devices matching query '${query}' found`)
+                return this.returnErr(
+                    "No matching devices", 
+                    `No devices matching query "${query}`
+                )
+            }
+        } else {
+            items = items.filter(device => !ignored.has(device.name))
+            if (items.length === 0) {
+                log.debug("all paired devices are ignored")
+                return this.returnResult([{
+                    "title": "All devices are ignored",
+                    "subtitle": "Type a device name to find and unignore it, or edit the Ignored devices setting",
+                    "valid": false,
+                }], LIST_RERUN_SECONDS)
+            }
+        }
+
+        items.forEach(device => {
+            device.favorite = favorites.has(device.name)
+            device.ignored = ignored.has(device.name)
+        })
+
+        // Workflow setting; unset or unknown falls back to the default order.
+        // "Alfred's order" applies no sorting and keeps the item uid so Alfred
+        // can order by its learned knowledge; every other mode strips the uid
+        // (below) so the order computed here is shown exactly.
+        let requestedOrder = this.config.sortOrder
+        let sortOrder = SORTERS[requestedOrder] ? requestedOrder : DEFAULT_SORT_ORDER
+        let useAlfredOrder = sortOrder === ALFRED_SORT_ORDER
+        log.debug(`sorting devices with order '${sortOrder}'`)
+        items = SORTERS[sortOrder].sort(items)
+
+        // Enrich only the devices that will actually be displayed.
+        items = new DeviceEnricher(this.getWorkflowRoot()).enrich(items)
+
+        let results = []
+        items.forEach(device => {
+            // Type icons replace the old on/off icons, so the connection state
+            // is always part of the subtitle, followed by battery/address. The
+            // Bluetooth LE marker rides along with the state: LE devices are
+            // the ones macOS will not let the workflow disconnect.
+            let state = device.connected ? "Connected" : "Disconnected"
+            if (this.config.bleMarker && device.isBle) {
+                state = `${state} (BLE)`
+            }
+            let subtitleParts = [state]
+            let battery = formatBatteryLabel(device.battery, this.config.batteryIcons)
+            if (battery) {
+                subtitleParts.push(battery)
+            }
+            if (showAddresses) {
+                subtitleParts.push(device.address)
+            }
+
+            // The ⌃ modifier routes to the unpair confirmation. Only offer it
+            // for devices that expose the private `remove` selector; for the
+            // rest mark the modifier invalid so ⌃⏎ does nothing instead of
+            // running into a dead end. Checking the selector is a cheap
+            // in-process ObjC runtime call, no I/O.
+            let mods = {}
+            mods.ctrl = mgr.canUnpair(device)
+                ? { "arg": device.name, "subtitle": `Unpair ${device.name}` }
+                : { "valid": false, "subtitle": "Unpair is not supported for this device" }
+            // The ⌥ modifier toggles the favorite for this device
+            mods.alt = {
+                "arg": device.name,
+                "subtitle": device.favorite ? "Remove from favorites" : "Add to favorites"
+            }
+            // The ⌘ modifier toggles the ignore state for this device
+            mods.cmd = {
+                "arg": device.name,
+                "subtitle": device.ignored ? "Unignore device" : "Ignore device"
+            }
+
+            // A ⭐ marks a favorite, a 🚫 marks an ignored device; both can show
+            // when an ignored device is revealed through a search query.
+            let prefix = `${device.favorite ? "⭐ " : ""}${device.ignored ? "🚫 " : ""}`
+
+            let item = {
+                "title": `${prefix}${device.name}`,
+                "subtitle": subtitleParts.join(" · "),
+                "icon": {
+                    "path": device.icon
+                },
+                "arg": device.name,
+                "mods": mods,
+            }
+            // "Alfred's order" keeps the uid so Alfred can apply its knowledge;
+            // every other mode omits it so Alfred shows the computed order
+            // instead of re-sorting by what it already learned.
+            if (useAlfredOrder) {
+                item["uid"] = device.name
+            }
+            results.push(item)
+        })
+        return this.returnResult(results, LIST_RERUN_SECONDS, !useAlfredOrder)
+    }
+}
+
+class ToggleConnectionCommand extends WorkflowBase {
+    run() {
+        log.debug("running toggle command")
+        if (!this.ensureBluetoothPermission()) {
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+
+        let deviceName = this.args.at(1)
+        if (deviceName === undefined) {
+            log.error("missing required parameter \"deviceName\"")
+            this.notify(
+                "Could not toggle the selected device: no device name was provided",
+                {withTitle: "Blueman", subtitle: "Invalid arguments"},
+                true
+            )
+            return
+        }
+
+        let device = mgr.getDeviceByName(deviceName)
+        if (device === null) {
+            log.error(`Could not find device with name "${deviceName}"`)
+            this.notify(
+                `Could not find "${deviceName}". It may have been unpaired or renamed.`,
+                {withTitle: "Blueman", subtitle: "Device not found"},
+                true
+            )
+            return
+        }
+
+        log.debug(`Got device: ${device.name} (connected=${device.connected}, ble=${device.isBle})`)
+
+        if (device.connected) {
+            if (device.isBle) {
+                log.error(`Cannot disconnect "${deviceName}": it is a Bluetooth LE device, and macOS does not let apps disconnect LE devices`)
+                this.notify(
+                    `Cannot disconnect ${deviceName}: macOS does not let apps disconnect Bluetooth LE devices. Use Control Center -> Bluetooth`, 
+                    {withTitle: "Blueman", subtitle: "Not supported for this device"},
+                    true
+                )
+                return
+            }
+
+            log.debug("Device is connected, attemping to disconnect it")
+            if (mgr.disconnectDevice(device)) {
+                log.debug(`Successfully disconnected from "${deviceName}"`)
+                this.notify(`Successfully disconnected from ${deviceName}`, 
+                    {withTitle: "Blueman", subtitle: "Disconnected"}
+                )
+                return
+            }
+
+            log.error(`Could not disconnect device "${deviceName}": closeConnection returned without dropping the connection`)
+            this.notify(
+                `Could not disconnect ${deviceName}. See workflow README for details`, 
+                {withTitle: "Blueman", subtitle: "Error disconnecting"},
+                true
+            )
+        } else {
+            log.debug("Device is disconnected, attemping to connect to it")
+            try {
+                mgr.connectDevice(device)
+            } catch (e) {
+                log.error(`Could not initiate connection to "${deviceName}": ${e}`)
+                this.notify(`Could not connect to device ${deviceName}`, 
+                    {withTitle: "Blueman", subtitle: "Error connecting"},
+                    true
+                )
+                return
+            }
+
+            if (waitFor(() => ObjC.unwrap(device.instance.isConnected), 5)) {
+                log.debug(`Successfully connected to "${deviceName}"`)
+                this.notify(`Successfully connected to ${deviceName}`, 
+                    {withTitle: "Blueman", subtitle: "Connected"}
+                )
+            } else {
+                log.debug(`Could not connect to device "${deviceName}"`)
+                this.notify(`Could not connect to device ${deviceName}`, 
+                    {withTitle: "Blueman", subtitle: "Error connecting"},
+                    true
+                )
+            }
+        }
+
+        return
+    }
+}
+
+// First step of the unpair flow: the list item's ⌃ modifier routes here
+// instead of the toggle action, so the user gets an explicit confirmation
+// before the destructive call. Confirming sends the device name on to
+// UnpairDeviceCommand.
+class UnpairConfirmCommand extends WorkflowBase {
+    run() {
+        log.debug("running unpair confirmation command")
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        if (!mgr.hasBluetoothPermission()) {
+            log.error("bluetooth permission is missing for the app hosting this workflow (usually Alfred). See workflow README")
+            return this.returnPermissionError()
+        }
+
+        let deviceName = this.args.at(1)
+        if (deviceName === undefined) {
+            log.error("missing required parameter \"deviceName\"")
+            return this.returnErr(
+                "Could not unpair the selected device",
+                "No device name was provided"
+            )
+        }
+
+        let device = mgr.getDeviceByName(deviceName)
+        if (device === null) {
+            log.error(`Could not find device with name "${deviceName}"`)
+            return this.returnErr(
+                `Could not find "${deviceName}"`,
+                "It may have been unpaired or renamed"
+            )
+        }
+
+        return this.returnResult([
+            {
+                "uid": "unpair-confirm",
+                "title": `Unpair ${device.name}`,
+                "subtitle": "Removes the pairing — you will need to pair it again",
+                "icon": {
+                    "path": UNPAIR_ICON_PATH
+                },
+                "arg": device.name,
+            },
+            {
+                "uid": "unpair-cancel",
+                "title": "Cancel",
+                "subtitle": "Keep the device paired",
+                "icon": {
+                    "path": CANCEL_ICON_PATH
+                },
+                "valid": false,
+            }
+        ])
+    }
+}
+
+// Second step of the unpair flow: performs the actual removal. The device is
+// identified by name, matching how the toggle command and the list item arg
+// work.
+class UnpairDeviceCommand extends WorkflowBase {
+    run() {
+        log.debug("running unpair command")
+        if (!this.ensureBluetoothPermission()) {
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+
+        if (!mgr.isBluetoothOn()) {
+            log.error("cannot unpair while bluetooth is off")
+            this.notify(
+                "Turn Bluetooth on to unpair a device",
+                {withTitle: "Blueman", subtitle: "Bluetooth is off"},
+                true
+            )
+            return
+        }
+
+        let deviceName = this.args.at(1)
+        if (deviceName === undefined) {
+            log.error("missing required parameter \"deviceName\"")
+            this.notify(
+                "Could not unpair the selected device: no device name was provided",
+                {withTitle: "Blueman", subtitle: "Invalid arguments"},
+                true
+            )
+            return
+        }
+
+        let device = mgr.getDeviceByName(deviceName)
+        if (device === null) {
+            log.error(`Could not find device with name "${deviceName}"`)
+            this.notify(
+                `Could not find "${deviceName}". It may have been unpaired or renamed.`,
+                {withTitle: "Blueman", subtitle: "Device not found"},
+                true
+            )
+            return
+        }
+
+        if (!mgr.canUnpair(device)) {
+            log.error(`Device "${deviceName}" does not support unpairing`)
+            this.notify(
+                `Cannot unpair ${deviceName}: this device does not support removal on this macOS version`,
+                {withTitle: "Blueman", subtitle: "Not supported for this device"},
+                true
+            )
+            return
+        }
+
+        let result = mgr.unpairDevice(device)
+        if (result === "ok") {
+            log.debug(`Successfully unpaired "${deviceName}"`)
+            this.notify(`Unpaired ${deviceName}`,
+                {withTitle: "Blueman", subtitle: "Unpaired"}
+            )
+            return
+        }
+
+        log.error(`Could not unpair device "${deviceName}" (${result})`)
+        this.notify(
+            `Could not unpair ${deviceName}. See workflow README for details`,
+            {withTitle: "Blueman", subtitle: "Error unpairing"},
+            true
+        )
+    }
+}
+
+// Toggles the selected device in a "one device name per line" workflow
+// configuration variable (favorites or ignored devices). No Bluetooth
+// permission gate: these lists are pure configuration, and a name that no
+// longer resolves is still toggled as given. Subclasses build the list.
+class ToggleNamedListCommand extends WorkflowBase {
+    list() {
+        throw new Error("ToggleNamedListCommand subclasses must implement list()")
+    }
+
+    run() {
+        let list = this.list()
+        log.debug(`running toggle ${list.configKey} command`)
+
+        let deviceName = this.args.at(1)
+        if (deviceName === undefined) {
+            log.error("missing required parameter \"deviceName\"")
+            this.notify(
+                `Could not update ${list.label}: no device name was provided`,
+                {withTitle: "Blueman", subtitle: "Invalid arguments"},
+                true
+            )
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        let device = mgr.getDeviceByName(deviceName)
+        let name = device === null ? deviceName : device.name
+
+        let had = list.has(name)
+        list.toggle(name)
+
+        this.setEnvVar(list.envVar, list.serialize())
+
+        log.debug(`${had ? "removed" : "added"} "${name}" ${had ? "from" : "to"} ${list.configKey}`)
+        this.notify(
+            `${had ? "Removed" : "Added"} ${name} ${had ? "from" : "to"} ${list.label}`,
+            {withTitle: "Blueman", subtitle: list.label}
+        )
+    }
+}
+
+class ToggleFavoriteCommand extends ToggleNamedListCommand {
+    list() { return new Favorites(this.config.favorites) }
+}
+
+class ToggleIgnoreCommand extends ToggleNamedListCommand {
+    list() { return new Ignored(this.config.ignore) }
+}
+
+class TurnBtOffCommand extends WorkflowBase {
+    run() {
+        log.debug("running command to turn bluetooth OFF")
+        if (!this.ensureBluetoothPermission()) {
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+
+        if (!mgr.isBluetoothOn()) {
+            log.debug("bluetooth already turned off, exiting")
+            this.notify("Bluetooth already turned off",
+                {withTitle: "Blueman", subtitle: "Error"}
+            )
+            return
+        }
+
+        if (!mgr.turnOffBluetooth()) {
+            log.error("timeout waiting for the bluetooth power state transition to OFF")
+            this.notify("Could not turn bluetooth off",
+                {withTitle: "Blueman", subtitle: "Error"},
+                true
+            )
+            return
+        }
+
+        let msg = "Command to turn bluetooth OFF was successfully sent"
+        log.debug(msg)
+        this.notify(msg, {withTitle: "Blueman", subtitle: "Success"})
+    }
+}
+
+class TurnBtOnCommand extends WorkflowBase {
+    run() {
+        log.debug("running command to turn bluetooth ON")
+        if (!this.ensureBluetoothPermission()) {
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+
+        if (mgr.isBluetoothOn()) {
+            log.debug("bluetooth already turned on, exiting")
+            this.notify("Bluetooth already turned on",
+                {withTitle: "Blueman", subtitle: "Error"}
+            )
+            return
+        }
+
+        if (!mgr.turnOnBluetooth()) {
+            log.error("timeout waiting for the bluetooth power state transition to ON")
+            this.notify("Could not turn bluetooth on",
+                {withTitle: "Blueman", subtitle: "Error"},
+                true
+            )
+            return
+        }
+
+        let msg = "Command to turn bluetooth ON was successfully sent"
+        log.debug(msg)
+        this.notify(msg, {withTitle: "Blueman", subtitle: "Success"})
+    }
+}
+
+const AUTHORIZATION_LABELS = {
+    0: "not determined",
+    1: "restricted",
+    2: "denied",
+    3: "granted",
+}
+
+const POWER_STATE_LABELS = {
+    0: "off",
+    1: "on",
+    2: "unknown",
+}
+
+class TogglePowerCommand extends WorkflowBase {
+    run() {
+        log.debug("running command to toggle bluetooth power")
+        if (!this.ensureBluetoothPermission()) {
+            return
+        }
+
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        let turnOn = !mgr.isBluetoothOn()
+        log.debug(`turning bluetooth ${turnOn ? "ON" : "OFF"}`)
+
+        if (!(turnOn ? mgr.turnOnBluetooth() : mgr.turnOffBluetooth())) {
+            let target = turnOn ? "on" : "off"
+            log.error(`timeout waiting for the bluetooth power state transition to ${target.toUpperCase()}`)
+            this.notify(`Could not turn bluetooth ${target}`,
+                {withTitle: "Blueman", subtitle: "Error"},
+                true
+            )
+            return
+        }
+
+        let msg = `Command to turn bluetooth ${turnOn ? "ON" : "OFF"} was successfully sent`
+        log.debug(msg)
+        this.notify(msg, {withTitle: "Blueman", subtitle: "Success"})
+    }
+}
+
+class DiagnosticsCommand extends WorkflowBase {
+    run() {
+        log.debug("running diagnostics command")
+        let info = this.collectInfo()
+        let report = this.formatReport(info, false)
+        let redactedReport = this.formatReport(info, true)
+
+        return this.returnResult([
+            {
+                "uid": "bt-diagnostics",
+                "title": "Copy Bluetooth diagnostics",
+                "subtitle": info.summary,
+                "arg": report,
+                "text": {
+                    "copy": report,
+                    "largetype": report,
+                },
+                "mods": {
+                    "alt": {
+                        "arg": redactedReport,
+                        "subtitle": "Copy redacted diagnostics (device names hidden)",
+                    }
+                }
+            }
+        ])
+    }
+
+    collectInfo() {
+        let mgr = new BtManager(this.currentApp, this.doShellScript.bind(this))
+        let authorization = mgr.getBluetoothAuthorization()
+        let permission = authorization === null || authorization === 3
+
+        // Without the permission IOBluetooth reports no devices and no
+        // meaningful power state, so do not present that as "off" / "0 devices"
+        let powerState = permission ? mgr.getPowerState() : null
+        let devices = permission ? mgr.getPairedDevices() : []
+
+        let connectedCount = devices.filter(device => device.connected).length
+        let bleCount = devices.filter(device => device.isBle).length
+        let macOSVersion = this.getMacOSVersionString()
+
+        return {
+            macOSVersion: macOSVersion,
+            arch: this.shellOutput("/usr/bin/uname -m"),
+            model: this.shellOutput("/usr/sbin/sysctl -n hw.model"),
+            authorization: authorization,
+            permission: permission,
+            powerState: powerState,
+            devices: devices,
+            connectedCount: connectedCount,
+            classicCount: devices.length - bleCount,
+            bleCount: bleCount,
+            summary: `macOS ${macOSVersion} · `
+                + (permission ? "permission granted" : "permission missing")
+                + " · "
+                + (powerState === null
+                    ? "Bluetooth unknown"
+                    : `Bluetooth ${POWER_STATE_LABELS[powerState] || "unknown"}`)
+                + " · "
+                + (permission ? `${devices.length} devices` : "devices unavailable"),
+        }
+    }
+
+    permissionLabel(info) {
+        if (info.authorization === null) {
+            return "not required (macOS < 14)"
+        }
+        let label = AUTHORIZATION_LABELS[info.authorization] || "unknown"
+        return `${label} (authorization=${info.authorization})`
+    }
+
+    powerLabel(info) {
+        if (info.powerState === null) {
+            return "unknown (permission missing)"
+        }
+        return POWER_STATE_LABELS[info.powerState] || `unknown (${info.powerState})`
+    }
+
+    deviceCountLabel(info) {
+        if (!info.permission) {
+            return "unavailable (no Bluetooth permission)"
+        }
+        return `${info.devices.length} (connected: ${info.connectedCount}, `
+            + `Classic: ${info.classicCount}, LE: ${info.bleCount})`
+    }
+
+    formatReport(info, redact) {
+        let lines = [
+            redact ? "Blueman diagnostics (redacted)" : "Blueman diagnostics",
+            `Workflow: ${this.config.workflowVersion || "unknown"}`,
+            `Alfred: ${this.config.alfredVersion || "unknown"}`,
+            `macOS: ${info.macOSVersion} (${info.arch}, ${info.model})`,
+            `Bluetooth permission: ${this.permissionLabel(info)}`,
+            `Bluetooth power: ${this.powerLabel(info)}`,
+            `Paired devices: ${this.deviceCountLabel(info)}`,
+            `Keywords: list=${this.config.listKeyword}, on=${this.config.onKeyword}, `
+                + `off=${this.config.offKeyword}, toggle=${this.config.toggleKeyword}`,
+            `Settings: sort_order=${this.config.sortOrder || DEFAULT_SORT_ORDER}, `
+                + `show_mac_addresses=${this.config.showMacAddresses ? "on" : "off"}, `
+                + `ble_marker=${this.config.bleMarker ? "on" : "off"}, `
+                + `battery_icons=${this.config.batteryIcons || "auto"}, `
+                + `notifications=${this.config.notifications}, `
+                + `ignored=${new Ignored(this.config.ignore).count}`,
+        ]
+
+        if (info.devices.length > 0) {
+            lines.push("Devices:")
+            info.devices.forEach((device, index) => {
+                let name = redact ? `Device ${index + 1}` : device.name
+                let address = !redact && this.config.showMacAddresses
+                    ? ` | ${device.address}`
+                    : ""
+                lines.push(
+                    `- ${name} | ${device.isBle ? "LE" : "Classic"} | `
+                    + `${device.connected ? "connected" : "disconnected"} | `
+                    + `battery: ${formatBatteryLabel(device.battery, this.config.batteryIcons) || "n/a"}${address}`)
+            })
+        }
+
+        if (!info.permission) {
+            lines.push("", "Grant Bluetooth permission to Alfred (Privacy & Security -> Bluetooth).")
+        } else if (info.powerState === 0) {
+            lines.push("", "Bluetooth is off; device states may be the last known values.")
+        }
+
+        return lines.join("\n")
+    }
+}
+
+const possibleCommands = {
+    "list": ListBtDevicesCommand,
+    "diagnostics": DiagnosticsCommand,
+    "favorite": ToggleFavoriteCommand,
+    "ignore": ToggleIgnoreCommand,
+    "toggle": ToggleConnectionCommand,
+    "toggle-power": TogglePowerCommand,
+    "turn-on": TurnBtOnCommand,
+    "turn-off": TurnBtOffCommand,
+    "unpair": UnpairDeviceCommand,
+    "unpair-confirm": UnpairConfirmCommand
+}
+
+function run() {
+    // Logging is a simple global initialized here (rather than threaded
+    // through every dependency) and used across the whole script. Config is
+    // parsed once here and passed to the command.
+    let config = new Config()
+    log = new SimpleLogger(config.logLevel)
+
+    let rawArgs = $.NSProcessInfo.processInfo.arguments
+    if (rawArgs.count < 5) {
+        log.error(`invalid usage. This script should be called within alfred workflow only`)
+        return
+    }
+    let args = ObjC.deepUnwrap(rawArgs).slice(4)
+
+    if (args.length < 1) {
+        return log.error("Invalid number of arguments passed")
+    }
+
+    let command = args.at(0)
+    let possibleCommandNames = Object.keys(possibleCommands).join(", ")
+    if (!(command in possibleCommands)) {
+        log.error(
+            `invalid command "${command}". Possible commands are: [${possibleCommandNames}]`)
+        return log.error("Invalid command specified")
+    }
+
+    let runner = new possibleCommands[command](null, config)
+    return runner.run()
+}

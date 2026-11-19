@@ -4,9 +4,5 @@
 <dict>
 	<key>autoExpandSnippets</key>
 	<true/>
-	<key>enabled</key>
-	<true/>
-	<key>enabledImages</key>
-	<true/>
 </dict>
 </plist>
