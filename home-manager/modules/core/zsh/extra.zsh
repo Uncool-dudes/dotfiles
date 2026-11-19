@@ -162,6 +162,35 @@ bindkey -M vicmd '\es' sesh-sessions
 bindkey -M viins '\es' sesh-sessions
 
 # ── Postgres / AlloyDB ───────────────────────────────────────────
+# Starts the ssh tunnel (127.0.0.1:5432 -> AlloyDB) and waits for it to bind.
+# Not `autossh -f`: -f forces AUTOSSH_GATETIME=0, so a first-connect failure
+# retries forever in silence, and each extra call adds another looping daemon.
+# BatchMode keeps ssh from blocking on a tty prompt it can't show in background.
+function alloydb() {
+  local log="${XDG_CACHE_HOME:-$HOME/.cache}/alloydb-tunnel.log"
+  if lsof -nP -iTCP:5432 -sTCP:LISTEN >/dev/null; then
+    echo 'alloydb tunnel already up on :5432'
+    return 0
+  fi
+  if pgrep -f 'autossh.* alloydb$' >/dev/null; then
+    echo "alloydb: autossh running but :5432 not bound; see $log, stop with: pkill -f 'autossh.* alloydb\$'" >&2
+    return 1
+  fi
+  mkdir -p "${log:h}"
+  AUTOSSH_GATETIME=30 autossh -M 0 -N -o BatchMode=yes alloydb >|"$log" 2>&1 &!
+  local i
+  for i in {1..20}; do
+    if lsof -nP -iTCP:5432 -sTCP:LISTEN >/dev/null; then
+      echo 'alloydb tunnel up on :5432'
+      return 0
+    fi
+    sleep 0.5
+  done
+  echo "alloydb: tunnel not up after 10s" >&2
+  tail -n 20 "$log" >&2
+  return 1
+}
+
 function pgc() {
   local svc="$1" db="$2"
   local user
