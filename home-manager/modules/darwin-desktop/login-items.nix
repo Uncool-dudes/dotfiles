@@ -4,10 +4,12 @@ let
   # the repo. Karabiner, Little Snitch and Hazel start their own services and
   # need no entry here.
   apps = [
-    "Alfred 5"
+    "Alfred 6"
     "BetterTouchTool"
     "CleanShot X"
     "Mullvad VPN"
+    "OrbStack"
+    "Paste"
     "PopClip"
     "TG Pro"
   ];
